@@ -57,7 +57,7 @@ export function StaffAttendanceRow({
       )}`}
     >
       <div className="flex items-center gap-3 w-full sm:w-auto">
-        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono w-6 text-center">
+        <span className="text-xs text-muted-foreground font-mono w-6 text-center">
           {index + 1}
         </span>
         <Avatar className="size-8 flex-shrink-0">
@@ -66,10 +66,10 @@ export function StaffAttendanceRow({
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate capitalize">
+          <p className="text-sm font-medium text-foreground truncate capitalize">
             {staff.staffName}
           </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">{staff.role}</p>
+          <p className="text-xs text-muted-foreground">{staff.role}</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export function StaffAttendanceRow({
                       ? 'bg-emerald-500 dark:bg-emerald-500 text-white'
                       : 'bg-red-500 dark:bg-red-500 text-white'
                   } border-transparent shadow-sm ring-1 ring-white/10`
-                : 'border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950'
+                : ' text-muted-foreground hover: dark:hover: bg-card'
             }`}
           >
             {getStatusIcon(status)}

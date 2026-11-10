@@ -1,5 +1,6 @@
 import { env } from '../env';
 import { triggerGlobalRefresh } from '../query-client';
+import { getValidTokenOrRefresh } from '../api';
 const API_BASE = env.NEXT_PUBLIC_API_URL;
 const GRAPHQL_ENDPOINT = typeof window !== 'undefined' ? '/graphql-proxy' : `${API_BASE}/graphql`;
 
@@ -11,11 +12,6 @@ function getStoredToken(): string | null {
 function getStoredTenantId(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('schoolsaas_tenant_id');
-}
-
-function getStoredRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('school_refresh_token');
 }
 
 // ── GraphQL-level refresh interceptor ──
@@ -33,27 +29,7 @@ function markGraphqlRefreshFailed() {
 }
 
 async function refreshForGraphQL(): Promise<string> {
-  const refreshToken = getStoredRefreshToken();
-  if (!refreshToken) throw new Error('No refresh token');
-
-  const refreshRes = await fetch(
-    typeof window !== 'undefined' ? '/api/proxy/auth/refresh' : `${API_BASE}/auth/refresh`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    }
-  );
-
-  if (!refreshRes.ok) throw new Error('Refresh failed');
-  const data = await refreshRes.json();
-  localStorage.setItem('school_token', data.token);
-  localStorage.setItem('school_refresh_token', data.refreshToken);
-  if (typeof document !== 'undefined') {
-    const d = new Date(); d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
-    document.cookie = `school_token=${data.token};expires=${d.toUTCString()};path=/;SameSite=Lax`;
-  }
-  return data.token;
+  return getValidTokenOrRefresh();
 }
 
 let batchQueue: Array<{
@@ -122,11 +98,7 @@ async function flushBatch() {
       } catch (refreshErr) {
         graphqlRefreshing = false;
         markGraphqlRefreshFailed();
-        // Force logout
-        if (typeof window !== 'undefined') {
-          localStorage.clear(); sessionStorage.clear();
-          window.location.href = '/';
-        }
+        // The shared refresh already dropped the account that failed; no local wipe here.
         currentQueue.forEach(op => op.reject(refreshErr));
         return;
       }

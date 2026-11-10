@@ -114,7 +114,7 @@ import { formatVehicleType } from "./TransportDialogs";
                           >
                             <Eye className="size-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="size-8 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50" onClick={() => onEditRoute(r)} title="Edit Route">
+                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => onEditRoute(r)} title="Edit Route">
                             <Pencil className="size-4" />
                           </Button>
                         </TableCell>
@@ -152,7 +152,7 @@ import { formatVehicleType } from "./TransportDialogs";
                </div>
                <div className="flex items-center gap-2">
                  <Badge className={v.status === 'active' ? 'bg-emerald-500' : 'bg-red-500'}>{v.status}</Badge>
-                 <Button variant="ghost" size="icon" className="size-8 text-zinc-500 hover:text-zinc-950 dark:hover:text-zinc-50" onClick={() => onEditVehicle(v)} title="Edit Vehicle">
+                 <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground" onClick={() => onEditVehicle(v)} title="Edit Vehicle">
                    <Pencil className="size-3.5" />
                  </Button>
                </div>

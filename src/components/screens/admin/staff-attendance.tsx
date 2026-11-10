@@ -58,7 +58,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2 max-w-md bg-zinc-100 dark:bg-zinc-900 p-1 rounded-2xl h-12">
+          <TabsList className="grid w-full grid-cols-2 max-w-md bg-muted p-1 rounded-2xl h-12">
             <TabsTrigger
               value="teacher"
               className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
@@ -71,7 +71,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
               className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-sm font-bold flex items-center gap-2"
             >
               <Briefcase className="size-4" />
-              Admin Staff
+              Staff
             </TabsTrigger>
           </TabsList>
         </Tabs>

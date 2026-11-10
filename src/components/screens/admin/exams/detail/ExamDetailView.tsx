@@ -55,7 +55,7 @@ export function ExamDetailView({
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <button
           onClick={onBack}
-          className="flex items-center gap-1 hover:text-foreground transition-colors font-medium p-1 -ml-1 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800"
+          className="flex items-center gap-1 hover:text-foreground transition-colors font-medium p-1 -ml-1 rounded-md hover:bg-accent"
           title="Back to all exams"
         >
           <ArrowLeft className="size-4" />
@@ -91,7 +91,7 @@ export function ExamDetailView({
       </div>
 
       {/* Main Header Row (Image 1) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-border/70 rounded-2xl p-5 shadow-sm">
         <div className="flex items-center gap-3.5">
           <div className="size-11 sm:size-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
             <FileText className="size-6" />
@@ -117,7 +117,7 @@ export function ExamDetailView({
                   Upcoming
                 </span>
               ) : (
-                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700">
+                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-muted text-foreground border ">
                   Draft
                 </span>
               )}
@@ -143,7 +143,7 @@ export function ExamDetailView({
                 cleanName: exam.name,
               } as any)
             }
-            className="rounded-xl border-border/80 text-foreground font-semibold gap-2 shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800"
+            className="rounded-xl border-border/80 text-foreground font-semibold gap-2 shadow-2xs hover:bg-accent"
           >
             <Pencil className="size-4 text-muted-foreground" />
             Edit Exam
@@ -176,7 +176,7 @@ export function ExamDetailView({
           }`}
         >
           Subjects
-          <span className="size-5 rounded-full bg-slate-100 dark:bg-zinc-800 text-xs font-bold flex items-center justify-center text-muted-foreground">
+          <span className="size-5 rounded-full bg-muted text-xs font-bold flex items-center justify-center text-muted-foreground">
             {exam.distinctSubjects?.length || exam.subjectCount || exam.subjects?.length || 0}
           </span>
           {activeTab === 'subjects' && (

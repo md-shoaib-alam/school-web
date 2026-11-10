@@ -27,7 +27,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { RoleRecord } from "./types";
 
 const ACTION_COLORS: Record<string, string> = {
-  view: "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-800 dark:text-zinc-350 dark:border-zinc-700/50",
+  view: "bg-muted text-foreground ",
   create: "bg-emerald-50 text-emerald-700 border-emerald-100/70 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
   edit: "bg-amber-50 text-amber-700 border-amber-100/70 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
   delete: "bg-rose-50 text-rose-700 border-rose-100/70 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",
@@ -51,9 +51,9 @@ const formatDate = (dateStr: string) => {
 
 export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: RoleTableProps) {
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
+    <div className="rounded-2xl border  bg-card overflow-hidden">
       <Table>
-        <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead className="w-[250px]">Role Name</TableHead>
             <TableHead>Staff Assigned</TableHead>
@@ -73,7 +73,7 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
              const permCount = Object.values(perms).flat().length;
 
              return (
-              <TableRow key={role.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
+              <TableRow key={role.id} className="hover:bg-muted transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div 
@@ -83,28 +83,28 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
                       {role.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-zinc-900 dark:text-zinc-100">{role.name}</p>
+                      <p className="font-semibold text-foreground">{role.name}</p>
                       {role.description && (
-                        <p className="text-[10px] text-zinc-500 line-clamp-1">{role.description}</p>
+                        <p className="text-[10px] text-muted-foreground line-clamp-1">{role.description}</p>
                       )}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   {role.userCount === 0 ? (
-                    <span className="text-xs text-zinc-400 italic pl-3 select-none">0 staff</span>
+                    <span className="text-xs text-muted-foreground italic pl-3 select-none">0 staff</span>
                   ) : (
                     <Popover>
                       <PopoverTrigger asChild>
                         <Badge 
                           variant="outline" 
-                          className="cursor-pointer bg-zinc-50/50 hover:bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-300 font-semibold border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit"
+                          className="cursor-pointer bg-muted hover:bg-muted text-foreground font-semibold  px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit"
                         >
-                          <Users className="size-3 text-zinc-500" />
+                          <Users className="size-3 text-muted-foreground" />
                           <span>{role.userCount} staff</span>
                         </Badge>
                       </PopoverTrigger>
-                      <PopoverContent className="w-64 p-3 bg-popover/95 backdrop-blur-md shadow-xl border border-zinc-200 dark:border-zinc-800 rounded-xl" align="start">
+                      <PopoverContent className="w-64 p-3 bg-popover/95 backdrop-blur-md shadow-xl border  rounded-xl" align="start">
                         <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-2">
                           <Users className="size-3.5" />
                           <span>Assigned Staff ({role.userCount})</span>
@@ -113,7 +113,7 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
                           {allStaff
                             .filter((u) => u.customRole?.id === role.id)
                             .map((staff) => (
-                              <div key={staff.id} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
+                              <div key={staff.id} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-accent/40">
                                 <div className="size-6 rounded-full bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold shrink-0">
                                   {staff.name.charAt(0).toUpperCase()}
                                 </div>
@@ -130,19 +130,19 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
                 </TableCell>
                 <TableCell>
                   {permCount === 0 ? (
-                    <span className="text-xs text-zinc-400 italic">No permissions</span>
+                    <span className="text-xs text-muted-foreground italic">No permissions</span>
                   ) : (
                     <Popover>
                       <PopoverTrigger asChild>
                         <Badge 
                           variant="outline" 
-                          className="cursor-pointer bg-zinc-50/50 hover:bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-300 font-semibold border-zinc-200 dark:border-zinc-800 px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit"
+                          className="cursor-pointer bg-muted hover:bg-muted text-foreground font-semibold  px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-colors select-none w-fit"
                         >
-                          <Shield className="size-3 text-zinc-500" />
+                          <Shield className="size-3 text-muted-foreground" />
                           <span>{permCount} permissions</span>
                         </Badge>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80 p-4 space-y-3 bg-popover/95 backdrop-blur-md shadow-xl border border-zinc-200 dark:border-zinc-800 rounded-xl" align="start">
+                      <PopoverContent className="w-80 p-4 space-y-3 bg-popover/95 backdrop-blur-md shadow-xl border  rounded-xl" align="start">
                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">
                           <Shield className="size-3.5" />
                           <span>Granted Permissions</span>
@@ -154,12 +154,12 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
                             return (
                               <div 
                                 key={mod} 
-                                className="flex items-start justify-between gap-3 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/50 dark:border-zinc-700/30"
+                                className="flex items-start justify-between gap-3 p-2 rounded-lg bg-muted border "
                               >
-                                <span className="font-bold text-xs text-zinc-700 dark:text-zinc-300 mt-0.5">{moduleLabel}</span>
+                                <span className="font-bold text-xs text-foreground mt-0.5">{moduleLabel}</span>
                                 <div className="flex flex-wrap gap-1 justify-end max-w-[70%]">
                                   {actions.map((action: string) => {
-                                    const colorClass = ACTION_COLORS[action] || "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-850 dark:text-zinc-300";
+                                    const colorClass = ACTION_COLORS[action] || "bg-muted text-foreground  dark:";
                                     return (
                                       <span
                                         key={action}
@@ -178,7 +178,7 @@ export function RoleTable({ roles, allStaff = [], onEdit, onAssign, onDelete }: 
                     </Popover>
                   )}
                 </TableCell>
-                <TableCell className="text-xs text-zinc-500" suppressHydrationWarning>
+                <TableCell className="text-xs text-muted-foreground" suppressHydrationWarning>
                   {formatDate(role.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">

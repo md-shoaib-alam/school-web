@@ -31,6 +31,7 @@ interface EditProfileDialogProps {
   setEditAvatar: (v: string) => void;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: (e: React.FormEvent) => void;
+  saving?: boolean;
 }
 
 export function EditProfileDialog({
@@ -47,20 +48,21 @@ export function EditProfileDialog({
   setEditAvatar,
   onFileChange,
   onSave,
+  saving,
 }: EditProfileDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl bg-white dark:bg-[#09090b]">
+      <DialogContent className="sm:max-w-[480px] p-6 rounded-3xl border  shadow-2xl bg-white dark:bg-[#09090b]">
         <DialogHeader className="space-y-1.5">
           <DialogTitle className="text-xl font-black tracking-tight">Edit Profile Details</DialogTitle>
-          <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400">
+          <DialogDescription className="text-xs text-muted-foreground">
             Modify your personal verified details. Changes reflect instantly.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSave} className="space-y-5 mt-2">
-          <div className="flex flex-col items-center gap-3 p-4 bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl">
-            <Label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Profile Photo</Label>
+          <div className="flex flex-col items-center gap-3 p-4 bg-muted border  rounded-2xl">
+            <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Profile Photo</Label>
             
             <div className="relative group">
               <Avatar className="size-20 border-2 border-emerald-500/20 shadow-lg">
@@ -81,7 +83,7 @@ export function EditProfileDialog({
             </div>
 
             <div className="space-y-1.5 w-full text-center">
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold">Or choose a premium profile preset</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Or choose a premium profile preset</span>
               <div className="flex items-center justify-center gap-2 mt-1">
                 {PRESET_AVATARS.map((avatarUrl, idx) => (
                   <button
@@ -103,53 +105,54 @@ export function EditProfileDialog({
 
           <div className="space-y-3.5">
             <div className="space-y-1">
-              <Label htmlFor="edit-name" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Full Name</Label>
+              <Label htmlFor="edit-name" className="text-xs font-bold text-muted-foreground">Full Name</Label>
               <Input
                 id="edit-name"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Enter your full name"
-                className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 h-10 font-medium"
+                className="rounded-xl  h-10 font-medium"
               />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="edit-phone" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Mobile Number</Label>
+              <Label htmlFor="edit-phone" className="text-xs font-bold text-muted-foreground">Mobile Number</Label>
               <Input
                 id="edit-phone"
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 h-10 font-medium"
+                className="rounded-xl  h-10 font-medium"
               />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="edit-address" className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Residential Address</Label>
+              <Label htmlFor="edit-address" className="text-xs font-bold text-muted-foreground">Residential Address</Label>
               <Textarea
                 id="edit-address"
                 value={editAddress}
                 onChange={(e) => setEditAddress(e.target.value)}
                 placeholder="Enter residential address"
-                className="rounded-xl border-zinc-200/80 dark:border-zinc-800/80 min-h-[70px] resize-none font-medium text-xs leading-normal"
+                className="rounded-xl  min-h-[70px] resize-none font-medium text-xs leading-normal"
               />
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 sm:gap-0 pt-2 border-t border-zinc-100 dark:border-zinc-900">
+          <DialogFooter className="flex gap-2 sm:gap-0 pt-2 border-t ">
             <Button
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="rounded-xl font-bold text-xs hover:bg-zinc-100 dark:hover:bg-zinc-900"
+              className="rounded-xl font-bold text-xs hover:bg-accent"
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              disabled={saving}
               className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-xl text-xs"
             >
-              Save Changes
+              {saving ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

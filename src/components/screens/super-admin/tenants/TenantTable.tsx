@@ -63,12 +63,12 @@ const TenantCard = memo(function TenantCard({
   onIntegrations: (tenant: Tenant) => void;
 }) {
   return (
-    <div className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
+    <div className="bg-card text-foreground rounded-2xl p-4 border-2 border-foreground shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
       <div>
         {/* Top Header: Emblem, Title, /slug, More Menu */}
         <div className="flex items-start justify-between gap-2.5">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="size-11 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+            <div className="size-11 rounded-2xl bg-muted dark:bg-neutral-900 border-2 border-foreground flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
               {tenant.logo ? (
                 <Image
                   src={tenant.logo}
@@ -78,7 +78,7 @@ const TenantCard = memo(function TenantCard({
                   className="object-contain w-full h-full"
                 />
               ) : (
-                <span className="text-neutral-900 dark:text-white font-bold text-sm">
+                <span className="text-foreground font-bold text-sm">
                   {tenant.name?.slice(0, 2).toUpperCase() || "SC"}
                 </span>
               )}
@@ -110,7 +110,7 @@ const TenantCard = memo(function TenantCard({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-accent transition-colors cursor-pointer"
                 title="School Actions"
               >
                 <Settings2 className="size-4" />
@@ -171,7 +171,7 @@ const TenantCard = memo(function TenantCard({
 
         {/* Stats Row: Students, Teachers, Parents */}
         <div className="grid grid-cols-3 gap-2 mt-3.5">
-          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+          <div className="bg-card border-2 border-foreground rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <Users className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
@@ -183,7 +183,7 @@ const TenantCard = memo(function TenantCard({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+          <div className="bg-card border-2 border-foreground rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <GraduationCap className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
@@ -195,7 +195,7 @@ const TenantCard = memo(function TenantCard({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+          <div className="bg-card border-2 border-foreground rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
             <UserCheck className="size-4 text-muted-foreground shrink-0" />
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
@@ -214,14 +214,14 @@ const TenantCard = memo(function TenantCard({
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
-            className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors shadow-2xs"
+            className="w-full h-9 rounded-xl border-2 border-foreground bg-card hover:bg-accent text-foreground font-semibold text-xs transition-colors shadow-2xs"
             onClick={onView}
           >
             View Details
           </Button>
           <Button
             variant="outline"
-            className="w-full h-9 rounded-xl border-2 border-neutral-900 dark:border-white bg-white dark:bg-zinc-950 hover:bg-neutral-100 dark:hover:bg-zinc-900 text-foreground font-semibold text-xs transition-colors shadow-2xs"
+            className="w-full h-9 rounded-xl border-2 border-foreground bg-card hover:bg-accent text-foreground font-semibold text-xs transition-colors shadow-2xs"
             onClick={onManageData}
           >
             Live Data
@@ -229,7 +229,7 @@ const TenantCard = memo(function TenantCard({
         </div>
 
         <Button
-          className="w-full h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-2xs flex items-center justify-center gap-2 transition-colors border-2 border-neutral-900 dark:border-white"
+          className="w-full h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-2xs flex items-center justify-center gap-2 transition-colors border-2 border-foreground"
           onClick={() => onAddAdmin(tenant)}
         >
           <Shield className="size-4 stroke-[2.2]" />
@@ -331,16 +331,16 @@ export function TenantTable({
     );
   }
 
-  const commonClasses = "text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5";
-  const cellClasses = "py-3 text-xs font-medium text-slate-700 dark:text-slate-300";
+  const commonClasses = "text-xs font-semibold text-muted-foreground py-3.5";
+  const cellClasses = "py-3 text-xs font-medium text-foreground";
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-card shadow-2xs overflow-hidden">
+    <div className="rounded-2xl border  bg-card shadow-2xs overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 hover:bg-transparent border-b border-slate-200/80 dark:border-slate-800">
-              <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5 pl-5">#</TableHead>
+            <TableRow className="bg-muted hover:bg-transparent border-b ">
+              <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5 pl-5">#</TableHead>
               <TableHead className={commonClasses}>School Name</TableHead>
               <TableHead className={commonClasses}>Plan</TableHead>
               <TableHead className={commonClasses}>Students</TableHead>
@@ -353,10 +353,10 @@ export function TenantTable({
             {tenants.map((tenant, idx) => (
               <TableRow
                 key={tenant.id}
-                className="border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
+                className="border-b  hover:bg-muted dark:hover:bg-slate-800/40 transition-colors"
               >
                 {/* # */}
-                <TableCell className="w-12 py-3 pl-5 text-xs font-semibold text-slate-400">
+                <TableCell className="w-12 py-3 pl-5 text-xs font-semibold text-muted-foreground">
                   {(currentPage - 1) * 25 + idx + 1}
                 </TableCell>
 
@@ -398,7 +398,7 @@ export function TenantTable({
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer text-xs"
+                        className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer text-xs"
                       >
                         •••
                       </button>
@@ -445,7 +445,7 @@ export function TenantTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-5 py-3 border-t ">
           <DataTablePagination
             page={currentPage}
             totalPages={totalPages}

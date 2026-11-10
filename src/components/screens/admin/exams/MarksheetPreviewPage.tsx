@@ -229,7 +229,7 @@ export function MarksheetPreviewPage({
     if (percentage >= 70) return { grade: 'B', remarks: 'Very good effort.', color: 'text-blue-500 dark:text-blue-400' };
     if (percentage >= 60) return { grade: 'C', remarks: 'Good job, keep it up.', color: 'text-amber-500 dark:text-amber-400' };
     if (percentage >= 50) return { grade: 'D', remarks: 'Satisfactory performance.', color: 'text-orange-500 dark:text-orange-400' };
-    if (percentage >= 40) return { grade: 'E', remarks: 'Pass, needs improvement.', color: 'text-zinc-600 dark:text-zinc-400' };
+    if (percentage >= 40) return { grade: 'E', remarks: 'Pass, needs improvement.', color: 'text-foreground' };
     return { grade: 'F', remarks: 'Fail, needs significant improvement.', color: 'text-red-500 dark:text-red-400' };
   };
 
@@ -400,7 +400,7 @@ export function MarksheetPreviewPage({
 
   if (isStandalone) {
     return (
-      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+      <div className="min-h-screen flex flex-col bg-zinc-950 text-muted-foreground">
         <MarksheetStandaloneToolbar
           classNameStr={classNameStr}
           classSection={classSection}

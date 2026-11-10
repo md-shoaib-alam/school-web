@@ -75,14 +75,14 @@ export function ClassSelect({
           role="combobox"
           disabled={disabled}
           aria-expanded={open}
-          className={`justify-between font-normal text-sm bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 ${className}`}
+          className={`justify-between font-normal text-sm bg-card text-foreground border  hover:bg-accent ${className}`}
         >
           <span className="truncate">{selectedClass || placeholder}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-[200px] p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl" 
+        className="w-[200px] p-0 border  bg-card shadow-xl" 
         align="start"
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
@@ -100,9 +100,9 @@ export function ClassSelect({
                 onValueChange("all");
                 setOpen(false);
               }}
-              className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+              className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-lg transition-colors cursor-pointer group"
             >
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">All Classes</span>
+              <span className="font-semibold text-foreground">All Classes</span>
               {value === "all" && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
             </button>
           )}
@@ -125,9 +125,9 @@ export function ClassSelect({
                     onValueChange(c.id);
                     setOpen(false);
                   }}
-                  className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group"
+                  className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-lg transition-colors cursor-pointer group"
                 >
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                  <span className="font-semibold text-foreground truncate">
                     {c.name}-{c.section}
                   </span>
                   {value === c.id && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}

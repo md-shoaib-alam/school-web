@@ -22,13 +22,13 @@ export function AssessmentsSummaryCards({
           <div className="inline-flex p-2 sm:p-3 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-2 sm:mb-3">
             <TrendingUp className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {assessmentAvg}%
           </p>
-          <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="hidden sm:block text-xs text-muted-foreground mt-1 font-medium">
             Assessment Average
           </p>
-          <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="sm:hidden text-[10px] text-muted-foreground mt-1 font-medium">
             Average
           </p>
           <Progress value={assessmentAvg} className="mt-2 sm:mt-3 h-1 sm:h-2" />
@@ -40,16 +40,16 @@ export function AssessmentsSummaryCards({
           <div className="inline-flex p-2 sm:p-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white mb-2 sm:mb-3">
             <Award className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {totalGraded}
           </p>
-          <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="hidden sm:block text-xs text-muted-foreground mt-1 font-medium">
             Total Graded
           </p>
-          <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="sm:hidden text-[10px] text-muted-foreground mt-1 font-medium">
             Graded
           </p>
-          <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+          <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-muted-foreground font-medium">
             <span>{uniqueSubjectsCount} subjects</span>
           </div>
         </CardContent>
@@ -60,13 +60,13 @@ export function AssessmentsSummaryCards({
           <div className="inline-flex p-2 sm:p-3 rounded-xl bg-teal-600 dark:bg-teal-500 text-white mb-2 sm:mb-3">
             <CheckCircle2 className="size-4 sm:size-5" />
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg sm:text-3xl font-bold text-foreground">
             {passedCount}
           </p>
-          <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="hidden sm:block text-xs text-muted-foreground mt-1 font-medium">
             Subjects Passed
           </p>
-          <p className="sm:hidden text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+          <p className="sm:hidden text-[10px] text-muted-foreground mt-1 font-medium">
             Passed
           </p>
           <div className="flex items-center justify-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 font-semibold">

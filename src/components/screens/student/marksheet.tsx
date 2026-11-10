@@ -208,7 +208,7 @@ export function StudentMarksheet() {
     if (pct >= 70) return { grade: 'B',  remarks: 'Very good effort.', color: 'text-blue-500' };
     if (pct >= 60) return { grade: 'C',  remarks: 'Good job, keep it up.', color: 'text-amber-500' };
     if (pct >= 50) return { grade: 'D',  remarks: 'Satisfactory performance.', color: 'text-orange-500' };
-    if (pct >= 40) return { grade: 'E',  remarks: 'Pass, needs improvement.', color: 'text-zinc-600' };
+    if (pct >= 40) return { grade: 'E',  remarks: 'Pass, needs improvement.', color: 'text-foreground' };
     return { grade: 'F', remarks: 'Fail, needs significant improvement.', color: 'text-red-500' };
   };
 
@@ -342,7 +342,7 @@ export function StudentMarksheet() {
   );
 
   if (!studentInfo) return (
-    <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
+    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
       <AlertCircle className="size-10 mb-3 opacity-50" />
       <p className="text-sm font-medium">Could not load student information.</p>
     </div>
@@ -353,11 +353,11 @@ export function StudentMarksheet() {
       {/* ── Toolbar ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
             <FileText className="size-5 text-violet-500" />
             My Marksheet
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {studentInfo.name} · {studentInfo.className} · Roll {studentInfo.rollNumber}
           </p>
         </div>
@@ -400,13 +400,13 @@ export function StudentMarksheet() {
 
       {/* ── Sheet Preview ── */}
       {!compiledSheet || compiledSheet.subjects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl">
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground border-2 border-dashed rounded-xl">
           <GraduationCap className="size-12 mb-3 opacity-40" />
           <p className="text-sm font-medium">No published exam results found for {selectedYear}</p>
           <p className="text-xs mt-1 opacity-60">Results will appear here once your teacher publishes them.</p>
         </div>
       ) : (
-        <div ref={marksheetContainerRef} className="w-full overflow-x-auto pb-6 flex justify-center bg-zinc-50 dark:bg-zinc-950/20 p-4 sm:p-6 rounded-2xl">
+        <div ref={marksheetContainerRef} className="w-full overflow-x-auto pb-6 flex justify-center bg-muted p-4 sm:p-6 rounded-2xl">
           <div 
             className="shrink-0 transition-all duration-300 shadow-2xl rounded-lg bg-white marksheet-page-download"
             style={{ 

@@ -50,7 +50,7 @@ export function ParentCard({
 }: ParentCardProps) {
   return (
     <Card 
-      className="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-zinc-100 dark:border-zinc-800 hover:border-emerald-500/50 dark:hover:border-emerald-800/50 cursor-pointer"
+      className="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border  hover:border-emerald-500/50 dark:hover:border-emerald-800/50 cursor-pointer"
       onClick={() => onView(parent)}
     >
       <CardContent className="p-5">
@@ -65,12 +65,12 @@ export function ParentCard({
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm truncate" title={parent.name}>
+              <h3 className="font-semibold text-foreground text-sm truncate" title={parent.name}>
                 {parent.name}
               </h3>
               <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                <Mail className="size-3 text-zinc-500 dark:text-zinc-400 shrink-0" />
-                <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate block flex-1 min-w-0" title={parent.email}>
+                <Mail className="size-3 text-muted-foreground shrink-0" />
+                <span className="text-xs text-foreground truncate block flex-1 min-w-0" title={parent.email}>
                   {parent.email}
                 </span>
               </div>
@@ -136,7 +136,7 @@ export function ParentCard({
         </div>
 
         {/* Parent Details */}
-        <div className="flex items-center gap-4 text-xs text-zinc-600 dark:text-zinc-300 mb-4">
+        <div className="flex items-center gap-4 text-xs text-foreground mb-4">
           {parent.phone && (
             <span className="flex items-center gap-1">
               <Phone className="size-3" /> {parent.phone}
@@ -153,7 +153,7 @@ export function ParentCard({
         <Separator className="mb-3" />
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 flex items-center gap-1">
+            <span className="text-xs font-medium text-foreground flex items-center gap-1">
               <Baby className="size-3" /> Children ({parent.children.length})
             </span>
             <Button
@@ -172,11 +172,11 @@ export function ParentCard({
 
           {parent.children.length === 0 ? (
             <div 
-              className="text-center py-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg"
+              className="text-center py-6 bg-muted rounded-lg"
               onClick={(e) => e.stopPropagation()}
             >
-              <GraduationCap className="size-8 mx-auto text-zinc-300 dark:text-zinc-600 mb-2" />
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <GraduationCap className="size-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-xs text-muted-foreground">
                 No children linked yet
               </p>
               <Button
@@ -196,7 +196,7 @@ export function ParentCard({
               {parent.children.map((child) => (
                 <div
                   key={child.id}
-                  className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-2 cursor-default"
+                  className="flex items-center justify-between bg-muted rounded-lg px-3 py-2 cursor-default"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -204,10 +204,10 @@ export function ParentCard({
                       {child.gender === "male" ? "👦" : "👧"}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                      <p className="text-xs font-medium text-foreground truncate">
                         {child.name}
                       </p>
-                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                      <p className="text-[10px] text-muted-foreground">
                         {child.className} • Roll {child.rollNumber}
                       </p>
                     </div>

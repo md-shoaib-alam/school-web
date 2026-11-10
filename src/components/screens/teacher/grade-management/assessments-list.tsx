@@ -42,22 +42,22 @@ export function AssessmentsList({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[200px]">
         {[...Array(3)].map((_, i) => (
-          <Card key={i} className="rounded-xl border border-zinc-100 dark:border-zinc-800 p-5 space-y-4 animate-pulse">
+          <Card key={i} className="rounded-2xl border  p-5 space-y-4 animate-pulse">
             <div className="flex justify-between items-start">
               <div className="space-y-2 flex-1">
-                <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
-                <div className="h-3 bg-zinc-100 dark:bg-zinc-800/60 rounded w-1/2" />
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-3 bg-muted rounded w-1/2" />
               </div>
-              <div className="h-5 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+              <div className="h-5 w-16 bg-muted rounded-full" />
             </div>
             <div className="space-y-1">
               <div className="flex justify-between">
-                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded w-1/3" />
-                <div className="h-3 bg-zinc-100 dark:bg-zinc-800 rounded w-1/6" />
+                <div className="h-3 bg-muted rounded w-1/3" />
+                <div className="h-3 bg-muted rounded w-1/6" />
               </div>
-              <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full" />
+              <div className="h-2 w-full bg-muted rounded-full" />
             </div>
-            <div className="h-9 w-full bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
+            <div className="h-9 w-full bg-muted rounded-lg" />
           </Card>
         ))}
       </div>
@@ -87,15 +87,15 @@ export function AssessmentsList({
         return (
           <Card
             key={a.id}
-            className={`rounded-xl shadow-sm ${isCompleted ? "border-emerald-200/60 dark:border-emerald-800/60 bg-emerald-50/5 dark:bg-emerald-900/5" : "border-zinc-100 dark:border-zinc-800"} hover:shadow-md transition-shadow`}
+            className={`rounded-xl shadow-sm ${isCompleted ? "border-emerald-200/60 dark:border-emerald-800/60 bg-emerald-50/5 dark:bg-emerald-900/5" : ""} hover:shadow-md transition-shadow`}
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-3 gap-2">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-zinc-900 dark:text-zinc-100 text-sm truncate">
+                  <h3 className="font-medium text-foreground text-sm truncate">
                     {a.title}
                   </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {selectedSubjectObj?.name} • {selectedClassObj?.name} {selectedClassObj?.section}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export function AssessmentsList({
                 )}
               </div>
 
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                 <span className="flex items-center gap-1">
                   <FileText className="size-3" /> {a.type}
                 </span>
@@ -124,7 +124,7 @@ export function AssessmentsList({
 
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500 dark:text-zinc-400">
+                  <span className="text-muted-foreground">
                     Submissions
                   </span>
                   <span className="font-medium">
@@ -132,7 +132,7 @@ export function AssessmentsList({
                   </span>
                 </div>
                 <Progress value={pct} className="h-2" />
-                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                   <Users className="size-3" />
                   {totalStudents - gradedCount === 0 
                     ? "All students have submitted"
@@ -140,7 +140,7 @@ export function AssessmentsList({
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-2">
+              <div className="mt-4 pt-3 border-t  flex flex-col gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -155,7 +155,7 @@ export function AssessmentsList({
                   size="sm"
                   className={`w-full text-xs gap-1.5 ${
                     isCompleted
-                      ? "text-zinc-400 dark:text-zinc-500 border-zinc-200/50 dark:border-zinc-800/50 bg-transparent cursor-not-allowed opacity-60"
+                      ? "text-muted-foreground  bg-transparent cursor-not-allowed opacity-60"
                       : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200/50 dark:border-emerald-800/50"
                   }`}
                   onClick={() => !isCompleted && dispatch({ type: "SET_CONFIRM_COMPLETE_ID", id: a.id })}

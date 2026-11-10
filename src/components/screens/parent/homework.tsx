@@ -28,7 +28,7 @@ import {
   CalendarDays,
   Calendar as CalendarIcon,
 } from "lucide-react";
-import type { StudentInfo, AssignmentInfo } from "@/lib/types";
+import type { StudentInfo, AssignmentInfo } from "@/types";
 import { DailyDiaryPlanner } from "@/components/shared/daily-diary-planner";
 
 type HomeworkStatus = "active" | "submitted" | "overdue";
@@ -81,7 +81,7 @@ export function ParentHomework() {
       <Card className="rounded-xl shadow-sm">
         <CardContent className="p-12 text-center">
           <Users className="size-12 mx-auto text-muted-foreground/40" />
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">No children registered</h3>
+          <h3 className="text-lg font-semibold text-foreground mt-4">No children registered</h3>
           <p className="text-sm text-muted-foreground mt-1">Contact administration to link your child to this account.</p>
         </CardContent>
       </Card>
@@ -92,11 +92,11 @@ export function ParentHomework() {
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b  pb-5">
         <div className="space-y-3.5 text-left">
           <div className="flex items-center gap-2">
             <BookMarked className="size-5 text-violet-600" />
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+            <h2 className="text-lg font-semibold text-foreground uppercase tracking-tight">
               Homework & Diary
             </h2>
           </div>
@@ -311,18 +311,18 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
         </div>
       )}
 
-      <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+      <Card className="rounded-xl shadow-sm ">
         <CardHeader className="pb-3 pt-5 flex flex-row items-center justify-between space-y-0 gap-4">
           <CardTitle className="text-sm font-semibold flex items-center gap-2 tracking-tight">
             <FileText className="size-4 text-violet-500" />
             Homework Tracker & Diary
           </CardTitle>
-          <div className="flex bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 p-0.5 rounded-lg">
+          <div className="flex bg-violet-50/60 border border-violet-100/50 p-0.5 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setViewMode("list")}
-              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "list" ? "bg-white dark:bg-zinc-800 text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-zinc-900 dark:hover:text-zinc-100"}`}
+              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "list" ? "bg-white text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
             >
               <List className="size-3.5" />
               List View
@@ -331,7 +331,7 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
               variant="ghost"
               size="sm"
               onClick={() => setViewMode("diary")}
-              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "diary" ? "bg-white dark:bg-zinc-800 text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-zinc-900 dark:hover:text-zinc-100"}`}
+              className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "diary" ? "bg-white text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
             >
               <CalendarIcon className="size-3.5" />
               Daily Diary
@@ -342,9 +342,9 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
           {viewMode === "list" ? (
             <div className="space-y-4">
               {/* Date Header / Selector for List View */}
-              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+              <div className="flex items-center justify-between border-b  pb-3">
                 <div className="text-left flex flex-col justify-center">
-                  <h3 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-stone-100">
+                  <h3 className="text-sm font-bold tracking-tight text-foreground dark:text-stone-100">
                     {selectedDate ? format(selectedDate, "eeee") : "Select Date"}
                   </h3>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
@@ -356,13 +356,13 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
                   <PopoverTrigger asChild>
                     <button 
                       type="button"
-                      className="h-8 text-[11px] font-bold px-3 bg-violet-50/60 dark:bg-zinc-900 border border-violet-100/50 dark:border-zinc-800 text-violet-700 dark:text-violet-300 hover:bg-violet-100/30 rounded-lg flex items-center justify-center transition-colors"
+                      className="h-8 text-[11px] font-bold px-3 bg-violet-50/60 border border-violet-100/50 text-violet-700 dark:text-violet-300 hover:bg-violet-100/30 rounded-lg flex items-center justify-center transition-colors"
                     >
                       <CalendarDays className="size-3.5 mr-1 text-violet-500" />
                       Select Date
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border border-zinc-200 dark:border-zinc-800" align="end">
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border " align="end">
                     <Calendar
                       mode="single"
                       selected={selectedDate}
@@ -380,10 +380,10 @@ function ChildHomeworkView({ student }: { student: StudentInfo }) {
               {/* List of homework for selected date */}
               <ScrollArea className="max-h-[500px] pr-3">
                 {selectedDateHomeworks.length === 0 && dueSelectedDateHomeworks.length === 0 ? (
-                  <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-xl">
+                  <div className="text-center py-16 text-muted-foreground border-2 border-dashed  rounded-xl">
                     <FileText className="size-10 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No homework found</p>
-                    <p className="text-xs text-zinc-505 mt-1">
+                    <p className="text-sm font-semibold text-foreground">No homework found</p>
+                    <p className="text-xs  mt-1">
                       No homework assigned or due on this date.
                     </p>
                   </div>
@@ -458,13 +458,13 @@ function ListHomeworkCard({
       className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
         a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
         a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
-        "border-zinc-100 dark:border-zinc-800"
+        ""
       }`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0 text-left">
           <div className="flex items-center gap-2 mb-1">
-            <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{a.title}</h4>
+            <h4 className="font-semibold text-sm text-foreground truncate">{a.title}</h4>
             {getStatusBadge(a.status)}
           </div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -486,10 +486,10 @@ function ListHomeworkCard({
         </div>
       </div>
 
-      <div className="mt-3 pt-2 border-t border-zinc-100/70 dark:border-zinc-800/60 flex flex-col gap-1">
+      <div className="mt-3 pt-2 border-t  flex flex-col gap-1">
         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <span>Progress Tracking</span>
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">{getProgressValue(a.status)}%</span>
+          <span className="font-medium text-foreground">{getProgressValue(a.status)}%</span>
         </div>
         <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
       </div>
@@ -507,11 +507,11 @@ function HomeworkSummaryCard({ label, count, icon, themeColor }: { label: string
   };
   const theme = schemes[themeColor];
   return (
-    <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-none ">
       <CardContent className="p-4 text-left flex flex-col justify-between h-full">
         <div className="flex items-center justify-between">
           <div className={`p-2 rounded-lg bg-gradient-to-br ${theme.split(" ").slice(0,2).join(" ")} text-white shadow-xs`}>{icon}</div>
-          <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">{count}</span>
+          <span className="text-2xl font-black tracking-tight text-foreground">{count}</span>
         </div>
         <p className="text-[11px] font-semibold text-muted-foreground mt-2">{label} Homework</p>
       </CardContent>

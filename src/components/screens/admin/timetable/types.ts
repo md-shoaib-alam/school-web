@@ -1,4 +1,4 @@
-import type { ClassInfo, TimetableSlot as BaseTimetableSlot } from "@/lib/types";
+import type { ClassInfo, TimetableSlot as BaseTimetableSlot } from "@/types";
 
 export type ViewMode = "grid" | "list" | "day";
 

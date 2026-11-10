@@ -79,7 +79,7 @@ export function Sidebar({
       className={cn(
         "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-out will-change-transform transform-gpu lg:transition-all lg:duration-300 lg:will-change-auto lg:transform-none lg:h-full border-r overflow-hidden",
         isModernUI
-          ? "bg-white dark:bg-[#0A0A0A] border-r border-slate-200/80 dark:border-zinc-800/80"
+          ? "bg-sidebar border-r "
           : "bg-sidebar border-sidebar-border",
         sidebarOpen 
           ? "w-72 translate-x-0 lg:w-72 lg:translate-x-0 shadow-2xl lg:shadow-none" 
@@ -117,8 +117,7 @@ export function Sidebar({
         roleLabels={roleLabels}
         onNavigate={navigateTo}
         onLogout={() => {
-          logout();
-          replace("/");
+          replace(logout() ?? "/");
         }}
         onPasswordChange={() => setIsChangePasswordOpen(true)}
       />

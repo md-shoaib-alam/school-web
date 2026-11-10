@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { apiFetch } from '@/lib/api';
-import { parseLocalDate } from '@/lib/utils';
+import { parseLocalDate } from '@/lib/date';
 import { ClassOption, SubjectOption } from '../types';
 import { GradeGroup, BulkSubjectRow, CreatedExamSummary } from './wizardTypes';
 

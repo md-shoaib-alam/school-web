@@ -45,7 +45,7 @@ export function ParentsTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-3 sm:px-6 py-4">Parent</th>
                 <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">Children</th>
@@ -53,14 +53,14 @@ export function ParentsTableView({
                 <th className="px-3 sm:px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-border">
               {parents.map((parent, index) => {
                 const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
                 const color = avatarColors[index % avatarColors.length];
                 return (
                   <tr 
                     key={parent.id} 
-                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors cursor-pointer"
+                    className="hover:bg-muted transition-colors cursor-pointer"
                     onClick={() => onView(parent)}
                   >
                     <td className="px-3 sm:px-6 py-4">
@@ -71,9 +71,9 @@ export function ParentsTableView({
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">{parent.name}</span>
+                          <span className="font-bold text-foreground truncate">{parent.name}</span>
                           {parent.username && (
-                            <span className="text-[10px] sm:text-[11px] text-zinc-500 font-mono">ID: {parent.username}</span>
+                            <span className="text-[10px] sm:text-[11px] text-muted-foreground font-mono">ID: {parent.username}</span>
                           )}
                           <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{parent.email}</span>
                           <div className="sm:hidden flex flex-wrap gap-1 mt-1">
@@ -91,10 +91,10 @@ export function ParentsTableView({
                             {child.name}
                           </Badge>
                         ))}
-                        {parent.children.length === 0 && <span className="text-xs text-zinc-400 italic">None linked</span>}
+                        {parent.children.length === 0 && <span className="text-xs text-muted-foreground italic">None linked</span>}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-4 hidden lg:table-cell text-zinc-600 dark:text-zinc-400 font-medium">
+                    <td className="px-3 sm:px-6 py-4 hidden lg:table-cell text-foreground font-medium">
                       {parent.occupation || 'N/A'}
                     </td>
                     <td className="px-3 sm:px-6 py-4">
@@ -104,7 +104,7 @@ export function ParentsTableView({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0"
+                            className="size-8 text-muted-foreground hover:text-emerald-600 shrink-0"
                             onClick={() => onView(parent)}
                             title="View Details"
                           >
@@ -120,12 +120,12 @@ export function ParentsTableView({
                             <LinkIcon className="size-3.5" />
                             <span className="hidden sm:inline">Link</span>
                           </Button>
-                          <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-emerald-600 shrink-0" onClick={() => onEdit(parent)}>
+                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-emerald-600 shrink-0" onClick={() => onEdit(parent)}>
                             <Pencil className="size-3.5" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="size-8 text-zinc-400 hover:text-red-600 shrink-0" title="Delete">
+                              <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-red-600 shrink-0" title="Delete">
                                 <Trash2 className="size-3.5" />
                               </Button>
                             </AlertDialogTrigger>

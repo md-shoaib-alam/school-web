@@ -20,7 +20,7 @@ export function AttendanceFooter({
   onSave,
 }: AttendanceFooterProps) {
   return (
-    <div className="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6 lg:left-[calc(18rem+1.5rem)] lg:right-10 flex flex-col sm:flex-row items-center justify-between bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md p-3 sm:p-4 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-xl border border-zinc-200/80 dark:border-zinc-800 gap-3 z-30">
+    <div className="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6 lg:left-[calc(18rem+1.5rem)] lg:right-10 flex flex-col sm:flex-row items-center justify-between bg-white/95 backdrop-blur-md p-3 sm:p-4 px-4 sm:px-6 rounded-xl sm:rounded-2xl shadow-xl border  gap-3 z-30">
       <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
         {hasChanges ? (
           <div className="flex items-center gap-2.5">
@@ -30,7 +30,7 @@ export function AttendanceFooter({
             </span>
           </div>
         ) : (
-          <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 dark:text-zinc-500 italic">
+          <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground italic">
             No unsaved changes
           </span>
         )}

@@ -85,7 +85,7 @@ export function SidebarFooter({
             className="cursor-pointer gap-2"
             onClick={() => onNavigate("school-settings")}
           >
-            <Settings className="size-4 text-blue-500" />
+            <Settings className="size-4 text-brand" />
             School Settings
           </DropdownMenuItem>
         </>
@@ -113,13 +113,13 @@ export function SidebarFooter({
       className={cn(
         isModernUI
           ? cn(
-              "p-3 border-t border-slate-200/80 dark:border-zinc-800/80 space-y-3",
+              "p-3 border-t  space-y-3",
               !sidebarOpen && "flex flex-col items-center justify-center p-2"
             )
           : isMinimal
             ? "mb-6 flex items-center justify-center mx-auto"
             : cn(
-                "bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 shadow-sm",
+                "bg-card border  shadow-sm",
                 sidebarOpen
                   ? "mx-3 mb-3 p-3 rounded-xl"
                   : "size-12 mb-3 rounded-xl flex items-center justify-center mx-auto"
@@ -128,24 +128,24 @@ export function SidebarFooter({
     >
       {/* "Need Help?" widget matching reference image bottom left */}
       {isModernUI && sidebarOpen && (
-        <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-900/40 p-3.5 space-y-2.5">
+        <div className="rounded-2xl border  bg-muted p-3.5 space-y-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-full bg-blue-50 dark:bg-zinc-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <div className="size-8 rounded-full bg-blue-50 flex items-center justify-center text-brand shrink-0">
               <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
               </svg>
             </div>
             <div>
-              <p className="font-bold text-xs text-slate-900 dark:text-zinc-100 leading-tight">Need Help?</p>
-              <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">Contact our support team</p>
+              <p className="font-bold text-xs text-foreground leading-tight">Need Help?</p>
+              <p className="text-[10px] text-muted-foreground font-medium">Contact our support team</p>
             </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onNavigate(isSuperAdmin ? "settings" : currentUser.role === "admin" ? "school-settings" : "tickets")}
-            className="w-full h-8 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-zinc-800 shadow-2xs"
+            className="w-full h-8 text-xs font-semibold rounded-xl bg-card  text-brand hover:bg-accent shadow-2xs"
           >
             Help & Support
           </Button>
@@ -157,7 +157,7 @@ export function SidebarFooter({
         sidebarOpen && !isMinimal ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-3 w-full cursor-pointer select-none group p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+              <div className="flex items-center gap-3 w-full cursor-pointer select-none group p-1.5 rounded-xl hover:bg-accent/60 transition-colors">
                 <Avatar className="size-9">
                   <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
                   <AvatarFallback
@@ -170,15 +170,15 @@ export function SidebarFooter({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate text-zinc-900 dark:text-zinc-100">
+                  <p className="text-sm font-semibold truncate text-foreground">
                     {currentUser.name}
                   </p>
-                  <p className="text-[11px] text-slate-500 font-medium truncate">
+                  <p className="text-[11px] text-muted-foreground font-medium truncate">
                     {currentUser.customRole?.name || roleLabels[currentUser.role]}
                   </p>
                 </div>
 
-                <div className="size-8 flex items-center justify-center rounded-md transition-colors text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 group-hover:text-zinc-700 dark:group-hover:text-zinc-200">
+                <div className="size-8 flex items-center justify-center rounded-md transition-colors text-muted-foreground group-hover:bg-accent group-hover:text-foreground">
                   <Settings className="size-4" />
                 </div>
               </div>

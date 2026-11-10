@@ -162,30 +162,30 @@ export function StudentDetailDialog({
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent 
-        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-t-3xl sm:rounded-2xl max-h-[95vh] sm:max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-t-3xl sm:rounded-2xl max-h-[95vh] sm:max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header Section with mint gradient aura */}
-        <div className="relative px-4 sm:px-8 pt-5 sm:pt-6 pb-5 sm:pb-6 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/40 via-white to-emerald-50/20 dark:from-emerald-950/15 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
+        <div className="relative px-4 sm:px-8 pt-5 sm:pt-6 pb-5 sm:pb-6 border-b  bg-gradient-to-r from-emerald-50/40 via-white to-emerald-50/20 dark:from-emerald-950/15 dark:via-zinc-900 dark:to-zinc-900 shrink-0">
           
           {/* Top navigation header row for mobile */}
           <div className="flex items-center justify-between pb-3 sm:pb-4">
             <button
               onClick={() => onOpenChange(false)}
-              className="p-1.5 -ml-1.5 rounded-full text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-1.5 -ml-1.5 rounded-full text-foreground hover:bg-accent transition-colors"
               aria-label="Back"
             >
               <ChevronLeft className="size-5" />
             </button>
 
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
               Student Profile
             </h2>
 
             <button
               onClick={() => onOpenChange(false)}
-              className="p-1.5 -mr-1.5 rounded-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors"
+              className="p-1.5 -mr-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors"
               aria-label="More options"
             >
               <MoreVertical className="size-5" />
@@ -202,7 +202,7 @@ export function StudentDetailDialog({
 
               <div className="space-y-1.5 flex-1 flex flex-col items-center sm:items-start w-full">
                 <div className="flex items-center justify-center sm:justify-start gap-2.5">
-                  <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                     {currentStudent.name}
                   </DialogTitle>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60">
@@ -216,14 +216,14 @@ export function StudentDetailDialog({
                   Detailed profile information for {currentStudent.name}
                 </DialogDescription>
 
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-                  ID: <span className="font-semibold text-slate-700 dark:text-zinc-300">{currentStudent.username || currentStudent.rollNumber || "–"}</span>
-                  <span className="mx-2.5 text-slate-300 dark:text-zinc-700">|</span>
-                  Roll No: <span className="font-semibold text-slate-700 dark:text-zinc-300">{currentStudent.rollNumber || "–"}</span>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+                  ID: <span className="font-semibold text-foreground">{currentStudent.username || currentStudent.rollNumber || "–"}</span>
+                  <span className="mx-2.5 text-muted-foreground">|</span>
+                  Roll No: <span className="font-semibold text-foreground">{currentStudent.rollNumber || "–"}</span>
                 </p>
 
                 {/* Mobile Class Pill Bar */}
-                <div className="flex sm:hidden items-center justify-center gap-2.5 w-full max-w-xs mt-1 py-2 px-5 rounded-xl bg-white dark:bg-zinc-800/90 border border-slate-200/80 dark:border-zinc-700/80 shadow-xs text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-200">
+                <div className="flex sm:hidden items-center justify-center gap-2.5 w-full max-w-xs mt-1 py-2 px-5 rounded-xl bg-white border  shadow-xs text-xs sm:text-sm font-semibold text-foreground">
                   <GraduationCap className="size-4 text-emerald-600" />
                   <span>{currentStudent.className || "Unassigned"}</span>
                 </div>
@@ -237,7 +237,7 @@ export function StudentDetailDialog({
                   <GraduationCap className="size-7" />
                 </div>
               </div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700 shadow-sm text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-200">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border  shadow-sm text-xs sm:text-sm font-semibold text-foreground">
                 <BookOpen className="size-3.5 text-emerald-600" />
                 {currentStudent.className || "Unassigned"}
               </div>
@@ -246,7 +246,7 @@ export function StudentDetailDialog({
         </div>
 
         {/* Tab Navigation Bar */}
-        <div className="px-2 sm:px-8 border-b border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 overflow-x-auto no-scrollbar">
+        <div className="px-2 sm:px-8 border-b  bg-card shrink-0 overflow-x-auto no-scrollbar">
           <div className="flex items-center justify-between sm:justify-start gap-1 sm:gap-6 -mb-px">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -258,10 +258,10 @@ export function StudentDetailDialog({
                   className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2.5 sm:px-1 text-[11px] sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                     isActive
                       ? "border-emerald-600 text-emerald-700 dark:text-emerald-400 font-semibold"
-                      : "border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200"
+                      : "border-transparent text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
                   }`}
                 >
-                  <Icon className={`size-4 sm:size-4 ${isActive ? "text-emerald-600 dark:text-emerald-400 stroke-[2.2]" : "text-slate-400 stroke-[1.8]"}`} />
+                  <Icon className={`size-4 sm:size-4 ${isActive ? "text-emerald-600 dark:text-emerald-400 stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"}`} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -276,7 +276,7 @@ export function StudentDetailDialog({
         >
           {isLoading ? (
             <div className="min-h-[360px] flex flex-col items-center justify-center py-10 px-4">
-              <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-zinc-800/90 border border-slate-100 dark:border-zinc-700/80 p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-full max-w-sm rounded-3xl bg-white border  p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
                 {/* Visual Image / ID Card Asset */}
                 <div className="relative w-40 h-28 mb-5 flex items-center justify-center">
                   <Image
@@ -291,15 +291,15 @@ export function StudentDetailDialog({
 
                 {/* Animated Circular Ring Loader */}
                 <div className="relative size-12 mb-4 flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-[3.5px] border-slate-100 dark:border-zinc-700" />
+                  <div className="absolute inset-0 rounded-full border-[3.5px] " />
                   <div className="absolute inset-0 rounded-full border-[3.5px] border-emerald-600 dark:border-emerald-400 border-t-transparent border-r-transparent animate-spin" />
                 </div>
 
                 {/* Title and subtitle */}
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
                   {selectedSiblingId ? "Opening Sibling Profile..." : "Loading Student Profile..."}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 dark:text-zinc-400 mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Please wait a moment
                 </p>
               </div>
@@ -317,7 +317,7 @@ export function StudentDetailDialog({
             />
           ) : (
             /* Other Tabs Placeholder with clean state */
-            <div className="py-16 text-center text-slate-400 dark:text-zinc-500">
+            <div className="py-16 text-center text-muted-foreground">
               <Building2 className="size-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm font-medium">No records found for {activeTab}</p>
             </div>
@@ -325,11 +325,11 @@ export function StudentDetailDialog({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 sm:px-8 py-4 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div className="px-6 sm:px-8 py-4 bg-card border-t  flex items-center justify-between shrink-0">
           <Button
             variant="outline"
             onClick={handlePrint}
-            className="gap-2 text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 font-medium rounded-xl"
+            className="gap-2 text-foreground  hover:bg-accent font-medium rounded-xl"
           >
             <Printer className="size-4" />
             Print Profile

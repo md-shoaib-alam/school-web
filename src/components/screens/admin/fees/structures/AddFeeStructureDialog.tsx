@@ -44,7 +44,7 @@ export function AddFeeStructureDialog({
               <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
               <SelectContent>
                 {minCategories
-                  .filter(c => c.status !== 'inactive')
+                  .filter(c => c.status !== 'inactive' && c.code !== 'TRANSPORT')
                   .map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}
               </SelectContent>
             </Select>

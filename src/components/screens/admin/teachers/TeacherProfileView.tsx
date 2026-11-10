@@ -20,7 +20,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
@@ -211,7 +211,7 @@ export function TeacherProfileView({
   if (isLoading) {
     return (
       <div className="min-h-[460px] flex flex-col items-center justify-center py-16 px-4">
-        <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-zinc-800/90 border border-slate-100 dark:border-zinc-700/80 p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+        <div className="w-full max-w-sm rounded-3xl bg-white border  p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
           <div className="relative w-40 h-28 mb-5 flex items-center justify-center">
             <Image
               src="/assets/admin/table.avif"
@@ -223,13 +223,13 @@ export function TeacherProfileView({
             />
           </div>
           <div className="relative size-12 mb-4 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-[3.5px] border-slate-100 dark:border-zinc-700" />
+            <div className="absolute inset-0 rounded-full border-[3.5px] " />
             <div className="absolute inset-0 rounded-full border-[3.5px] border-emerald-600 dark:border-emerald-400 border-t-transparent border-r-transparent animate-spin" />
           </div>
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
             Loading Teacher Profile...
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Please wait a moment
           </p>
         </div>
@@ -245,14 +245,14 @@ export function TeacherProfileView({
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 border border-emerald-100 dark:border-zinc-700 transition-all shadow-xs"
+            className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:hover:bg-zinc-700 text-foreground border border-emerald-100 transition-all shadow-xs"
           >
-            <ChevronLeft className="size-4 text-slate-700 dark:text-zinc-300 stroke-[2.5]" />
+            <ChevronLeft className="size-4 text-foreground stroke-[2.5]" />
             <span className="text-xs sm:text-sm font-semibold tracking-tight">Back to Teachers</span>
           </button>
 
-          <span className="hidden sm:inline-block text-xs text-slate-400 dark:text-zinc-500 font-medium">
-            Teachers <span className="mx-1.5 text-slate-300 dark:text-zinc-700">›</span> Teacher Profile
+          <span className="hidden sm:inline-block text-xs text-muted-foreground font-medium">
+            Teachers <span className="mx-1.5 text-muted-foreground">›</span> Teacher Profile
           </span>
         </div>
 
@@ -272,7 +272,7 @@ export function TeacherProfileView({
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800"
+            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-foreground  rounded-xl hover:bg-accent"
           >
             <Printer className="size-3.5" />
             Print
@@ -280,7 +280,7 @@ export function TeacherProfileView({
 
           {/* More actions menu button */}
           <button
-            className="p-2.5 sm:p-2 rounded-xl border border-slate-200/90 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-xs"
+            className="p-2.5 sm:p-2 rounded-xl border  text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-xs"
             aria-label="More options"
           >
             <MoreVertical className="size-4" />
@@ -289,17 +289,17 @@ export function TeacherProfileView({
       </div>
 
       {/* Main Profile Header Box */}
-      <div className="relative rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 p-5 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
+      <div className="relative rounded-2xl border  bg-card p-5 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex flex-row items-center gap-4 sm:gap-5 w-full">
             {/* Avatar Circle */}
-            <div className="size-20 sm:size-24 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-slate-100 dark:border-zinc-700 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
+            <div className="size-20 sm:size-24 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2  flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
               {getInitials(currentTeacher.name)}
             </div>
 
             {/* Profile Info details */}
             <div className="space-y-1.5 flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight truncate">
                 {currentTeacher.name}
               </h1>
 
@@ -315,18 +315,18 @@ export function TeacherProfileView({
               </div>
 
               {/* Email line */}
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 dark:text-zinc-400 font-medium truncate pt-0.5">
-                <Mail className="size-3.5 text-slate-400 shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium truncate pt-0.5">
+                <Mail className="size-3.5 text-muted-foreground shrink-0" />
                 <span className="truncate">{currentTeacher.email}</span>
               </div>
 
               {/* Teacher ID with Copy Button */}
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
                 <span>Teacher ID:</span>
-                <span className="font-semibold text-slate-800 dark:text-zinc-200">{displayTeacherId}</span>
+                <span className="font-semibold text-foreground">{displayTeacherId}</span>
                 <button
                   onClick={() => handleCopy(displayTeacherId, "Teacher ID")}
-                  className="p-1 text-slate-400 hover:text-emerald-600 transition-colors rounded"
+                  className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
                   aria-label="Copy Teacher ID"
                 >
                   {copiedField === "Teacher ID" ? (
@@ -341,7 +341,7 @@ export function TeacherProfileView({
 
           {/* Desktop Right Side Quote Banner with teachertop illustration */}
           <div className="hidden lg:flex items-end justify-end gap-5 pr-2 self-end shrink-0">
-            <div className="text-right italic text-xs text-slate-400 dark:text-zinc-500 max-w-[210px] pb-2 leading-relaxed">
+            <div className="text-right italic text-xs text-muted-foreground max-w-[210px] pb-2 leading-relaxed">
               &ldquo;Educating minds, building brighter futures.&rdquo;
             </div>
             <div className="relative w-36 h-28 shrink-0 overflow-hidden">
@@ -358,7 +358,7 @@ export function TeacherProfileView({
       </div>
 
       {/* Tab Navigation Bar — horizontally scrollable pill row */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200/80 dark:border-zinc-800/70 px-2 py-2 overflow-x-auto no-scrollbar">
+      <div className="bg-card rounded-xl border  px-2 py-2 overflow-x-auto no-scrollbar">
         <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -370,11 +370,11 @@ export function TeacherProfileView({
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all ${
                   isActive
                     ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                    : "text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-800 dark:hover:text-zinc-200"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:text-muted-foreground"
                 }`}
               >
                 <Icon className={`size-4 shrink-0 ${
-                  isActive ? "text-white stroke-[2.2]" : "text-slate-400 stroke-[1.8]"
+                  isActive ? "text-white stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"
                 }`} />
                 <span>{tab.label}</span>
               </button>
@@ -455,7 +455,7 @@ export function TeacherProfileView({
           </div>
         </div>
       ) : (
-        <div className="py-20 text-center text-slate-400 dark:text-zinc-500 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/80 dark:border-zinc-800">
+        <div className="py-20 text-center text-muted-foreground bg-card rounded-2xl border ">
           <Building2 className="size-10 mx-auto mb-2 opacity-30" />
           <p className="text-sm font-medium">No records found for {activeTab}</p>
         </div>

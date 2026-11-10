@@ -100,16 +100,16 @@ export function TeacherDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-full sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header Section with mint gradient aura and table.avif illustration */}
-        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
+        <div className="relative px-6 sm:px-8 pt-6 pb-5 border-b  bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
           {/* Close button at top right */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors z-20"
+            className="absolute top-5 right-5 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors z-20"
             aria-label="Close"
           >
             <X className="size-5" />
@@ -120,10 +120,10 @@ export function TeacherDialog({
               <p className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                 {isCreate ? "ADD NEW TEACHER" : "EDIT TEACHER"}
               </p>
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 {isCreate ? "Add New Teacher" : "Edit Teacher Profile"}
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 {isCreate
                   ? "Fill in the teacher details below. A unique Teacher ID will be generated automatically for login."
                   : "Update the teacher information below and save your changes."}
@@ -160,12 +160,12 @@ export function TeacherDialog({
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 0: Profile Photo                                   */}
             {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
-              <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
+              <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                 <Camera className="size-4 text-emerald-600" />
                 <div>
                   <span>Profile Photo</span>
-                  <p className="text-[11px] font-normal text-slate-400 dark:text-zinc-500">
+                  <p className="text-[11px] font-normal text-muted-foreground">
                     Upload a clear photo of the teacher (Optional)
                   </p>
                 </div>
@@ -180,13 +180,13 @@ export function TeacherDialog({
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-9 px-4 text-xs font-semibold rounded-xl border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 gap-2"
+                    className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
                     onClick={() => toast.info("Photo upload will be saved with profile")}
                   >
                     <Upload className="size-3.5 text-emerald-600" />
                     Upload Photo
                   </Button>
-                  <p className="text-[10px] text-slate-400 dark:text-zinc-500">JPG, PNG up to 5MB</p>
+                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 5MB</p>
                 </div>
               </div>
             </div>
@@ -194,8 +194,8 @@ export function TeacherDialog({
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 1: Personal Information                           */}
             {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
                 <User className="size-4 text-emerald-600" />
                 Personal Information
               </div>
@@ -204,11 +204,11 @@ export function TeacherDialog({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Full Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="t_name" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                  <Label htmlFor="t_name" className="text-xs font-semibold text-foreground">
                     Full Name <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       id="t_name"
                       name="name"
@@ -216,21 +216,21 @@ export function TeacherDialog({
                       value={formData.name || ""}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Enter full name"
-                      className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                      className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                     />
                   </div>
                 </div>
 
               {/* Gender */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Gender
                 </Label>
                 <Select
                   value={formData.gender || "male"}
                   onValueChange={(val) => setFormData({ ...formData, gender: val })}
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -243,7 +243,7 @@ export function TeacherDialog({
 
               {/* Date of Birth */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Date of Birth
                 </Label>
                 <DatePicker
@@ -253,7 +253,7 @@ export function TeacherDialog({
                     setFormData({ ...formData, dateOfBirth: formatted });
                   }}
                   placeholder="Pick date of birth"
-                  className="w-full h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                  className="w-full h-9 text-xs rounded-xl bg-muted "
                 />
               </div>
             </div>
@@ -262,28 +262,28 @@ export function TeacherDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Teacher ID (auto-generated placeholder) */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Teacher ID</Label>
+                <Label className="text-xs font-semibold text-foreground">Teacher ID</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-xs">#</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-xs">#</span>
                   <Input
                     value={formData.teacherId || ""}
                     onChange={(e) => setFormData({ ...formData, teacherId: e.target.value })}
                     placeholder="Auto-generate"
-                    className="pl-7 h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 text-slate-600 border-slate-200 dark:border-zinc-800"
+                    className="pl-7 h-9 text-xs rounded-xl bg-muted text-foreground "
                   />
                 </div>
               </div>
 
               {/* Qualification */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Qualification <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.qualification || "B.Ed"}
                   onValueChange={(val) => setFormData({ ...formData, qualification: val })}
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                     <SelectValue placeholder="Select qualification" />
                   </SelectTrigger>
                   <SelectContent>
@@ -301,16 +301,16 @@ export function TeacherDialog({
 
               {/* Experience */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Experience
                 </Label>
                 <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     value={formData.experience || ""}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
                     placeholder="e.g., 5 years"
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                   />
                 </div>
               </div>
@@ -320,8 +320,8 @@ export function TeacherDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 2: Contact Information                            */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
               <Phone className="size-4 text-emerald-600" />
               Contact Information
             </div>
@@ -330,11 +330,11 @@ export function TeacherDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Email Address */}
               <div className="space-y-1.5">
-                <Label htmlFor="t_email" className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label htmlFor="t_email" className="text-xs font-semibold text-foreground">
                   Email Address <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     id="t_email"
                     name="email"
@@ -343,18 +343,18 @@ export function TeacherDialog({
                     value={formData.email || ""}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="teacher@school.com"
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                    className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                   />
                 </div>
               </div>
 
               {/* Phone Number */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Phone Number
                 </Label>
-                <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-2.5 text-xs text-slate-500 bg-slate-100 dark:bg-zinc-800 border-r border-slate-200 dark:border-zinc-700 font-medium">
+                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
+                  <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
                     +91
                   </span>
                   <input
@@ -364,18 +364,18 @@ export function TeacherDialog({
                     value={formData.phone || ""}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="Enter phone number"
-                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-slate-800 dark:text-zinc-200"
+                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                   />
                 </div>
               </div>
 
               {/* Alternate Phone */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Alternate Phone <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Alternate Phone <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
-                <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-2.5 text-xs text-slate-500 bg-slate-100 dark:bg-zinc-800 border-r border-slate-200 dark:border-zinc-700 font-medium">
+                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
+                  <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
                     +91
                   </span>
                   <input
@@ -383,7 +383,7 @@ export function TeacherDialog({
                     value={formData.alternatePhone || ""}
                     onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })}
                     placeholder="Enter alternate number"
-                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-slate-800 dark:text-zinc-200"
+                    className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                   />
                 </div>
               </div>
@@ -392,20 +392,20 @@ export function TeacherDialog({
             {/* Address */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Address
                 </Label>
-                <span className="text-[10px] text-slate-400">0/200</span>
+                <span className="text-[10px] text-muted-foreground">0/200</span>
               </div>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 size-4 text-slate-400" />
+                <MapPin className="absolute left-3 top-3 size-4 text-muted-foreground" />
                 <textarea
                   rows={2}
                   value={formData.address || ""}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Enter full address"
                   maxLength={200}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-zinc-200 resize-none"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-muted border  focus:outline-none focus:ring-1 focus:ring-emerald-500 text-foreground resize-none"
                 />
               </div>
             </div>
@@ -414,8 +414,8 @@ export function TeacherDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 3: Professional Information                       */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
               <Briefcase className="size-4 text-emerald-600" />
               Professional Information
             </div>
@@ -423,14 +423,14 @@ export function TeacherDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Role (Fixed to Teacher / Faculty Member on server) */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Role <span className="text-[10px] text-slate-400 font-normal">(Teacher)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Role <span className="text-[10px] text-muted-foreground font-normal">(Teacher)</span>
                 </Label>
                 <Select
                   value="Faculty Member"
                   disabled
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-100/70 dark:bg-zinc-800/40 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 cursor-not-allowed">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed">
                     <SelectValue placeholder="Faculty Member" />
                   </SelectTrigger>
                   <SelectContent>
@@ -441,14 +441,14 @@ export function TeacherDialog({
 
               {/* Subject(s) */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                  Subject(s) <span className="text-slate-400 font-normal">(Optional)</span>
+                <Label className="text-xs font-semibold text-foreground">
+                  Subject(s) <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
                 <Select
                   value={formData.subjects || "Mathematics"}
                   onValueChange={(val) => setFormData({ ...formData, subjects: val })}
                 >
-                  <SelectTrigger className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
                     <SelectValue placeholder="Select subjects" />
                   </SelectTrigger>
                   <SelectContent>
@@ -464,7 +464,7 @@ export function TeacherDialog({
 
               {/* Date of Joining */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
+                <Label className="text-xs font-semibold text-foreground">
                   Date of Joining <span className="text-red-500">*</span>
                 </Label>
                 <DatePicker
@@ -474,7 +474,7 @@ export function TeacherDialog({
                     setFormData({ ...formData, joiningDate: formatted });
                   }}
                   placeholder="Pick date of joining"
-                  className="w-full h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                  className="w-full h-9 text-xs rounded-xl bg-muted "
                 />
               </div>
             </div>
@@ -483,14 +483,14 @@ export function TeacherDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 4: Account Settings                               */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-zinc-800/60 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
+            <div className="flex items-center gap-2 pb-2 border-b  text-foreground font-semibold text-sm sm:text-base">
               <CheckCircle2 className="size-4 text-emerald-600" />
               Account Settings
             </div>
 
             <div className="space-y-1.5 max-w-xs">
-              <Label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Status</Label>
+              <Label className="text-xs font-semibold text-foreground">Status</Label>
               <div className="flex items-center gap-3">
                 <Select
                   value={formData.status || "active"}
@@ -508,7 +508,7 @@ export function TeacherDialog({
                     <SelectItem value="on_leave">On Leave</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-[11px] text-slate-400 dark:text-zinc-500 leading-snug">
+                <p className="text-[11px] text-muted-foreground leading-snug">
                   Inactive teachers will not be able to log in to the system.
                 </p>
               </div>
@@ -517,14 +517,14 @@ export function TeacherDialog({
         </div>
 
         {/* Modal Footer with Reset on left, Cancel & Add Teacher on right */}
-        <div className="px-6 sm:px-8 py-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/80 flex items-center justify-between gap-3 shrink-0">
+        <div className="px-6 sm:px-8 py-4 border-t  bg-muted flex items-center justify-between gap-3 shrink-0">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleReset}
             disabled={submitting}
-            className="h-9 px-3 text-xs rounded-xl font-medium text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:bg-slate-100 gap-1.5"
+            className="h-9 px-3 text-xs rounded-xl font-medium text-muted-foreground  hover:bg-muted gap-1.5"
           >
             <RotateCcw className="size-3.5" />
             Reset
@@ -537,7 +537,7 @@ export function TeacherDialog({
               size="sm"
               onClick={() => onOpenChange(false)}
               disabled={submitting}
-              className="h-9 px-4 text-xs rounded-xl font-medium text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              className="h-9 px-4 text-xs rounded-xl font-medium text-foreground  hover:bg-accent"
             >
               Cancel
             </Button>

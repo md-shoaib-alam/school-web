@@ -29,7 +29,7 @@ const formatSubscriptionDate = (dateStr?: string | null) => {
 export function HistoryTable({ subscriptions }: HistoryTableProps) {
   if (subscriptions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-zinc-400 dark:text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
         <Receipt className="size-10 mb-3 opacity-40" />
         <p className="text-sm font-medium">No payment history</p>
         <p className="text-xs mt-1">
@@ -42,27 +42,27 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
   return (
     <div>
       {/* Mobile View: Vertical Cards */}
-      <div className="md:hidden divide-y divide-zinc-100 dark:divide-zinc-800">
+      <div className="md:hidden divide-y divide-border">
         {subscriptions.map((sub) => (
           <div key={sub.id} className="p-4 space-y-3">
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-bold text-zinc-900 dark:text-zinc-100">
+                <p className="font-bold text-foreground">
                   {sub.planName}
                 </p>
                 {sub.period && (
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  <p className="text-xs text-muted-foreground">
                     {sub.period.charAt(0).toUpperCase() + sub.period.slice(1)} Billing
                   </p>
                 )}
               </div>
-              <p className="font-bold text-zinc-900 dark:text-zinc-100">
+              <p className="font-bold text-foreground">
                 {sub.amount === 0 ? "Free" : `₹${sub.amount.toLocaleString()}`}
               </p>
             </div>
             
             <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
+              <span className="text-muted-foreground" suppressHydrationWarning>
                 {formatSubscriptionDate(sub.createdAt)}
               </span>
               {sub.status === "active" ? (
@@ -77,8 +77,8 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
             </div>
             
             {sub.transactionId && (
-              <div className="pt-1 border-t border-dashed border-zinc-100 dark:border-zinc-800">
-                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono truncate">
+              <div className="pt-1 border-t border-dashed ">
+                <p className="text-[10px] text-muted-foreground font-mono truncate">
                   ID: {sub.transactionId}
                 </p>
               </div>
@@ -91,20 +91,20 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
       <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/50">
-              <TableHead className="font-semibold text-zinc-600 dark:text-zinc-400">
+            <TableRow className="bg-muted">
+              <TableHead className="font-semibold text-foreground">
                 Plan
               </TableHead>
-              <TableHead className="font-semibold text-zinc-600 dark:text-zinc-400">
+              <TableHead className="font-semibold text-foreground">
                 Amount
               </TableHead>
-              <TableHead className="font-semibold text-zinc-600 dark:text-zinc-400">
+              <TableHead className="font-semibold text-foreground">
                 Date
               </TableHead>
-              <TableHead className="font-semibold text-zinc-600 dark:text-zinc-400">
+              <TableHead className="font-semibold text-foreground">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-zinc-600 dark:text-zinc-400">
+              <TableHead className="font-semibold text-foreground">
                 Transaction ID
               </TableHead>
             </TableRow>
@@ -112,24 +112,24 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
           <TableBody>
             {subscriptions.map((sub) => (
               <TableRow key={sub.id}>
-                <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
+                <TableCell className="font-medium text-foreground">
                   {sub.planName}
                   {sub.period && (
-                    <span className="ml-1 text-xs text-zinc-400 dark:text-zinc-500">
+                    <span className="ml-1 text-xs text-muted-foreground">
                       ({sub.period})
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-zinc-700 dark:text-zinc-300">
+                <TableCell className="text-foreground">
                   {sub.amount === 0 ? (
-                    <span className="text-zinc-400 dark:text-zinc-500">
+                    <span className="text-muted-foreground">
                       Free
                     </span>
                   ) : (
                     <span>₹{sub.amount.toLocaleString()}</span>
                   )}
                 </TableCell>
-                <TableCell className="text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
+                <TableCell className="text-muted-foreground" suppressHydrationWarning>
                   {formatSubscriptionDate(sub.createdAt)}
                 </TableCell>
                 <TableCell>
@@ -143,7 +143,7 @@ export function HistoryTable({ subscriptions }: HistoryTableProps) {
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell className="text-xs text-zinc-400 dark:text-zinc-500 font-mono max-w-[140px] truncate">
+                <TableCell className="text-xs text-muted-foreground font-mono max-w-[140px] truncate">
                   {sub.transactionId || "–"}
                 </TableCell>
               </TableRow>

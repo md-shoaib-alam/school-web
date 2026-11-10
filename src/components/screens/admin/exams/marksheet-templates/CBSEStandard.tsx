@@ -36,7 +36,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
 
   return (
     <div 
-      className="relative bg-white text-zinc-900 px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
+      className="relative bg-white text-foreground px-9 py-8 border-[5px] border-emerald-800 rounded overflow-hidden select-none flex flex-col justify-between shrink-0 text-left h-[1123px] w-[794px] box-border font-sans"
       style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
     >
       {/* Dynamic Header */}
@@ -51,44 +51,44 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <h2 className="font-semibold text-xl text-emerald-900 leading-none tracking-wide uppercase">
               {sheet.schoolName.toUpperCase()}
             </h2>
-            <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest mt-1.5">
+            <p className="text-[8px] text-muted-foreground font-bold uppercase tracking-widest mt-1.5">
               Affiliated to Central Board of Secondary Education (CBSE), New Delhi
             </p>
             <p className="text-[10px] text-emerald-800 font-bold tracking-wider mt-1 uppercase">
               {examName ? `${examName} REPORT CARD` : 'ACADEMIC ASSESSMENT REPORT CARD'}: {academicYear}
             </p>
           </div>
-          <div className="size-14 border border-zinc-200 rounded flex flex-col items-center justify-center text-[7px] font-bold text-zinc-400">
+          <div className="size-14 border  rounded flex flex-col items-center justify-center text-[7px] font-bold text-muted-foreground">
             <span>STUDENT</span>
             <span>PHOTO</span>
           </div>
         </div>
 
         {/* Indian / CBSE Student Info Matrix */}
-        <div className="grid grid-cols-12 gap-y-2.5 gap-x-4 text-xs border border-zinc-200 p-3 rounded-lg bg-zinc-55/30">
+        <div className="grid grid-cols-12 gap-y-2.5 gap-x-4 text-xs border  p-3 rounded-lg /30">
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Student's Name:</span>
-            <span className="font-bold text-zinc-900 truncate">{sheet.studentName}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Student's Name:</span>
+            <span className="font-bold text-foreground truncate">{sheet.studentName}</span>
           </div>
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Class / Section:</span>
-            <span className="font-bold text-zinc-900">{classNameStr}, {classSection}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Class / Section:</span>
+            <span className="font-bold text-foreground">{classNameStr}, {classSection}</span>
           </div>
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Roll Number:</span>
-            <span className="font-bold text-zinc-900 font-mono">{sheet.rollNumber}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Roll Number:</span>
+            <span className="font-bold text-foreground font-mono">{sheet.rollNumber}</span>
           </div>
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Admission No. (SRN):</span>
-            <span className="font-bold text-zinc-900 font-mono">SRN-{getDeterministicId(sheet.studentName + 'admission', 1000, 9999)}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Admission No. (SRN):</span>
+            <span className="font-bold text-foreground font-mono">SRN-{getDeterministicId(sheet.studentName + 'admission', 1000, 9999)}</span>
           </div>
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Father's Name:</span>
-            <span className="font-bold text-zinc-900 truncate">Shri. R. K. {sheet.studentName.split(' ').pop()}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Father's Name:</span>
+            <span className="font-bold text-foreground truncate">Shri. R. K. {sheet.studentName.split(' ').pop()}</span>
           </div>
           <div className="col-span-6 flex">
-            <span className="text-zinc-500 font-bold uppercase text-[8.5px] w-32 shrink-0">Mother's Name:</span>
-            <span className="font-bold text-zinc-900 truncate">Smt. Sunita {sheet.studentName.split(' ').pop()}</span>
+            <span className="text-muted-foreground font-bold uppercase text-[8.5px] w-32 shrink-0">Mother's Name:</span>
+            <span className="font-bold text-foreground truncate">Smt. Sunita {sheet.studentName.split(' ').pop()}</span>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
           <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
             PART 1: SCHOLASTIC AREAS
           </h4>
-          <div className="rounded border border-zinc-200 overflow-hidden bg-white">
+          <div className="rounded border  overflow-hidden bg-white">
             <table className="w-full text-xs border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-800 border-none text-white text-[9.5px]">
@@ -112,12 +112,12 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               </thead>
               <tbody>
                 {sheet.subjects.map((sub, sIdx) => (
-                  <tr key={sIdx} className="border-b border-zinc-150 hover:bg-zinc-50/50">
-                    <td className="px-3 py-2 text-left font-bold text-zinc-800 truncate">{sub.subjectName}</td>
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.midtermMarks}</td>}
-                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-zinc-600">{sub.finalMarks}</td>}
-                    <td className="px-3 py-2 text-center font-bold font-mono text-zinc-700">{sub.maxMarks ?? 100}</td>
-                    <td className="px-3 py-2 text-center font-medium font-mono text-zinc-600">{sub.passingMarks ?? 33}</td>
+                  <tr key={sIdx} className="border-b  hover:bg-muted">
+                    <td className="px-3 py-2 text-left font-bold text-foreground truncate">{sub.subjectName}</td>
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-foreground">{sub.midtermMarks}</td>}
+                    {marksheetType === 'combined' && <td className="px-3 py-2 text-center font-mono text-foreground">{sub.finalMarks}</td>}
+                    <td className="px-3 py-2 text-center font-bold font-mono text-foreground">{sub.maxMarks ?? 100}</td>
+                    <td className="px-3 py-2 text-center font-medium font-mono text-foreground">{sub.passingMarks ?? 33}</td>
                     <td className="px-3 py-2 text-center font-black font-mono text-emerald-800">{sub.obtainedMarks ?? 0}</td>
                     <td className="px-3 py-2 text-center">
                       <span className="font-black text-emerald-900 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded text-[10px]">
@@ -137,18 +137,18 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
               PART 2: CO-SCHOLASTIC AREAS (3-Point Scale A-C)
             </h4>
-            <div className="rounded border border-zinc-200 overflow-hidden bg-white">
+            <div className="rounded border  overflow-hidden bg-white">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-emerald-900/10 text-emerald-900 text-[8.5px] border-b border-zinc-200">
+                  <tr className="bg-emerald-900/10 text-emerald-900 text-[8.5px] border-b ">
                     <th className="font-bold px-3 py-1.5 text-left">ACTIVITY / DOMAIN</th>
                     <th className="font-bold px-3 py-1.5 text-center w-[60px]">GRADE</th>
                   </tr>
                 </thead>
                 <tbody>
                   {coScholastic.map((cs, cIdx) => (
-                    <tr key={cIdx} className="border-b border-zinc-100 last:border-none">
-                      <td className="px-3 py-1.5 text-left font-medium text-zinc-700 text-[10px]">{cs.area}</td>
+                    <tr key={cIdx} className="border-b  last:border-none">
+                      <td className="px-3 py-1.5 text-left font-medium text-foreground text-[10px]">{cs.area}</td>
                       <td className="px-3 py-1.5 text-center font-black text-emerald-800 text-[10px]">{cs.grade}</td>
                     </tr>
                   ))}
@@ -161,18 +161,18 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
             <h4 className="text-[9px] font-semibold uppercase text-emerald-900 tracking-wider">
               PART 3: DISCIPLINE (3-Point Scale A-C)
             </h4>
-            <div className="rounded border border-zinc-200 overflow-hidden bg-white">
+            <div className="rounded border  overflow-hidden bg-white">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-emerald-900/10 text-emerald-900 text-[8.5px] border-b border-zinc-200">
+                  <tr className="bg-emerald-900/10 text-emerald-900 text-[8.5px] border-b ">
                     <th className="font-bold px-3 py-1.5 text-left">DISCIPLINARY ASPECT</th>
                     <th className="font-bold px-3 py-1.5 text-center w-[60px]">GRADE</th>
                   </tr>
                 </thead>
                 <tbody>
                   {discipline.map((ds, dIdx) => (
-                    <tr key={dIdx} className="border-b border-zinc-100 last:border-none">
-                      <td className="px-3 py-1.5 text-left font-medium text-zinc-700 text-[10px]">{ds.area}</td>
+                    <tr key={dIdx} className="border-b  last:border-none">
+                      <td className="px-3 py-1.5 text-left font-medium text-foreground text-[10px]">{ds.area}</td>
                       <td className="px-3 py-1.5 text-center font-black text-emerald-800 text-[10px]">{ds.grade}</td>
                     </tr>
                   ))}
@@ -183,7 +183,7 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
         </div>
 
         {/* CBSE Grade Legend */}
-        <div className="border border-zinc-200 bg-zinc-50 rounded p-2 text-[8px] text-center font-bold text-zinc-500">
+        <div className="border  bg-muted rounded p-2 text-[8px] text-center font-bold text-muted-foreground">
           <span className="text-emerald-900 uppercase tracking-wider block mb-1">CBSE SCHOLASTIC GRADING SCALE</span>
           <div className="grid grid-cols-8 gap-0.5 mt-1 font-mono">
             <div>A1 (91-100)</div>
@@ -210,23 +210,23 @@ export const CBSEStandard: React.FC<MarksheetTemplateProps> = ({
               {sheet.status === 'pass' ? 'PROMOTED TO NEXT HIGHER CLASS' : 'RETAINED IN CURRENT CLASS'}
             </span>
           </div>
-          <p className="italic text-zinc-600 font-medium leading-relaxed">
+          <p className="italic text-foreground font-medium leading-relaxed">
             <strong>Class Teacher Remarks:</strong> "{sheet.remarks}"
           </p>
         </div>
 
         {/* Signature lines typical in Indian Schools */}
-        <div className="flex justify-between items-end text-[10px] font-bold text-zinc-500 pt-3 border-t border-dashed border-zinc-200">
+        <div className="flex justify-between items-end text-[10px] font-bold text-muted-foreground pt-3 border-t border-dashed ">
           <div className="flex flex-col items-center">
-            <div className="w-[100px] border-b border-zinc-400 mb-1" />
+            <div className="w-[100px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Parent Signature</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-[100px] border-b border-zinc-400 mb-1" />
+            <div className="w-[100px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Class Teacher</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-[100px] border-b border-zinc-400 mb-1" />
+            <div className="w-[100px] border-b  mb-1" />
             <span className="text-[7.5px] tracking-wider uppercase">Principal</span>
           </div>
         </div>

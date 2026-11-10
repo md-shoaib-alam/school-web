@@ -73,40 +73,47 @@ function resolveScreenFromPathname(
 
 function shouldIncludeItem(
   item: any,
-  currentUser: any,
-  isRoot: boolean,
-  hasPermissions: boolean
+  currentUser: any
 ): boolean {
   if (item.key === "dashboard") return true;
-  if (item.rootOnly) return isRoot;
+  if (item.rootOnly) return isRootAdmin(currentUser);
   if (!item.permModule) return true;
-  return hasPermissions ? hasPermission(currentUser, item.permModule, "view") : true;
+  return hasPermission(currentUser, item.permModule, "view");
 }
 
 function getFilteredNavItems(
-  currentUser: any,
-  isRoot: boolean,
-  hasPermissions: boolean
+  currentUser: any
 ) {
   if (!currentUser) return [];
   const allItems = navItems[currentUser.role] || [];
   return allItems
     .map((item) => {
+      // 1. If the parent group itself requires a permission, check it first
+      if (item.permModule && !shouldIncludeItem(item, currentUser)) {
+        return null;
+      }
+
+      // 2. Filter children
       if (item.children && item.children.length > 0) {
-        const filteredChildren = item.children.filter((child: any) =>
-          shouldIncludeItem(child, currentUser, isRoot, hasPermissions)
-        );
+        const filteredChildren = item.children.filter((child: any) => {
+          const effectiveChild = child.permModule !== undefined
+            ? child
+            : { ...child, permModule: item.permModule };
+          return shouldIncludeItem(effectiveChild, currentUser);
+        });
         if (filteredChildren.length === 0) return null;
         return { ...item, children: filteredChildren };
       }
-      return shouldIncludeItem(item, currentUser, isRoot, hasPermissions) ? item : null;
+
+      return shouldIncludeItem(item, currentUser) ? item : null;
     })
     .filter(Boolean) as typeof allItems;
 }
 
 function isStatusExpired(status: string | undefined): boolean {
   if (!status) return false;
-  return status !== "active" && status !== "trial";
+  // A cancelled school keeps access until its endDate, so expiry is date-driven
+  return status !== "active" && status !== "trial" && status !== "cancelled";
 }
 
 function isDateExpired(endDate: string | Date | undefined): boolean {
@@ -323,17 +330,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }, [resolvedScreen, currentScreen, setCurrentScreen]);
 
   const isSuperAdmin = currentUser?.role === "super_admin";
-  const isRoot = currentUser ? isRootAdmin(currentUser) : false;
-  const hasCustomPermissions =
-    !!currentUser?.customRole?.permissions &&
-    Object.keys(currentUser.customRole.permissions).length > 0;
-  const hasPlatformPermissions = isSuperAdmin && !!currentUser?.platformRole;
 
   // Filter nav items based on permissions
   const items = useMemo(() => {
-    const hasPermissions = hasPlatformPermissions || hasCustomPermissions;
-    return getFilteredNavItems(currentUser, isRoot, hasPermissions);
-  }, [currentUser, isRoot, hasPlatformPermissions, hasCustomPermissions]);
+    return getFilteredNavItems(currentUser);
+  }, [currentUser]);
 
   // --- SUBSCRIPTION CHECK LOGIC ---
   const isExpired = useMemo(() => {
@@ -421,6 +422,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 role={currentUser.role}
                 endDate={resolvedTenant?.endDate}
                 status={resolvedTenant?.status}
+                plan={resolvedTenant?.plan}
               />
             ) : (
               children

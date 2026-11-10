@@ -91,7 +91,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "bulk-attendance-import",
       label: "Bulk Attendance",
       icon: <ClipboardList className="size-4" />,
-      permModule: null,
+      permModule: "tenants",
     },
     {
       key: "users",
@@ -150,7 +150,9 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "roles",
       label: "Roles & Permissions",
       icon: <Shield className="size-4" />,
-      permModule: "roles",
+      // No grantable module opens this: creating or handing out platform roles
+      // belongs to the owner alone, matching the server's root-only guard.
+      rootOnly: true,
     },
     {
       key: "manage-admins",
@@ -163,13 +165,13 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "platform-notices",
       label: "Notices",
       icon: <Bell className="size-4" />,
-      permModule: "analytics",
+      permModule: "notices",
     },
     {
       key: "send-notification",
       label: "Send Push Notification",
       icon: <Send className="size-4" />,
-      permModule: null,
+      permModule: "notices",
     },
 
     // Insights & Security
@@ -233,7 +235,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       children: [
         { key: "attendance", label: "Student Attendance", icon: <Users className="size-4" /> },
         { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="size-4" /> },
-        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="size-4" /> },
+        { key: "staff-attendance", label: "Staff Attendance", icon: <Briefcase className="size-4" /> },
       ]
     },
     {
@@ -533,7 +535,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "academic-years",
       label: "Academic Years",
       icon: <CalendarDays className="size-4" />,
-      permModule: "settings",
+      permModule: "academic-years",
     },
     {
       key: "classes",
@@ -570,7 +572,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
         { key: "my-attendance", label: "My Attendance", icon: <UserCheck className="size-4" />, permModule: null },
         { key: "attendance", label: "Student Attendance", icon: <Users className="size-4" />, permModule: "attendance" },
         { key: "teacher-attendance", label: "Teacher Attendance", icon: <GraduationCap className="size-4" />, permModule: "attendance" },
-        { key: "staff-attendance", label: "Admin Staff Attendance", icon: <Briefcase className="size-4" />, permModule: "attendance" },
+        { key: "staff-attendance", label: "Staff Attendance", icon: <Briefcase className="size-4" />, permModule: "attendance" },
       ]
     },
     {
@@ -590,7 +592,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "promotions-group",
       label: "Class Promotion",
       icon: <GraduationCap className="size-4" />,
-      permModule: "students",
+      permModule: "promotions",
       children: [
         { key: "promotions", label: "Promotions", icon: <ArrowRight className="size-4" /> },
         { key: "bulk-promote", label: "Bulk Promote", icon: <Zap className="size-4" /> },
@@ -601,7 +603,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "leave-management",
       label: "Leave Management",
       icon: <CalendarDays className="size-4" />,
-      permModule: "attendance",
+      permModule: "leaves",
       children: [
         { key: "student-leaves", label: "Student Leaves", icon: <GraduationCap className="size-4" /> },
         { key: "teacher-leaves", label: "Teacher Leaves", icon: <Briefcase className="size-4" /> },
@@ -612,7 +614,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "certificates",
       label: "Certificates",
       icon: <Award className="size-4" />,
-      permModule: "students",
+      permModule: "certificates",
     },
 
     // Finance
@@ -636,6 +638,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "expenses",
       label: "School Expenses",
       icon: <Wallet className="size-4" />,
+      permModule: "expenses",
     },
     
     // Communication & Support
@@ -649,6 +652,7 @@ export const navItems: Record<UserRole, NavItem[]> = {
       key: "tickets",
       label: "Support Tickets",
       icon: <TicketCheck className="size-4" />,
+      permModule: "tickets",
     },
     {
       key: "reports",

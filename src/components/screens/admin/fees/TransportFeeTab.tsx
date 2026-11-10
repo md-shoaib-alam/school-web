@@ -249,7 +249,7 @@ export function TransportFeeTab() {
           ) : (
             <div className="p-6 text-center border rounded-xl bg-card">
               <h2 className="text-lg font-semibold">Route Not Found</h2>
-              <p className="text-zinc-500 text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 The transport route &ldquo;{decodedRouteName}&rdquo; does not exist or has been deleted.
               </p>
               <Button className="mt-4" onClick={() => window.location.href = `/${slug}/transport-fee`}>

@@ -228,7 +228,7 @@ export function RoadmapPanel() {
   const getStatusBadge = (status: UpcomingFeature["status"]) => {
     switch (status) {
       case "Planned":
-        return <Badge variant="outline" className="bg-zinc-100 hover:bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 font-medium text-xs rounded px-2.5 py-0.5 border border-zinc-200 dark:border-zinc-700">Planned</Badge>;
+        return <Badge variant="outline" className="bg-muted hover:bg-muted text-foreground font-medium text-xs rounded px-2.5 py-0.5 border ">Planned</Badge>;
       case "In Progress":
         return <Badge variant="outline" className="bg-amber-50 hover:bg-amber-100/50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 font-medium text-xs rounded px-2.5 py-0.5 border border-amber-200 dark:border-amber-900/50 flex items-center gap-1"><Clock className="size-3" /> In Progress</Badge>;
       case "Testing":
@@ -255,11 +255,11 @@ export function RoadmapPanel() {
       {/* Standard Corporate Header Panel */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-5 rounded-lg border border-border shadow-xs text-left">
         <div className="space-y-1">
-          <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground flex items-center gap-2">
             <ListTodo className="size-5 text-teal-600" />
             Product Roadmap
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-xs">
+          <p className="text-muted-foreground text-xs">
             Manage future capabilities, map tier limits, and track implementation checklists.
           </p>
         </div>
@@ -277,34 +277,34 @@ export function RoadmapPanel() {
           <CardContent className="p-5">
             <form onSubmit={handleAddFeature} className="space-y-4">
               <div className="flex items-center gap-2 mb-1 text-left">
-                <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">Create Roadmap Capability</h3>
+                <h3 className="text-xs font-semibold text-foreground uppercase tracking-wide">Create Roadmap Capability</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="title" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Feature Title</Label>
+                  <Label htmlFor="title" className="text-xs font-semibold text-muted-foreground ml-0.5">Feature Title</Label>
                   <Input 
                     id="title"
                     placeholder="e.g. Dynamic Timetable Conflict Detector"
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-muted border  h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="target" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Target Release</Label>
+                  <Label htmlFor="target" className="text-xs font-semibold text-muted-foreground ml-0.5">Target Release</Label>
                   <Input 
                     id="target"
                     placeholder="e.g. Q3 2026, July 2026"
                     value={newTarget}
                     onChange={e => setNewTarget(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-muted border  h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5 text-left">
-                <Label htmlFor="desc" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Description</Label>
+                <Label htmlFor="desc" className="text-xs font-semibold text-muted-foreground ml-0.5">Description</Label>
                 <Textarea
                   id="desc"
                   placeholder="What capability does this introduce to schools?"
@@ -316,12 +316,12 @@ export function RoadmapPanel() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 text-left">
-                  <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Target Plan Placement</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground ml-0.5">Target Plan Placement</Label>
                   <Select value={newCategory} onValueChange={(v) => setNewCategory(v as any)}>
-                    <SelectTrigger className="h-9.5 rounded-md border border-zinc-200 dark:border-zinc-800 font-semibold bg-zinc-50 dark:bg-zinc-950/40 focus:bg-white dark:focus:bg-zinc-900 text-xs">
+                    <SelectTrigger className="h-9.5 rounded-md border  font-semibold bg-muted focus:bg-white dark:focus:bg-zinc-900 text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                    <SelectContent className="rounded-md border  bg-card">
                       <SelectItem value="starter" className="text-xs font-medium py-2">Starter Plan</SelectItem>
                       <SelectItem value="standard" className="text-xs font-medium py-2">Standard Plan</SelectItem>
                       <SelectItem value="premium" className="text-xs font-medium py-2">Premium Plan</SelectItem>
@@ -330,13 +330,13 @@ export function RoadmapPanel() {
                 </div>
 
                 <div className="space-y-1.5 text-left">
-                  <Label htmlFor="notes" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 ml-0.5">Starter Pack Entitlement Notes</Label>
+                  <Label htmlFor="notes" className="text-xs font-semibold text-muted-foreground ml-0.5">Starter Pack Entitlement Notes</Label>
                   <Input 
                     id="notes"
                     placeholder="Starter: Excluded. Standard: 1 classroom. Premium: Unlimited."
                     value={newNotes}
                     onChange={e => setNewNotes(e.target.value)}
-                    className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
+                    className="bg-muted border  h-9.5 rounded-md text-xs font-medium focus-visible:ring-1 focus-visible:ring-teal-500"
                   />
                 </div>
               </div>
@@ -365,14 +365,14 @@ export function RoadmapPanel() {
       {/* Features List Section */}
       <div className="space-y-4">
         {features.length === 0 ? (
-          <Card className="border border-dashed border-zinc-200 dark:border-zinc-800 bg-transparent py-16 text-center shadow-none rounded-lg">
+          <Card className="border border-dashed  bg-transparent py-16 text-center shadow-none rounded-lg">
             <CardContent className="flex flex-col items-center gap-3">
-              <div className="size-12 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
-                <ListTodo className="size-5 text-zinc-400" />
+              <div className="size-12 rounded-full bg-muted flex items-center justify-center border ">
+                <ListTodo className="size-5 text-muted-foreground" />
               </div>
               <div>
-                <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">No Roadmap Features</h4>
-                <p className="text-xs text-zinc-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                <h4 className="font-semibold text-sm text-foreground">No Roadmap Features</h4>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
                   Click the button at the top to draft your first product capability.
                 </p>
               </div>
@@ -392,7 +392,7 @@ export function RoadmapPanel() {
                   "overflow-hidden transition-colors rounded-lg border bg-card shadow-xs",
                   isExpanded 
                     ? "border-teal-500/60 dark:border-teal-500/40 shadow-xs"
-                    : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                    : " hover: dark:hover:"
                 )}
               >
                 <div className="p-4 sm:p-5">
@@ -405,10 +405,10 @@ export function RoadmapPanel() {
                       </div>
                       <div className="min-w-0 flex-1 text-left">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-semibold text-sm text-zinc-900 dark:text-white">{item.title}</h4>
+                          <h4 className="font-semibold text-sm text-foreground">{item.title}</h4>
                           {getStatusBadge(item.status)}
                         </div>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1 leading-relaxed line-clamp-1">
+                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed line-clamp-1">
                           {item.description}
                         </p>
                       </div>
@@ -416,9 +416,9 @@ export function RoadmapPanel() {
 
                     {/* Header Right Actions */}
                     <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                      <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800">
-                        <Calendar className="size-3.5 text-zinc-400" />
-                        Target: <span className="text-zinc-900 dark:text-white font-bold">{item.targetRelease}</span>
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold bg-muted px-2.5 py-1 rounded border ">
+                        <Calendar className="size-3.5 text-muted-foreground" />
+                        Target: <span className="text-foreground font-bold">{item.targetRelease}</span>
                       </div>
                       <Button
                         variant="ghost"
@@ -438,9 +438,9 @@ export function RoadmapPanel() {
 
                   {/* Checklist Summary (when collapsed) */}
                   {!isExpanded && totalTodos > 0 && (
-                    <div className="mt-3.5 pt-3.5 border-t border-dashed border-zinc-200 dark:border-zinc-800/60 flex items-center gap-4">
-                      <Progress value={progressVal} className="h-1.5 flex-1 bg-zinc-100 dark:bg-zinc-950" style={{ transform: "translateY(1px)" }} />
-                      <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 shrink-0 font-mono">
+                    <div className="mt-3.5 pt-3.5 border-t border-dashed  flex items-center gap-4">
+                      <Progress value={progressVal} className="h-1.5 flex-1 bg-muted" style={{ transform: "translateY(1px)" }} />
+                      <span className="text-xs font-semibold text-muted-foreground shrink-0 font-mono">
                         {completedTodos}/{totalTodos} Tasks ({Math.round(progressVal)}%)
                       </span>
                     </div>
@@ -448,13 +448,13 @@ export function RoadmapPanel() {
 
                   {/* Expanded Checklist & Notes Drawer */}
                   {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left">
+                    <div className="mt-4 pt-4 border-t border-dashed  text-left">
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         
                         {/* Left Columns: Todo checklist */}
                         <div className="lg:col-span-2 space-y-3.5">
                           <div className="flex items-center justify-between">
-                            <h5 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                            <h5 className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
                               <ListTodo className="size-3.5 text-teal-600" /> Checklist & Tasks
                             </h5>
                             {totalTodos > 0 && (
@@ -465,13 +465,13 @@ export function RoadmapPanel() {
                           </div>
 
                           {totalTodos > 0 && (
-                            <Progress value={progressVal} className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-950" />
+                            <Progress value={progressVal} className="h-1.5 w-full bg-muted" />
                           )}
 
                           {/* Todo Items list */}
                           <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                             {item.todos.length === 0 ? (
-                              <p className="text-xs text-zinc-400 italic py-3 text-left">No checklists added yet. Draft task lists below!</p>
+                              <p className="text-xs text-muted-foreground italic py-3 text-left">No checklists added yet. Draft task lists below!</p>
                             ) : (
                               item.todos.map((todo) => (
                                 <div 
@@ -479,8 +479,8 @@ export function RoadmapPanel() {
                                   className={cn(
                                     "flex items-center justify-between p-2 rounded-md border transition-colors group/todo",
                                     todo.completed 
-                                      ? "bg-zinc-50/50 dark:bg-zinc-950/10 border-transparent text-zinc-400 dark:text-zinc-500 line-through opacity-70" 
-                                      : "bg-white dark:bg-zinc-900 border-zinc-200/60 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
+                                      ? "bg-muted border-transparent text-muted-foreground line-through opacity-70" 
+                                      : "bg-card  text-foreground"
                                   )}
                                 >
                                   <button
@@ -496,7 +496,7 @@ export function RoadmapPanel() {
                                   </button>
                                   <button
                                     onClick={() => handleDeleteTodo(item.id, todo.id)}
-                                    className="opacity-0 group-hover/todo:opacity-100 text-zinc-300 hover:text-red-500 size-6 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                    className="opacity-0 group-hover/todo:opacity-100 text-muted-foreground hover:text-red-500 size-6 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2 hover:bg-red-50 dark:hover:bg-red-950/20"
                                   >
                                     <Trash2 className="size-3.5" />
                                   </button>
@@ -506,7 +506,7 @@ export function RoadmapPanel() {
                           </div>
 
                           {/* Add Todo input */}
-                          <div className="flex gap-2 items-center bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 p-1.5 rounded-md">
+                          <div className="flex gap-2 items-center bg-muted border  p-1.5 rounded-md">
                             <Input 
                               placeholder="Add checklist task (e.g. Map parent context)..."
                               value={newTodoTexts[item.id] || ""}
@@ -530,20 +530,20 @@ export function RoadmapPanel() {
                         </div>
 
                         {/* Right Column: Roadmap Notes & Status dropdown select */}
-                        <div className="space-y-4 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 pt-4 lg:pt-0 lg:pl-6 flex flex-col justify-between text-left">
+                        <div className="space-y-4 border-t lg:border-t-0 lg:border-l  pt-4 lg:pt-0 lg:pl-6 flex flex-col justify-between text-left">
                           
                           <div className="space-y-4">
                             {/* Status settings using flat Dropdown Select */}
                             <div className="space-y-1.5">
-                              <Label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
+                              <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 opacity-90">
                                 <GitBranch className="size-3.5" /> Roadmap Status
                               </Label>
                               <Select value={item.status} onValueChange={(v) => handleStatusChange(item.id, v as any)}>
-                                <SelectTrigger className="h-9 rounded-md border border-zinc-200 dark:border-zinc-800 font-semibold bg-zinc-50/50 dark:bg-zinc-950/40 focus:bg-white dark:focus:bg-zinc-900 text-xs">
+                                <SelectTrigger className="h-9 rounded-md border  font-semibold bg-muted focus:bg-white dark:focus:bg-zinc-900 text-xs">
                                   <div className="flex items-center gap-2">
                                     <span className={cn(
                                       "size-2 rounded-full",
-                                      item.status === "Planned" && "bg-zinc-400 dark:bg-zinc-500",
+                                      item.status === "Planned" && "bg-zinc-400 dark:bg-muted0",
                                       item.status === "In Progress" && "bg-amber-500",
                                       item.status === "Testing" && "bg-blue-500",
                                       item.status === "Completed" && "bg-emerald-500"
@@ -551,7 +551,7 @@ export function RoadmapPanel() {
                                     <SelectValue />
                                   </div>
                                 </SelectTrigger>
-                                <SelectContent className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                                <SelectContent className="rounded-md border  bg-card">
                                   <SelectItem value="Planned" className="text-xs font-medium py-2">Planned</SelectItem>
                                   <SelectItem value="In Progress" className="text-xs font-medium py-2">In Progress</SelectItem>
                                   <SelectItem value="Testing" className="text-xs font-medium py-2">Testing</SelectItem>
@@ -562,7 +562,7 @@ export function RoadmapPanel() {
 
                             {/* Custom plan notes / details */}
                             <div className="space-y-1.5">
-                              <Label htmlFor={`notes-${item.id}`} className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 opacity-90">
+                              <Label htmlFor={`notes-${item.id}`} className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5 opacity-90">
                                 <FileText className="size-3.5" /> Entitlements & Plan Notes
                               </Label>
                               <Textarea
@@ -576,7 +576,7 @@ export function RoadmapPanel() {
                           </div>
 
                           {/* Delete roadmap feature */}
-                          <div className="pt-3.5 flex justify-between items-center text-xs font-medium text-muted-foreground border-t border-dashed border-zinc-200 dark:border-zinc-800 mt-4">
+                          <div className="pt-3.5 flex justify-between items-center text-xs font-medium text-muted-foreground border-t border-dashed  mt-4">
                             <span>Ref: {item.id}</span>
                             <button
                               onClick={() => handleDeleteFeature(item.id)}
@@ -600,11 +600,11 @@ export function RoadmapPanel() {
       </div>
 
       {/* Pro tip card info */}
-      <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex items-start gap-3 text-left">
+      <div className="bg-muted border  rounded-lg p-4 flex items-start gap-3 text-left">
         <Info className="size-4.5 text-amber-600 shrink-0 mt-0.5" />
         <div className="space-y-0.5">
-          <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Sandbox Roadmap Orchestration</h4>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          <h4 className="text-xs font-semibold text-foreground">Sandbox Roadmap Orchestration</h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Toggling status or updating plan notes inside the Product Roadmap is strictly for dashboard planning and task checklists. It will not trigger live database locks, allowing you to orchestrate limits safely before shipping features.
           </p>
         </div>

@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { GraduationCap } from "lucide-react";
-import type { GradeRecord } from "@/lib/types";
+import type { GradeRecord } from "@/types";
 
 interface ExamsTableProps {
   activeTab: string;
@@ -26,7 +26,7 @@ export function ExamsTable({
   filteredGrades,
 }: ExamsTableProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800">
+    <Card className="rounded-xl shadow-sm ">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <GraduationCap className="size-4 text-violet-500" />
@@ -39,7 +39,7 @@ export function ExamsTable({
           value={activeTab}
           onValueChange={onActiveTabChange}
         >
-          <TabsList className="mb-4 bg-zinc-50 dark:bg-zinc-900 p-1">
+          <TabsList className="mb-4 bg-muted p-1">
             <TabsTrigger value="all" className="text-xs">
               All Exams
             </TabsTrigger>
@@ -55,14 +55,14 @@ export function ExamsTable({
             <ScrollArea className="max-h-[500px] w-full">
               <div className="min-w-[600px] sm:min-w-full pb-4">
                 {filteredGrades.length === 0 ? (
-                  <div className="text-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed rounded-xl mt-2">
+                  <div className="text-center py-12 text-muted-foreground border border-dashed rounded-xl mt-2">
                     <GraduationCap className="size-10 mx-auto mb-2 opacity-40" />
                     <p className="text-sm font-medium">No exam grades found</p>
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-zinc-100 dark:border-zinc-800">
+                      <TableRow className="">
                         <TableHead className="font-semibold">Subject</TableHead>
                         <TableHead className="font-semibold">
                           Exam Type
@@ -84,7 +84,7 @@ export function ExamsTable({
                         return (
                           <TableRow
                             key={g.id}
-                            className="border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30"
+                            className=" hover:bg-muted"
                           >
                             <TableCell className="font-medium">
                               {g.subjectName}
@@ -92,18 +92,18 @@ export function ExamsTable({
                             <TableCell>
                               <Badge
                                 variant="outline"
-                                className="text-xs capitalize px-2.5 font-medium bg-zinc-50/50 dark:bg-zinc-900"
+                                className="text-xs capitalize px-2.5 font-medium bg-muted"
                               >
                                 {g.examType}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                              <span className="text-sm font-semibold text-foreground">
                                 {Number(g.marks)
                                   .toFixed(2)
                                   .replace(/\.00$/, "")}
                               </span>
-                              <span className="text-xs text-zinc-400">
+                              <span className="text-xs text-muted-foreground">
                                 /{g.maxMarks}
                               </span>
                             </TableCell>
@@ -111,9 +111,9 @@ export function ExamsTable({
                               <div className="flex items-center justify-center gap-2">
                                 <Progress
                                   value={pct}
-                                  className="w-16 h-1.5 bg-zinc-100 dark:bg-zinc-800 [&>div]:bg-violet-500"
+                                  className="w-16 h-1.5 bg-muted [&>div]:bg-violet-500"
                                 />
-                                <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                                <span className="text-xs font-medium text-foreground">
                                   {pct}%
                                 </span>
                               </div>

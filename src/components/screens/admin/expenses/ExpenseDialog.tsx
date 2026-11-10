@@ -19,7 +19,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { formatLocalDate, parseLocalDate } from "@/lib/utils";
+import {
+  formatLocalDate,
+  parseLocalDate,
+} from "@/lib/date";
 
 interface ExpenseDialogProps {
   open: boolean;

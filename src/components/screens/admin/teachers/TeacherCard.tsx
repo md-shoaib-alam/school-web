@@ -57,14 +57,14 @@ export function TeacherCard({
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start gap-4">
-          <Avatar className="size-14 shrink-0 ring-2 ring-white dark:ring-zinc-800 shadow-sm">
+          <Avatar className="size-14 shrink-0 ring-2 ring-white dark:ring-border shadow-sm">
             <AvatarFallback className={`${color} text-white text-sm font-bold`}>
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <h3 
-              className="font-semibold text-zinc-900 dark:text-zinc-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors hover:underline"
+              className="font-semibold text-foreground truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors hover:underline"
             >
               {teacher.name}
             </h3>
@@ -162,7 +162,7 @@ export function TeacherCard({
           </div>
 
           {/* Experience & Qualification */}
-          <div className="flex items-center gap-4 pt-2 border-t dark:border-zinc-700">
+          <div className="flex items-center gap-4 pt-2 border-t">
             {teacher.experience && (
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Briefcase className="size-3.5" />

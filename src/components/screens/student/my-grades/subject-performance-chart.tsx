@@ -28,7 +28,7 @@ export function SubjectPerformanceChart({
   chartConfig,
 }: SubjectPerformanceChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 h-full">
+    <Card className="rounded-xl shadow-sm  h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <BarChart3 className="size-4 text-violet-500" />
@@ -79,7 +79,7 @@ export function SubjectPerformanceChart({
             </ChartContainer>
           )
         ) : (
-          <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
+          <div className="h-[260px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl ">
             <p className="text-sm">No subject chart data available</p>
           </div>
         )}

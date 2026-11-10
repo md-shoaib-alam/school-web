@@ -100,14 +100,14 @@ function AdmitCardPrintPreview({
   const totalPages = Math.ceil(admitCards.length / cardsPerPage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-zinc-950 text-muted-foreground font-sans">
       {/* Custom Standalone Toolbar */}
       <div className="toolbar no-print">
         <div className="toolbar-title flex items-center gap-2">
           <span style={{ fontSize: "1.1rem" }}>🎫</span>
           <span className="font-bold tracking-tight text-white">Admit Card Workspace</span>
           <span className="toolbar-badge select-none">{classNameStr} - {classSection}</span>
-          <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider ml-2 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
+          <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider ml-2 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
             {admitCards.length} Cards
           </span>
         </div>
@@ -115,7 +115,7 @@ function AdmitCardPrintPreview({
         <div className="toolbar-actions flex items-center flex-wrap gap-3">
           {/* Template Switcher */}
           <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
-            <span className="text-[10px] text-zinc-300 font-bold uppercase tracking-wider">Style:</span>
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Style:</span>
             <select 
               value={selectedTemplate} 
               onChange={(e) => setSelectedTemplate(e.target.value)}
@@ -215,8 +215,8 @@ function AdmitCardPrintPreview({
                   <div 
                     key={card.cardNumber} 
                     className={selectedTemplate === 'compact_dual'
-                      ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-200"
-                      : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                      ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed "
+                      : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed "
                     }
                   >
                     <div className="size-full flex items-center justify-center p-1">
@@ -248,8 +248,8 @@ function AdmitCardPrintPreview({
                 <div 
                   key={`print-${card.cardNumber}`} 
                   className={selectedTemplate === 'compact_dual'
-                    ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed border-zinc-200"
-                    : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed border-zinc-300"
+                    ? "flex items-center justify-center h-[12.8cm] p-1 border border-dashed "
+                    : "flex items-center justify-center h-[13.8cm] p-1 border border-dashed "
                   }
                   style={{ 
                     pageBreakInside: 'avoid',

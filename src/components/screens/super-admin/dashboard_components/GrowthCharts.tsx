@@ -40,28 +40,28 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
   ];
 
   return (
-    <Card className="border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 rounded-2xl shadow-sm h-full flex flex-col justify-between">
+    <Card className="border  bg-card rounded-2xl shadow-sm h-full flex flex-col justify-between">
       <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+          <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
             <div className="size-6 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
               <BarChart3 className="size-3.5" />
             </div>
             Platform Insights
           </CardTitle>
-          <CardDescription className="text-xs text-slate-500 mt-0.5">
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Growth over the last 6 months
           </CardDescription>
         </div>
-        <div className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
-          Last 6 Months <ChevronDown className="size-3 text-slate-400" />
+        <div className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border  bg-muted text-foreground">
+          Last 6 Months <ChevronDown className="size-3 text-muted-foreground" />
         </div>
       </CardHeader>
 
       <CardContent className="pt-2 flex-1 flex flex-col justify-between">
         {loading || !recharts ? (
           <div className="space-y-4">
-            <div className="h-[210px] w-full flex items-end justify-between px-4 pb-4 pt-6 gap-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="h-[210px] w-full flex items-end justify-between px-4 pb-4 pt-6 gap-3 border-b ">
               {[45, 60, 75, 55, 90, 100].map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
                   <div className="flex items-end gap-1.5 w-full justify-center h-full">
@@ -154,11 +154,11 @@ export function GrowthCharts({ loading, data }: GrowthChartsProps) {
             <div className="flex items-center justify-center gap-6 pt-1 text-xs">
               <div className="flex items-center gap-2">
                 <div className="size-2.5 rounded-full bg-[#60A5FA]" />
-                <span className="font-medium text-slate-600 dark:text-slate-400">New Schools</span>
+                <span className="font-medium text-foreground">New Schools</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="size-2.5 rounded-full bg-[#2563EB]" />
-                <span className="font-medium text-slate-600 dark:text-slate-400">New Users</span>
+                <span className="font-medium text-foreground">New Users</span>
               </div>
             </div>
           </div>

@@ -53,11 +53,11 @@ const actions = [
 
 export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
   return (
-    <div className="rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 sm:p-5 shadow-xs flex flex-col h-full">
+    <div className="rounded-2xl sm:rounded-3xl border  bg-card p-4 sm:p-5 shadow-xs flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="flex items-center gap-2 pb-3 border-b ">
         <Zap className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400 fill-blue-600/20" />
-        <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-sm sm:text-base font-bold text-foreground">
           Quick Actions
         </h2>
       </div>
@@ -85,16 +85,16 @@ export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
                 {act.icon}
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] sm:text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                <p className="text-[11px] sm:text-xs font-bold text-foreground truncate">
                   {act.label}
                 </p>
-                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+                <p className="text-[10px] text-muted-foreground truncate">
                   {act.subtitle}
                 </p>
               </div>
             </div>
 
-            <ChevronRight className="size-3.5 text-zinc-400 dark:text-zinc-500 group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
+            <ChevronRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </div>
         ))}
       </div>

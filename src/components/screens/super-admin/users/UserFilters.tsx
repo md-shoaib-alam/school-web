@@ -103,10 +103,10 @@ export function UserFilters({
         {/* Row 1 on mobile: Search Input + Mobile Filters Button */}
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 dark:text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <Input
               placeholder="Search users by name or email..."
-              className="pl-9 h-9 bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-xl text-xs placeholder:text-slate-400 shadow-2xs focus-visible:ring-1 focus-visible:ring-blue-500"
+              className="pl-9 h-9 bg-card border  rounded-xl text-xs placeholder:text-muted-foreground shadow-2xs focus-visible:ring-1 focus-visible:ring-blue-500"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
             />
@@ -129,13 +129,13 @@ export function UserFilters({
         <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 sm:gap-2">
           {/* Role Filter */}
           <Select value={roleFilter} onValueChange={onRoleFilterChange}>
-            <SelectTrigger className="h-9 w-full sm:w-[135px] rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[11px] sm:text-xs font-medium shadow-2xs px-2 sm:px-3 truncate">
+            <SelectTrigger className="h-9 w-full sm:w-[135px] rounded-xl  bg-card text-[11px] sm:text-xs font-medium shadow-2xs px-2 sm:px-3 truncate">
               <div className="flex items-center gap-1.5 truncate">
-                <Users className="size-3.5 text-slate-400 shrink-0 hidden xs:inline sm:inline" />
+                <Users className="size-3.5 text-muted-foreground shrink-0 hidden xs:inline sm:inline" />
                 <SelectValue placeholder="All Roles" />
               </div>
             </SelectTrigger>
-            <SelectContent className="rounded-xl border border-slate-200 dark:border-zinc-800 text-xs">
+            <SelectContent className="rounded-xl border  text-xs">
               {ROLES.map((r) => (
                 <SelectItem key={r.value} value={r.value} className="text-xs font-medium">
                   {r.label}
@@ -151,25 +151,25 @@ export function UserFilters({
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="h-9 w-full sm:w-[155px] rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[11px] sm:text-xs font-medium justify-between shadow-2xs hover:bg-slate-50 dark:hover:bg-zinc-800/80 px-2 sm:px-3 truncate"
+                className="h-9 w-full sm:w-[155px] rounded-xl  bg-card text-[11px] sm:text-xs font-medium justify-between shadow-2xs hover:bg-accent/80 px-2 sm:px-3 truncate"
               >
                 <div className="flex items-center gap-1.5 truncate">
-                  <Building2 className="size-3.5 text-slate-400 shrink-0 hidden xs:inline sm:inline" />
+                  <Building2 className="size-3.5 text-muted-foreground shrink-0 hidden xs:inline sm:inline" />
                   <span className="truncate">
                     {tenantFilter === "all" ? "All Schools" : (tenants.find(t => t.id === tenantFilter)?.name || "All Schools")}
                   </span>
                 </div>
-                <ChevronDown className="ml-1 size-3 shrink-0 text-slate-400 opacity-60" />
+                <ChevronDown className="ml-1 size-3 shrink-0 text-muted-foreground opacity-60" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[280px] max-w-sm p-0 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl rounded-xl" align="start">
-              <div className="flex items-center border-b px-3 border-slate-200 dark:border-zinc-800">
-                <Search className="mr-2 size-3.5 shrink-0 text-slate-400" />
+            <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[280px] max-w-sm p-0 border  bg-card shadow-xl rounded-xl" align="start">
+              <div className="flex items-center border-b px-3 ">
+                <Search className="mr-2 size-3.5 shrink-0 text-muted-foreground" />
                 <Input
                   placeholder="Search schools..."
                   value={tenantSearch}
                   onChange={(e) => onTenantSearchChange(e.target.value)}
-                  className="flex h-9 w-full bg-transparent py-2 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-400"
+                  className="flex h-9 w-full bg-transparent py-2 text-xs outline-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
                 />
               </div>
               <ScrollArea className="h-56 p-1">
@@ -180,14 +180,14 @@ export function UserFilters({
                     setOpen(false);
                     onTenantSearchChange("");
                   }}
-                  className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-slate-100 dark:hover:bg-zinc-800/80 rounded-lg transition-colors cursor-pointer"
+                  className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-accent/80 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span className="font-semibold text-slate-900 dark:text-slate-100">All Schools</span>
+                  <span className="font-semibold text-foreground">All Schools</span>
                   {tenantFilter === "all" && <Check className="size-3.5 text-blue-600 shrink-0" />}
                 </button>
 
                 {filteredTenants.length === 0 ? (
-                  <div className="p-3 text-xs text-slate-400 text-center">No schools found.</div>
+                  <div className="p-3 text-xs text-muted-foreground text-center">No schools found.</div>
                 ) : (
                   filteredTenants.map((t, index) => (
                     <button
@@ -198,9 +198,9 @@ export function UserFilters({
                         onTenantFilterChange(t.id);
                         setOpen(false);
                       }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-slate-100 dark:hover:bg-zinc-800/80 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center justify-between w-full text-left px-3 py-2 text-xs hover:bg-accent/80 rounded-lg transition-colors cursor-pointer"
                     >
-                      <span className="font-medium text-slate-900 dark:text-slate-100 truncate pr-2">{t.name}</span>
+                      <span className="font-medium text-foreground truncate pr-2">{t.name}</span>
                       {tenantFilter === t.id && <Check className="size-3.5 text-blue-600 shrink-0" />}
                     </button>
                   ))
@@ -211,13 +211,13 @@ export function UserFilters({
 
           {/* Status Filter */}
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="h-9 w-full sm:w-[130px] rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-[11px] sm:text-xs font-medium shadow-2xs px-2 sm:px-3 truncate">
+            <SelectTrigger className="h-9 w-full sm:w-[130px] rounded-xl  bg-card text-[11px] sm:text-xs font-medium shadow-2xs px-2 sm:px-3 truncate">
               <div className="flex items-center gap-1.5 truncate">
-                <CircleDot className="size-3.5 text-slate-400 shrink-0 hidden xs:inline sm:inline" />
+                <CircleDot className="size-3.5 text-muted-foreground shrink-0 hidden xs:inline sm:inline" />
                 <SelectValue placeholder="All Status" />
               </div>
             </SelectTrigger>
-            <SelectContent className="rounded-xl border border-slate-200 dark:border-zinc-800 text-xs">
+            <SelectContent className="rounded-xl border  text-xs">
               {STATUS_OPTIONS.map((s) => (
                 <SelectItem key={s.value} value={s.value} className="text-xs font-medium">
                   {s.label}
@@ -242,9 +242,9 @@ export function UserFilters({
 
       {/* Row 3 on mobile / Row 2 on desktop: Counter & Action Buttons */}
       <div className="flex items-center justify-between gap-2 px-0.5 pt-0.5">
-        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+        <p className="text-xs font-medium text-muted-foreground truncate">
           <span className="hidden sm:inline">Showing </span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCount === 0 ? "0" : `${startItem}–${endItem}`}</span> of <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCount.toLocaleString()}</span>
+          <span className="font-semibold text-foreground">{totalCount === 0 ? "0" : `${startItem}–${endItem}`}</span> of <span className="font-semibold text-foreground">{totalCount.toLocaleString()}</span>
           <span className="hidden sm:inline"> users</span>
         </p>
 
@@ -253,9 +253,9 @@ export function UserFilters({
           <Button
             variant="outline"
             onClick={onExport}
-            className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-xl border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-slate-300 text-xs font-semibold gap-1.5 shadow-2xs transition-colors"
+            className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-xl  bg-card hover:bg-accent text-foreground text-xs font-semibold gap-1.5 shadow-2xs transition-colors"
           >
-            <Download className="size-3.5 text-slate-500" />
+            <Download className="size-3.5 text-muted-foreground" />
             <span>Export</span>
           </Button>
 

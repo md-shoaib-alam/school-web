@@ -31,7 +31,7 @@ export function AssessmentsPerformanceChart({
   assessmentAvg,
 }: AssessmentsPerformanceChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 w-full">
+    <Card className="rounded-xl shadow-sm  w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <BarChart3 className="size-4 text-violet-500" />
@@ -80,7 +80,7 @@ export function AssessmentsPerformanceChart({
             </ChartContainer>
           )
         ) : (
-          <div className="h-[260px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
+          <div className="h-[260px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl ">
             <p className="text-sm">No continuous assessment data available</p>
           </div>
         )}

@@ -46,7 +46,7 @@ export function SubjectsFilters({
               />
             </div>
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg shrink-0 sm:hidden">
+            <div className="flex items-center gap-0.5 bg-muted p-1 rounded-lg shrink-0 sm:hidden">
               <Button
                 variant={viewMode === "table" ? "secondary" : "ghost"}
                 size="sm"
@@ -68,7 +68,7 @@ export function SubjectsFilters({
         </div>
 
         {/* Desktop View Mode Toggle */}
-        <div className="hidden sm:flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg shrink-0">
+        <div className="hidden sm:flex items-center gap-0.5 bg-muted p-1 rounded-lg shrink-0">
           <Button
             variant={viewMode === "table" ? "secondary" : "ghost"}
             size="sm"

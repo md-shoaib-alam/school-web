@@ -63,9 +63,9 @@ export function TodayAttendanceCard({
 
   return (
     <>
-      <Card className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3.5 sm:p-4.5 shadow-2xs space-y-2.5 sm:space-y-3">
+      <Card className="rounded-2xl border  bg-card p-3.5 sm:p-4.5 space-y-2.5 sm:space-y-3">
         <div className="flex items-center justify-between pb-0.5">
-          <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+          <h3 className="text-sm sm:text-base font-bold text-foreground">
             Today&apos;s Attendance
           </h3>
           <Badge
@@ -73,7 +73,7 @@ export function TodayAttendanceCard({
               'font-semibold px-2 py-0.5 text-[11px] sm:text-xs border',
               isTodayPresent
                 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200/80'
-                : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-slate-200'
+                : 'bg-muted text-muted-foreground '
             )}
           >
             {isTodayPresent ? '● Present Today' : '● Not Marked'}
@@ -86,7 +86,7 @@ export function TodayAttendanceCard({
             'flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border',
             isTodayPresent
               ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30'
-              : 'bg-slate-50/90 dark:bg-zinc-900/60 border-slate-200/80 dark:border-zinc-800'
+              : 'bg-muted '
           )}
         >
           <div
@@ -99,14 +99,14 @@ export function TodayAttendanceCard({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1.5">
-              <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 capitalize">
+              <h4 className="text-xs sm:text-sm font-bold text-foreground capitalize">
                 {isTodayPresent ? 'Present Today' : 'Not Marked'}
               </h4>
-              <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-zinc-400 shrink-0">
+              <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground shrink-0">
                 {hasCheckedOut ? 'Shift Completed' : hasCheckedIn ? 'In Progress' : 'Pending'}
               </span>
             </div>
-            <p className="text-[10.5px] sm:text-[11px] text-slate-500 dark:text-zinc-400 leading-tight">
+            <p className="text-[10.5px] sm:text-[11px] text-muted-foreground leading-tight">
               {hasCheckedIn ? 'Attendance active for today' : 'Check-in required for today'}
             </p>
           </div>
@@ -115,9 +115,9 @@ export function TodayAttendanceCard({
         {/* Dedicated In Time & Out Time Cards */}
         <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
           {/* In Time Tile */}
-          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50/90 dark:bg-zinc-900/70 border border-slate-200/80 dark:border-zinc-800/80 space-y-1">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-muted border  space-y-1">
             <div className="flex items-center justify-between gap-1">
-              <span className="text-[10px] sm:text-[11px] font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-1.5 shrink-0">
+              <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 shrink-0">
                 <LogIn className="size-3 sm:size-3.5 text-emerald-600 dark:text-emerald-400" />
                 In Time
               </span>
@@ -126,21 +126,21 @@ export function TodayAttendanceCard({
                   'text-[9px] font-semibold px-1.5 py-0.5 rounded shrink-0',
                   todayRecord?.checkIn
                     ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-slate-200/70 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
+                    : 'bg-muted text-muted-foreground'
                 )}
               >
                 {todayRecord?.checkIn ? 'Recorded' : 'Pending'}
               </span>
             </div>
-            <p className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight">
+            <p className="text-sm sm:text-base font-extrabold text-foreground tracking-tight">
               {todayRecord?.checkIn || '--:--'}
             </p>
           </div>
 
           {/* Out Time Tile */}
-          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50/90 dark:bg-zinc-900/70 border border-slate-200/80 dark:border-zinc-800/80 space-y-1">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-muted border  space-y-1">
             <div className="flex items-center justify-between gap-1">
-              <span className="text-[10px] sm:text-[11px] font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-1.5 shrink-0">
+              <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 shrink-0">
                 <LogOut className="size-3 sm:size-3.5 text-rose-500 dark:text-rose-400" />
                 Out Time
               </span>
@@ -151,13 +151,13 @@ export function TodayAttendanceCard({
                     ? 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300'
                     : todayRecord?.checkIn
                     ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300'
-                    : 'bg-slate-200/70 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
+                    : 'bg-muted text-muted-foreground'
                 )}
               >
                 {todayRecord?.checkOut ? 'Completed' : todayRecord?.checkIn ? 'In Progress' : 'Pending'}
               </span>
             </div>
-            <p className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight">
+            <p className="text-sm sm:text-base font-extrabold text-foreground tracking-tight">
               {todayRecord?.checkOut || '--:--'}
             </p>
           </div>
@@ -219,27 +219,27 @@ export function TodayAttendanceCard({
 
       {/* Check Out Confirmation Dialog */}
       <AlertDialog open={showCheckOutConfirm} onOpenChange={setShowCheckOutConfirm}>
-        <AlertDialogContent className="max-w-md rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-zinc-800">
+        <AlertDialogContent className="max-w-md rounded-2xl p-5 sm:p-6 border ">
           <AlertDialogHeader className="text-left">
             <div className="size-11 sm:size-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 shadow-2xs">
               <AlertTriangle className="size-6" />
             </div>
-            <AlertDialogTitle className="text-base sm:text-lg font-bold text-slate-900 dark:text-zinc-100">
+            <AlertDialogTitle className="text-base sm:text-lg font-bold text-foreground">
               Confirm Daily Check-Out?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 space-y-2.5 pt-1">
+            <AlertDialogDescription className="text-xs sm:text-sm text-muted-foreground space-y-2.5 pt-1">
               <span>
                 Are you sure you want to check out now? Once checked out, your working hours for today will be finalized.
               </span>
-              <div className="bg-slate-50 dark:bg-zinc-900/80 p-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 space-y-1.5 text-xs">
+              <div className="bg-muted p-3 rounded-xl border  space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-zinc-400">Check-in recorded:</span>
+                  <span className="text-muted-foreground">Check-in recorded:</span>
                   <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                     {todayRecord?.checkIn || '--'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-zinc-400">Check-out time (IST):</span>
+                  <span className="text-muted-foreground">Check-out time (IST):</span>
                   <span className="font-bold text-rose-600 dark:text-rose-400">
                     {currentIstTime}
                   </span>

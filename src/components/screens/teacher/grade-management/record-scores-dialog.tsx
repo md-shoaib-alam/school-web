@@ -96,7 +96,7 @@ export function RecordScoresDialog({
             ))}
           </div>
         ) : students.length === 0 ? (
-          <div className="py-12 text-center text-zinc-400 dark:text-zinc-500">
+          <div className="py-12 text-center text-muted-foreground">
             <Users className="size-10 mx-auto mb-2 opacity-40" />
             <p className="text-sm">No students found</p>
             <p className="text-xs mt-1">
@@ -119,13 +119,13 @@ export function RecordScoresDialog({
                     className={`p-4 rounded-lg border transition-all ${
                       hasMark
                         ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/20"
-                        : "border-zinc-200 dark:border-zinc-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
+                        : " hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className={`text-sm font-semibold ${!hasMark ? "text-zinc-500 dark:text-zinc-400" : "text-zinc-900 dark:text-zinc-100"}`}>
+                          <p className={`text-sm font-semibold ${!hasMark ? "text-muted-foreground" : "text-foreground"}`}>
                             {student.name}
                           </p>
                           <Badge
@@ -139,7 +139,7 @@ export function RecordScoresDialog({
                             {hasMark ? "✓ Graded" : "Pending"}
                           </Badge>
                         </div>
-                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                        <p className="text-[11px] text-muted-foreground">
                           Roll No: {student.rollNumber}
                         </p>
                       </div>
@@ -155,10 +155,10 @@ export function RecordScoresDialog({
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="mt-3 pt-3 border-t  flex flex-col sm:flex-row sm:items-center gap-4">
                       <div className="flex-1 min-w-[150px]">
                         <div>
-                          <Label className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
+                          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
                             Marks Obtained
                           </Label>
                           <div className="flex items-center gap-2 mt-1">
@@ -226,7 +226,7 @@ export function RecordScoresDialog({
             </div>
 
             {isDirty && canCreate && !isActiveAssocCompleted && (
-              <div className="mt-2 pt-4 border-t border-zinc-100 dark:border-zinc-800 bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
+              <div className="mt-2 pt-4 border-t  bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
                 <Button
                   size="lg"
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2 shadow-md py-5 text-sm transition-all flex items-center justify-center"

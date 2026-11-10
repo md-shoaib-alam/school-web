@@ -1,4 +1,4 @@
-import { ClassInfo, AttendanceRecord, GradeRecord, FeeRecord } from "@/lib/types";
+import { ClassInfo, AttendanceRecord, GradeRecord, FeeRecord } from "@/types";
 import { ChartConfig } from "@/components/ui/chart";
 
 export interface AttendanceSummary {

@@ -153,7 +153,7 @@ export function ActiveExamTableRow({
       </TableCell>
       <TableCell className="py-4 pl-2 sm:pl-4">
         <div className="flex flex-col">
-          <span className="font-semibold text-sm text-slate-900 dark:text-white leading-tight">
+          <span className="font-semibold text-sm text-foreground leading-tight">
             {exam.name}
           </span>
           <span className="text-xs text-muted-foreground mt-0.5">
@@ -175,13 +175,13 @@ export function ActiveExamTableRow({
       <TableCell className="hidden sm:table-cell py-4 whitespace-nowrap">
         {renderTypeBadge(exam.examType)}
       </TableCell>
-      <TableCell className="hidden lg:table-cell py-4 text-sm text-slate-700 dark:text-zinc-300 whitespace-nowrap">
+      <TableCell className="hidden lg:table-cell py-4 text-sm text-foreground whitespace-nowrap">
         <div className="flex items-center gap-1.5">
           <Calendar className="size-3.5 text-muted-foreground" />
           {formatMockupDate(exam.startDate)}
         </div>
       </TableCell>
-      <TableCell className="hidden lg:table-cell py-4 text-sm text-slate-700 dark:text-zinc-300 whitespace-nowrap">
+      <TableCell className="hidden lg:table-cell py-4 text-sm text-foreground whitespace-nowrap">
         <div className="flex items-center gap-1.5">
           <Calendar className="size-3.5 text-muted-foreground" />
           {formatMockupDate(exam.endDate)}

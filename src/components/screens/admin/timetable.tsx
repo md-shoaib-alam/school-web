@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
-import type { ClassInfo } from "@/lib/types";
+import type { ClassInfo } from "@/types";
 
 // Sub-components
 import { GridView } from "./timetable/GridView";
@@ -355,7 +355,7 @@ export function AdminTimetable() {
         onManageClick={handleOpenManage}
       />
 
-      <Card className="border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xs rounded-2xl overflow-hidden">
+      <Card className="border  bg-card rounded-2xl overflow-hidden">
         <CardContent className="p-0 overflow-x-auto w-full">
           {isLoadingTimetable || isLoadingClasses ? (
             <TimetableSkeleton viewMode={viewMode} />

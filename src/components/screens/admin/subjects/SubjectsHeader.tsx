@@ -13,10 +13,10 @@ export function SubjectsHeader({ totalSubjects, canCreate, onAddClick }: Subject
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
           Subjects
         </h2>
-        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
           {totalSubjects} subjects across all classes
         </p>
       </div>

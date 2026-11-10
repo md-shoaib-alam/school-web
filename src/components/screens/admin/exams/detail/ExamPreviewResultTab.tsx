@@ -172,7 +172,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
   return (
     <div className="space-y-4">
       {/* Title Header with Breadcrumb and Info (Image 3) */}
-      <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="bg-card border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3.5">
             <div className="size-11 sm:size-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
@@ -198,7 +198,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
         <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/60">
           <div className="w-40 sm:w-44">
             <Select defaultValue="class">
-              <SelectTrigger className="rounded-xl bg-slate-50 dark:bg-zinc-800/60 border-border/80 text-xs sm:text-sm font-semibold">
+              <SelectTrigger className="rounded-xl bg-muted border-border/80 text-xs sm:text-sm font-semibold">
                 <SelectValue placeholder="Class 10">{exam.className}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -209,7 +209,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
 
           <div className="w-40 sm:w-44">
             <Select value={selectedSection} onValueChange={setSelectedSection}>
-              <SelectTrigger className="rounded-xl bg-slate-50 dark:bg-zinc-800/60 border-border/80 text-xs sm:text-sm font-semibold">
+              <SelectTrigger className="rounded-xl bg-muted border-border/80 text-xs sm:text-sm font-semibold">
                 <SelectValue placeholder="All Sections" />
               </SelectTrigger>
               <SelectContent>
@@ -226,10 +226,10 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
       </div>
 
       {/* Tabulation Matrix Table (Image 3) */}
-      <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-card border border-border/70 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-50/70 dark:bg-zinc-800/40">
+            <TableHeader className="bg-muted">
               <TableRow className="border-b border-border/70">
                 <TableHead className="w-20 text-center font-bold text-muted-foreground text-xs py-3.5">
                   Roll No.
@@ -284,7 +284,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
                     </TableCell>
 
                     {/* Student Name */}
-                    <TableCell className="py-4 pl-3 font-semibold text-sm text-slate-900 dark:text-zinc-100 whitespace-nowrap">
+                    <TableCell className="py-4 pl-3 font-semibold text-sm text-foreground whitespace-nowrap">
                       {row.studentName}
                     </TableCell>
 
@@ -294,7 +294,7 @@ export function ExamPreviewResultTab({ exam, onNavigatePublish }: ExamPreviewRes
                       return (
                         <TableCell
                           key={distinctSub.subjectName}
-                          className="py-4 text-center font-medium text-sm text-slate-800 dark:text-zinc-200 tabular-nums"
+                          className="py-4 text-center font-medium text-sm text-foreground tabular-nums"
                         >
                           {mark !== undefined ? mark : '-'}
                         </TableCell>

@@ -28,7 +28,7 @@ export function AssignmentGrid({
 
   if (assignments.length === 0) {
     return (
-      <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
+      <div className="text-center py-16 text-muted-foreground">
         <FileText className="size-12 mx-auto mb-4 opacity-50" />
         <p className="text-lg">No homework yet</p>
         <p className="text-sm mt-1">Create your first homework</p>
@@ -45,16 +45,16 @@ export function AssignmentGrid({
           <Card
             key={assignment.id}
             className={`rounded-xl shadow-sm ${
-              overdue ? "border-red-200 dark:border-red-800" : "border-zinc-100 dark:border-zinc-800"
+              overdue ? "border-red-200 dark:border-red-800" : ""
             } hover:shadow-md transition-shadow`}
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+                  <h3 className="font-semibold text-foreground text-sm">
                     {assignment.title}
                   </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {assignment.subjectName} • {assignment.className}
                   </p>
                 </div>
@@ -69,12 +69,12 @@ export function AssignmentGrid({
               </div>
 
               {assignment.description && (
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-3 line-clamp-2">
+                <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                   {assignment.description}
                 </p>
               )}
 
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                 <span className="flex items-center gap-1">
                   <Clock className="size-3" /> Due: {assignment.dueDate}
                 </span>
@@ -100,13 +100,13 @@ export function AssignmentGrid({
 
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500 dark:text-zinc-400">Submissions</span>
+                  <span className="text-muted-foreground">Submissions</span>
                   <span className="font-medium">
                     {assignment.submissions}/{assignment.totalStudents}
                   </span>
                 </div>
                 <Progress value={pct} className="h-2" />
-                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                   <Users className="size-3" />
                   {assignment.totalStudents - assignment.submissions === 0 
                     ? "All students have submitted"
@@ -114,7 +114,7 @@ export function AssignmentGrid({
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-2">
+              <div className="mt-4 pt-3 border-t  flex flex-col gap-2">
                 <Button
                   variant="outline"
                   size="sm"

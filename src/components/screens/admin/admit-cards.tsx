@@ -77,7 +77,7 @@ function getTodayDateString(): string {
 }
 
 function getExamTypeColor(type: string): string {
-  return examTypeColors[type] || 'bg-zinc-100 dark:bg-zinc-900/30 text-zinc-700 dark:text-zinc-400';
+  return examTypeColors[type] || 'bg-muted text-foreground';
 }
 
 // Reducer State & Types

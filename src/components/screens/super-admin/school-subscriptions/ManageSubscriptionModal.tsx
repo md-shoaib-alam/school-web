@@ -55,10 +55,10 @@ export function ManageSubscriptionModal({
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent
           showCloseButton={false}
-          className="p-0 sm:max-w-4xl md:max-w-[880px] w-[calc(100%-1.5rem)] max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950"
+          className="p-0 sm:max-w-4xl md:max-w-[880px] w-[calc(100%-1.5rem)] max-h-[92vh] overflow-y-auto rounded-3xl border  shadow-2xl bg-white dark:bg-slate-950"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 sm:px-6 sm:py-5 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="flex items-center justify-between p-4 sm:px-6 sm:py-5 border-b ">
             <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
               <div className="size-11 sm:size-12 rounded-2xl bg-blue-50 dark:bg-blue-950/70 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0 overflow-hidden">
                 {editingTenant?.logo ? (
@@ -76,10 +76,10 @@ export function ManageSubscriptionModal({
                 )}
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                <h3 className="text-sm sm:text-lg font-bold text-foreground truncate">
                   Manage Subscription
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {editingTenant?.name}
                 </p>
               </div>
@@ -102,7 +102,7 @@ export function ManageSubscriptionModal({
                   </SelectContent>
                 </Select>
                 {editingTenant?.startDate && (
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-muted-foreground">
                     Since {format(new Date(editingTenant.startDate), "MMM d, yyyy")}
                   </span>
                 )}
@@ -111,7 +111,7 @@ export function ManageSubscriptionModal({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="size-8 rounded-full text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-accent"
                 onClick={() => onOpenChange(false)}
               >
                 <X className="size-4" />
@@ -124,7 +124,7 @@ export function ManageSubscriptionModal({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
               {/* Left Column: School Overview, Counts, Plan */}
               <div className="space-y-3.5 sm:space-y-4">
-                <div className="p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
+                <div className="p-3.5 sm:p-4 rounded-2xl border  bg-muted flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <div className="relative size-14 sm:size-16 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                       {editingTenant?.logo ? (
@@ -143,11 +143,11 @@ export function ManageSubscriptionModal({
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                      <h4 className="font-bold text-sm sm:text-base text-foreground truncate">
                         {editingTenant?.name}
                       </h4>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs text-slate-400 font-normal truncate">
+                        <span className="text-xs text-muted-foreground font-normal truncate">
                           /{editingTenant?.slug || "school"}
                         </span>
                         {editingTenant?.slug && (
@@ -156,53 +156,53 @@ export function ManageSubscriptionModal({
                             target="_blank"
                             rel="noopener noreferrer"
                             title={`https://schoolconnect.in/${editingTenant.slug}`}
-                            className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
+                            className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
                           >
                             <ExternalLink className="size-3" />
                           </a>
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
                         <MapPin className="size-3 shrink-0" />
                         <span>{editingTenant?.address || "Bengaluru, Karnataka"}</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-200/60 dark:border-slate-800/60">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+                  <div className="grid grid-cols-3 gap-2 pt-1 border-t ">
+                    <div className="bg-card border  rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
                       <div className="size-6.5 sm:size-7 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
                         <Users className="size-3 sm:size-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                        <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                           {editingTenant?.studentCount ?? 0}
                         </p>
-                        <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">Students</p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Students</p>
                       </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+                    <div className="bg-card border  rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
                       <div className="size-6.5 sm:size-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                         <GraduationCap className="size-3 sm:size-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                        <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                           {editingTenant?.teacherCount ?? 0}
                         </p>
-                        <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">Teachers</p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Teachers</p>
                       </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
+                    <div className="bg-card border  rounded-xl p-2 sm:p-2.5 flex items-center gap-2 shadow-2xs">
                       <div className="size-6.5 sm:size-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                         <UserCheck className="size-3 sm:size-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                        <p className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                           {editingTenant?.parentCount ?? 0}
                         </p>
-                        <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">Parents</p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">Parents</p>
                       </div>
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export function ManageSubscriptionModal({
                       <Crown className="size-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <p className="text-xs font-bold text-foreground">
                         Current Plan
                       </p>
                       <div className="flex items-baseline gap-2 mt-0.5">
@@ -222,7 +222,7 @@ export function ManageSubscriptionModal({
                           {editingTenant?.plan ? `${editingTenant.plan} Plan` : "Starter Plan"}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-1">
+                      <p className="text-[11px] text-muted-foreground truncate mt-1">
                         {SCHOOL_PLANS.find((p) => p.id === editingTenant?.plan)?.description?.split(".")[0] || "Basic features for small schools"}
                       </p>
                     </div>
@@ -246,7 +246,7 @@ export function ManageSubscriptionModal({
                       }
                     }}
                   >
-                    <SelectTrigger className="h-auto p-1 sm:h-8.5 sm:px-3 border-0 sm:border bg-transparent sm:bg-white dark:sm:bg-slate-900 sm:border-slate-200 dark:sm:border-slate-800 text-blue-600 dark:text-blue-400 hover:bg-transparent sm:hover:bg-blue-50/50 shrink-0 rounded-xl gap-1.5 shadow-none sm:shadow-2xs cursor-pointer [&_svg]:size-5 sm:[&_svg]:size-4 [&_svg]:text-slate-700 sm:[&_svg]:text-blue-600 dark:[&_svg]:text-slate-300">
+                    <SelectTrigger className="h-auto p-1 sm:h-8.5 sm:px-3 border-0 sm:border bg-transparent sm:bg-white dark:sm:bg-slate-900 sm: dark:sm: text-blue-600 dark:text-blue-400 hover:bg-transparent sm:hover:bg-blue-50/50 shrink-0 rounded-xl gap-1.5 shadow-none sm:shadow-2xs cursor-pointer [&_svg]:size-5 sm:[&_svg]:size-4 [&_svg]:text-foreground sm:[&_svg]:text-blue-600 dark:[&_svg]:text-muted-foreground">
                       <RefreshCw className="size-3 text-blue-600 dark:text-blue-400 hidden sm:inline" />
                       <span className="hidden sm:inline text-xs font-semibold">Change Plan</span>
                     </SelectTrigger>
@@ -263,9 +263,9 @@ export function ManageSubscriptionModal({
                 <div className="hidden sm:block">
                   <div className="grid grid-cols-2 gap-3 items-end">
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">License Start Date</Label>
-                      <div className="h-10 px-3 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-2xs">
-                        <Calendar className="size-4 text-slate-500 dark:text-slate-400 shrink-0" />
+                      <Label className="text-xs font-semibold text-foreground">License Start Date</Label>
+                      <div className="h-10 px-3 rounded-2xl border  bg-card flex items-center justify-center gap-2 text-xs font-semibold text-foreground shadow-2xs">
+                        <Calendar className="size-4 text-muted-foreground shrink-0" />
                         <span className="text-xs">
                           {editingTenant?.startDate
                             ? format(new Date(editingTenant.startDate), "MMM d, yyyy")
@@ -275,9 +275,9 @@ export function ManageSubscriptionModal({
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">License Expiry Date</Label>
+                      <Label className="text-xs font-semibold text-foreground">License Expiry Date</Label>
                       <DatePicker
-                        className="w-full h-10 justify-center text-center rounded-2xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-semibold shadow-2xs [&_svg]:size-4 [&_svg]:text-slate-500"
+                        className="w-full h-10 justify-center text-center rounded-2xl  bg-card text-foreground font-semibold shadow-2xs [&_svg]:size-4 [&_svg]:text-muted-foreground"
                         date={editingTenant?.endDate ? new Date(editingTenant.endDate) : undefined}
                         onChange={(date) =>
                           setEditingTenant({
@@ -293,19 +293,19 @@ export function ManageSubscriptionModal({
 
               {/* Right Column: Subscription Limits */}
               <div className="space-y-3.5 sm:space-y-4">
-                <div className="p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20 space-y-3.5 sm:space-y-4">
+                <div className="p-3.5 sm:p-5 rounded-2xl border  bg-muted space-y-3.5 sm:space-y-4">
                   <div className="flex items-center gap-2.5">
                     <div className="size-8 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                       <Settings2 className="size-4" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">Subscription Limits</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Set maximum limits for different modules</p>
+                      <h4 className="font-bold text-sm text-foreground">Subscription Limits</h4>
+                      <p className="text-xs text-muted-foreground">Set maximum limits for different modules</p>
                     </div>
                   </div>
 
                   <div className="space-y-3 pt-1">
-                    <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl border  bg-card">
                       <span className="text-xs font-semibold text-foreground">Max Students</span>
                       <input
                         type="number"
@@ -314,7 +314,7 @@ export function ManageSubscriptionModal({
                         onChange={(e) => setEditingTenant({ ...editingTenant, maxStudents: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl border  bg-card">
                       <span className="text-xs font-semibold text-foreground">Max Teachers</span>
                       <input
                         type="number"
@@ -323,7 +323,7 @@ export function ManageSubscriptionModal({
                         onChange={(e) => setEditingTenant({ ...editingTenant, maxTeachers: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl border  bg-card">
                       <span className="text-xs font-semibold text-foreground">Max Parents</span>
                       <input
                         type="number"
@@ -332,7 +332,7 @@ export function ManageSubscriptionModal({
                         onChange={(e) => setEditingTenant({ ...editingTenant, maxParents: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl border  bg-card">
                       <span className="text-xs font-semibold text-foreground">Max Classes</span>
                       <input
                         type="number"
@@ -360,7 +360,7 @@ export function ManageSubscriptionModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 sm:px-6 sm:py-4 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="p-4 sm:px-6 sm:py-4 border-t  bg-muted flex flex-col sm:flex-row items-center justify-between gap-3">
             <Button
               variant="outline"
               className="hidden sm:flex h-10 px-4 rounded-xl text-xs font-semibold border-rose-200 text-rose-600 dark:text-rose-400 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 gap-1.5"
@@ -373,7 +373,7 @@ export function ManageSubscriptionModal({
             <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="w-full sm:w-auto h-10 px-4 rounded-xl text-xs font-semibold border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="w-full sm:w-auto h-10 px-4 rounded-xl text-xs font-semibold  bg-card hover:bg-accent"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
@@ -392,22 +392,22 @@ export function ManageSubscriptionModal({
 
       {/* Confirmation Modal: Update License */}
       <Dialog open={isConfirmUpdateOpen} onOpenChange={setIsConfirmUpdateOpen}>
-        <DialogContent className="sm:max-w-md p-6 rounded-3xl border border-slate-200 dark:border-slate-800">
+        <DialogContent className="sm:max-w-md p-6 rounded-3xl border ">
           <div className="flex items-start gap-4">
             <div className="size-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/40">
               <ShieldCheck className="size-5" />
             </div>
             <div className="space-y-1.5 flex-1 min-w-0">
-              <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              <h4 className="text-base font-bold text-foreground">
                 Confirm License Changes
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Are you sure you want to update the subscription limits and license details for <strong className="text-slate-800 dark:text-slate-200">{editingTenant?.name}</strong>?
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Are you sure you want to update the subscription limits and license details for <strong className="text-foreground">{editingTenant?.name}</strong>?
               </p>
-              <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
-                <p>• Plan: <strong className="text-slate-900 dark:text-slate-200 capitalize">{editingTenant?.plan}</strong></p>
-                <p>• Status: <strong className="text-slate-900 dark:text-slate-200 capitalize">{editingTenant?.status}</strong></p>
-                <p>• Student Limit: <strong className="text-slate-900 dark:text-slate-200">{editingTenant?.maxStudents}</strong></p>
+              <div className="mt-3 p-3 rounded-xl bg-muted border  text-[11px] text-foreground space-y-1">
+                <p>• Plan: <strong className="text-foreground capitalize">{editingTenant?.plan}</strong></p>
+                <p>• Status: <strong className="text-foreground capitalize">{editingTenant?.status}</strong></p>
+                <p>• Student Limit: <strong className="text-foreground">{editingTenant?.maxStudents}</strong></p>
               </div>
             </div>
           </div>
@@ -451,11 +451,11 @@ export function ManageSubscriptionModal({
               <AlertCircle className="size-5" />
             </div>
             <div className="space-y-1.5 flex-1 min-w-0">
-              <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              <h4 className="text-base font-bold text-foreground">
                 Cancel Subscription?
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                This will immediately change the status of <strong className="text-slate-800 dark:text-slate-200">{editingTenant?.name}</strong> to <strong className="text-rose-600 dark:text-rose-400">Suspended</strong>.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                This will immediately change the status of <strong className="text-foreground">{editingTenant?.name}</strong> to <strong className="text-rose-600 dark:text-rose-400">Suspended</strong>.
               </p>
             </div>
           </div>

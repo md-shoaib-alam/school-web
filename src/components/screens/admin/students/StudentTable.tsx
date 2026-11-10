@@ -81,7 +81,7 @@ export function StudentTable({
                 className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none group/row cursor-pointer"
                 onClick={() => onView(student)}
               >
-                <TableCell className="font-mono text-sm py-4 text-left pl-3 pr-4 sm:pr-8 font-medium text-slate-700 dark:text-zinc-300">
+                <TableCell className="font-mono text-sm py-4 text-left pl-3 pr-4 sm:pr-8 font-medium text-foreground">
                   {student.rollNumber}
                 </TableCell>
                 <TableCell className="py-4 pl-2 sm:pl-4">
@@ -99,7 +99,7 @@ export function StudentTable({
                         {student.name}
                       </p>
                       {student.username && (
-                        <p className="text-[11px] text-zinc-500 font-mono">
+                        <p className="text-[11px] text-muted-foreground font-mono">
                           ID: {student.username}
                         </p>
                       )}

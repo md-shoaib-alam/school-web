@@ -23,13 +23,13 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   if (loading) {
     return (
-      <div className="bg-white dark:bg-neutral-900/40 border border-zinc-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 h-full">
+      <div className="bg-card border  shadow-sm rounded-2xl p-5 sm:p-6 h-full">
         <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
           {/* Weekdays */}
           {WEEKDAY_LABELS.map((day) => (
             <div 
               key={day} 
-              className="pb-4 text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider"
+              className="pb-4 text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               {day}
             </div>
@@ -37,7 +37,7 @@ export function CalendarGrid({
           {/* Day Cells Skeleton */}
           {Array.from({ length: 42 }).map((_, i) => (
             <div key={i} className="aspect-square p-0.5 sm:p-1 flex flex-col items-stretch justify-stretch relative">
-              <Skeleton className="w-full h-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-200/40 dark:border-zinc-800/40" />
+              <Skeleton className="w-full h-full rounded-xl bg-muted border " />
             </div>
           ))}
         </div>
@@ -46,14 +46,14 @@ export function CalendarGrid({
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900/40 border border-zinc-200/60 dark:border-white/[0.06] shadow-sm rounded-2xl p-5 sm:p-6 h-full">
+    <div className="bg-card border  shadow-sm rounded-2xl p-5 sm:p-6 h-full">
       {/* Grid container */}
       <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
         {/* Weekdays */}
         {WEEKDAY_LABELS.map((day) => (
           <div 
             key={day} 
-            className="pb-4 text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider"
+            className="pb-4 text-xs font-medium text-muted-foreground uppercase tracking-wider"
           >
             {day}
           </div>
@@ -81,8 +81,8 @@ export function CalendarGrid({
                     : isDayToday
                       ? "border-2 border-blue-500 dark:border-rose-500 text-blue-600 dark:text-rose-400 font-extrabold bg-blue-50/60 dark:bg-rose-500/15 dark:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
                       : !inCurrentMonth
-                        ? "text-zinc-400 dark:text-zinc-600 bg-zinc-50/20 dark:bg-zinc-900/10 border-zinc-100 dark:border-zinc-800/30" 
-                        : "text-zinc-800 dark:text-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md"
+                        ? "text-muted-foreground bg-muted " 
+                        : "text-foreground bg-muted  shadow-sm hover:bg-accent hover: dark:hover: hover:shadow-md"
                   }
                 `}
               >

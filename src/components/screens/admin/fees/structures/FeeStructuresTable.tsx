@@ -70,7 +70,7 @@ export function FeeStructuresTable({
                           <span className="font-medium text-sm">{s.feeCategoryName}</span>
                           <span className="text-xs text-muted-foreground">({s.feeCategoryCode})</span>
                           {s.feeCategoryStatus === 'inactive' && (
-                            <Badge variant="secondary" className="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-0 h-5 px-1.5 text-[10px]">
+                            <Badge variant="secondary" className="bg-muted text-foreground border-0 h-5 px-1.5 text-[10px]">
                               Inactive
                             </Badge>
                           )}

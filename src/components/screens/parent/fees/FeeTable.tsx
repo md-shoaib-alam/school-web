@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { IndianRupee, Printer, Lock } from "lucide-react";
 import { STATUS_CONFIG, TYPE_ICONS } from "./constants";
-import type { FeeRecord } from "@/lib/types";
+import type { FeeRecord } from "@/types";
 import { ReceiptTemplate } from "./ReceiptTemplate";
 
 interface FeeTableProps {
@@ -135,7 +135,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                       <TableCell className="text-center">
                         {fee.status !== "paid" ? (
                           <div
-                            className="inline-flex items-center justify-center rounded-md text-xs font-semibold h-8 px-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-350 border border-zinc-300 dark:border-zinc-700 cursor-not-allowed shadow-none select-none"
+                            className="inline-flex items-center justify-center rounded-md text-xs font-semibold h-8 px-3 bg-muted text-foreground border  cursor-not-allowed shadow-none select-none"
                           >
                             Pay at School
                           </div>
@@ -150,7 +150,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
                               className={`h-7 px-2 text-[10px] gap-1 font-bold transition-all ${
                                 isPremium 
                                   ? "border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800/50 dark:text-emerald-400 dark:hover:bg-emerald-900/20" 
-                                  : "border-zinc-200 text-zinc-400 opacity-60 cursor-not-allowed grayscale"
+                                  : " text-muted-foreground opacity-60 cursor-not-allowed grayscale"
                               }`}
                               onClick={() => onPrintClick(fee)}
                             >

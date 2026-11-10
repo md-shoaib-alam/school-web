@@ -35,7 +35,7 @@ const priorityConfig: Record<string, { bg: string; label: string }> = {
     label: "Normal",
   },
   low: {
-    bg: "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700",
+    bg: "bg-muted text-muted-foreground ",
     label: "Low",
   },
 };
@@ -76,10 +76,10 @@ export function TeacherNotices() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-semibold text-foreground">
             School Notices
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {notices.length} notices{" "}
             {urgentCount > 0 ? `• ${urgentCount} urgent` : ""}
           </p>
@@ -109,12 +109,12 @@ export function TeacherNotices() {
                 .map((n) => (
                   <div
                     key={n.id}
-                    className="flex items-center justify-between bg-white dark:bg-zinc-900 p-3 rounded-lg"
+                    className="flex items-center justify-between bg-card p-3 rounded-lg"
                   >
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {n.title}
                     </p>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 ml-3 shrink-0" suppressHydrationWarning>
+                    <span className="text-[10px] text-muted-foreground ml-3 shrink-0" suppressHydrationWarning>
                       {new Date(n.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -131,11 +131,11 @@ export function TeacherNotices() {
       {notices.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <Bell className="size-12 mx-auto text-zinc-200 dark:text-zinc-700 mb-3" />
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <Bell className="size-12 mx-auto text-muted-foreground mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">
               No notices
             </p>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Your school hasn&apos;t posted any notices yet
             </p>
           </CardContent>
@@ -151,12 +151,12 @@ export function TeacherNotices() {
                 className={`rounded-xl shadow-sm hover:shadow-md transition-shadow ${
                   notice.priority === "urgent"
                     ? "border-red-200 dark:border-red-800"
-                    : "border-zinc-100 dark:border-zinc-800"
+                    : ""
                 }`}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
+                    <CardTitle className="text-sm font-semibold text-foreground leading-snug">
                       {notice.title}
                     </CardTitle>
                     <Badge
@@ -168,10 +168,10 @@ export function TeacherNotices() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3 mb-3 leading-relaxed">
+                  <p className="text-xs text-muted-foreground line-clamp-3 mb-3 leading-relaxed">
                     {notice.content}
                   </p>
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 border-t border-zinc-50 dark:border-zinc-800 pt-2">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground border-t  pt-2">
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
                         <User className="size-3" />

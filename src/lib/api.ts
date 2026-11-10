@@ -5,6 +5,14 @@
 
 import { env } from './env';
 import { triggerGlobalRefresh } from './query-client';
+import {
+  clearVault,
+  dashboardHref,
+  getActiveAccount,
+  removeAccount,
+  setActiveAccount,
+  updateAccountTokens,
+} from '@/store/app-store/accounts';
 
 const API_BASE = typeof window !== 'undefined' ? '/api/proxy' : env.NEXT_PUBLIC_API_URL;
 
@@ -48,6 +56,16 @@ function buildHeaders(isFormData: boolean = false): Record<string, string> {
 
 // ── Refresh token logic with queue ──
 
+type RefreshError = Error & { transient?: boolean };
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function transientError(message: string): RefreshError {
+  const error = new Error(message) as RefreshError;
+  error.transient = true;
+  return error;
+}
+
 let isRefreshing = false;
 let refreshFailed = false;
 let refreshFailedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -80,40 +98,78 @@ function processQueue(error: Error | null, token: string | null = null) {
   failedQueue = [];
 }
 
+async function postRefresh(refreshToken: string): Promise<Response | null> {
+  return fetch(`${API_BASE}/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  }).catch(() => null);
+}
+
+/**
+ * A 409 means another request holds the rotation lock and will write the new pair locally.
+ * Re-posting our own token would read as replay to the server and revoke that user's sessions,
+ * so we wait for its result instead.
+ */
+async function adoptConcurrentRotation(previous: string): Promise<string | null> {
+  for (let waited = 0; waited < 2000; waited += 250) {
+    await sleep(250);
+    const rotated = getRefreshToken();
+    if (rotated && rotated !== previous) return getToken();
+  }
+  return null;
+}
+
 async function refreshAccessToken(): Promise<string> {
   const refreshToken = getRefreshToken();
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
 
-  const res = await fetch(`${API_BASE}/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!res.ok) {
-    throw new Error('Refresh failed');
+  const res = await postRefresh(refreshToken);
+  if (!res) throw transientError('Refresh request did not reach the server');
+  if (res.status === 429) throw transientError('Too many refresh attempts');
+  if (res.status === 409) {
+    const token = await adoptConcurrentRotation(refreshToken);
+    if (token) return token;
+    throw transientError('Refresh already in progress');
   }
+  if (!res.ok) throw new Error('Refresh failed');
 
   const data = await res.json();
+  persistRotation(data.token, data.refreshToken);
+  return data.token;
+}
 
-  // Store the new tokens
-  setToken(data.token);
-  setRefreshToken(data.refreshToken);
+/** The rotated pair belongs to one vault entry; the globals only mirror whoever is active. */
+export function persistRotation(token: string, refreshToken: string): void {
+  setToken(token);
+  setRefreshToken(refreshToken);
 
-  // Also update cookie so the cookie guard still works
   if (typeof document !== 'undefined') {
     const d = new Date();
     d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
-    document.cookie = `school_token=${data.token};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+    document.cookie = `school_token=${token};expires=${d.toUTCString()};path=/;SameSite=Lax`;
   }
 
-  return data.token;
+  const active = getActiveAccount();
+  if (active) updateAccountTokens(active.user.id, token, refreshToken);
 }
 
 export function forceLogout() {
   if (typeof window === 'undefined') return;
+
+  const active = getActiveAccount();
+  if (active) {
+    const { next } = removeAccount(active.user.id);
+    if (next) {
+      setActiveAccount(next.user.id);
+      window.location.href = dashboardHref(next.user);
+      return;
+    }
+    clearVault();
+  }
+
   localStorage.clear();
   sessionStorage.clear();
   const cookies = document.cookie.split(';');
@@ -151,9 +207,12 @@ export async function getValidTokenOrRefresh(): Promise<string> {
     return newToken;
   } catch (err) {
     isRefreshing = false;
-    markRefreshFailed();
     processQueue(err as Error);
-    forceLogout();
+    // A blip or a rate limit costs an account nothing; a rejected token drops just that one.
+    if (!(err as RefreshError).transient) {
+      markRefreshFailed();
+      forceLogout();
+    }
     throw err;
   }
 }
@@ -289,26 +348,31 @@ export async function loginWithElysia(email: string, password: string) {
 }
 
 /**
+ * Best-effort server-side revocation for one session's own tokens. Removing an account from this
+ * browser must not leave its refresh token valid for the rest of the week.
+ */
+export async function revokeSession(token: string, refreshToken?: string): Promise<void> {
+  if (!token) return;
+  try {
+    await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ refreshToken: refreshToken || undefined }),
+      keepalive: true,
+    });
+  } catch {
+    // The local sign-out happens regardless.
+  }
+}
+
+/**
  * Logout: call server to invalidate tokens, then clear local storage.
  */
 export async function logoutWithElysia(): Promise<void> {
-  const token = getToken();
-  const refreshToken = getRefreshToken();
-  if (token) {
-    // Fire-and-forget: tell the server to revoke tokens
-    try {
-      await fetch(`${API_BASE}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ refreshToken: refreshToken || undefined }),
-      });
-    } catch {
-      // Ignore errors — we'll clear local state regardless
-    }
-  }
+  await revokeSession(getToken() || '', getRefreshToken() || undefined);
 }
 
 /**

@@ -60,10 +60,10 @@ export function TeacherGrades() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-semibold text-foreground">
             Assessments
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             {assessments.length} assessments total
           </p>
         </div>
@@ -101,7 +101,7 @@ export function TeacherGrades() {
         )}
 
         {/* Status Selection Tabs */}
-        <div className="flex border-b border-zinc-100 dark:border-zinc-800/80 mb-2">
+        <div className="flex border-b  mb-2">
           <button
             type="button"
             onClick={() => {
@@ -111,7 +111,7 @@ export function TeacherGrades() {
             className={`pb-3 px-6 text-sm font-semibold transition-colors duration-200 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
               activeTab === "active"
                 ? "text-blue-600 dark:text-blue-400"
-                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
             }`}
           >
             <Clock className={`size-4 ${activeTab === "active" ? "text-blue-500" : ""}`} />
@@ -138,7 +138,7 @@ export function TeacherGrades() {
             className={`pb-3 px-6 text-sm font-semibold transition-colors duration-200 outline-none relative flex items-center gap-2 cursor-pointer disabled:opacity-75 ${
               activeTab === "completed"
                 ? "text-emerald-600 dark:text-emerald-400"
-                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
             }`}
           >
             <CheckCircle2 className={`size-4 ${activeTab === "completed" ? "text-emerald-500" : ""}`} />
@@ -186,7 +186,7 @@ export function TeacherGrades() {
 
         {/* Empty State */}
         {!loading && !listLoading && assessments.length === 0 && (
-          <div className="text-center py-16 bg-zinc-50/40 dark:bg-zinc-900/10 rounded-xl border border-dashed border-border flex flex-col items-center justify-center animate-in fade-in-50 duration-500">
+          <div className="text-center py-16 bg-muted rounded-xl border border-dashed border-border flex flex-col items-center justify-center animate-in fade-in-50 duration-500">
             <div className={`${activeTab === "active" ? "bg-blue-50 dark:bg-blue-900/20" : "bg-emerald-50 dark:bg-emerald-900/20"} p-4 rounded-full mb-4`}>
               {activeTab === "active" ? (
                 <FileText className="size-10 text-blue-600 dark:text-blue-400 opacity-90" />
@@ -216,7 +216,7 @@ export function TeacherGrades() {
 
         {/* Empty State: No Students Found */}
         {selectedAssessmentId && students.length === 0 && (
-          <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
+          <div className="text-center py-16 text-muted-foreground">
             <Users className="size-12 mx-auto mb-4 opacity-50" />
             <p>No students found in this class</p>
           </div>

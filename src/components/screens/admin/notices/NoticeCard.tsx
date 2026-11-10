@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Calendar, Pencil, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import type { NoticeInfo } from "@/lib/types";
+import type { NoticeInfo } from "@/types";
 
 const priorityConfig: Record<string, { bg: string; text: string; border: string }> = {
-  normal: { bg: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300", text: "Normal", border: "border-l-zinc-400 dark:border-l-zinc-500" },
+  normal: { bg: "bg-muted text-foreground", text: "Normal", border: "border-l-zinc-400 dark:border-l-zinc-500" },
   important: { bg: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400", text: "Important", border: "border-l-orange-500" },
   urgent: { bg: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400", text: "Urgent", border: "border-l-red-500" },
 };
@@ -18,7 +18,7 @@ const roleConfig: Record<string, string> = {
   teacher: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
   student: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400",
   parent: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
-  all: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
+  all: "bg-muted text-foreground",
 };
 
 interface NoticeCardProps {
@@ -49,7 +49,7 @@ export function NoticeCard({
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="font-semibold text-foreground">
                 {notice.title}
               </h3>
               <Badge variant="outline" className={`text-[10px] font-medium capitalize ${priority.bg}`}>

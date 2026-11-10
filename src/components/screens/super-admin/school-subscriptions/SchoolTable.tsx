@@ -36,7 +36,7 @@ export function SchoolTable({
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/80">
             <TableHead className="w-12 pl-6 py-3.5">
-              <input type="checkbox" className="rounded border-slate-300 text-blue-600 size-3.5" />
+              <input type="checkbox" className="rounded  text-blue-600 size-3.5" />
             </TableHead>
             <TableHead className="w-10 text-xs font-semibold text-muted-foreground">#</TableHead>
             <TableHead className="min-w-[200px] text-xs font-semibold text-muted-foreground">School Name</TableHead>
@@ -100,7 +100,7 @@ export function SchoolTable({
               return (
                 <TableRow key={tenant.id} className="hover:bg-muted/30 transition-colors border-b border-border/70 last:border-none">
                   <TableCell className="pl-6 py-3.5">
-                    <input type="checkbox" className="rounded border-slate-300 text-blue-600 size-3.5" />
+                    <input type="checkbox" className="rounded  text-blue-600 size-3.5" />
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground font-mono">
                     {(currentPage - 1) * itemsPerPage + idx + 1}

@@ -190,7 +190,7 @@ export function SendNotificationScreen() {
                   <Wifi className="size-3" />
                   ephemeral flow
                 </div>
-                <ul className="text-sm text-zinc-500 space-y-1.5 list-disc pl-4 leading-relaxed">
+                <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-4 leading-relaxed">
                   <li>No database record is created.</li>
                   <li>Dispatched directly via Firebase API.</li>
                   <li>Delivered immediately in background and foreground.</li>

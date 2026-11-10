@@ -72,7 +72,7 @@ function StatusBadge({ status }: { status: string }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground border  dark:bg-slate-800">
       <span className="size-1.5 rounded-full bg-slate-400 shrink-0" />
       No Plan
     </span>
@@ -96,19 +96,19 @@ export function SubscriptionTable({
 }: SubscriptionTableProps) {
   const startEntry = (page - 1) * limit + 1;
   const endEntry = Math.min(page * limit, totalEntries);
-  const commonClasses = "text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5";
-  const cellClasses = "py-3 text-xs font-medium text-slate-700 dark:text-slate-300";
+  const commonClasses = "text-xs font-semibold text-muted-foreground py-3.5";
+  const cellClasses = "py-3 text-xs font-medium text-foreground";
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs bg-card">
+    <div className="rounded-2xl border  overflow-hidden shadow-2xs bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50/70 dark:bg-slate-800/40 hover:bg-transparent border-b border-slate-200/80 dark:border-slate-800">
+            <TableRow className="bg-muted hover:bg-transparent border-b ">
               <TableHead className="w-10 py-3.5 pl-4">
-                <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+                <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
               </TableHead>
-              <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+              <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
               <TableHead className={commonClasses}>Parent Name</TableHead>
               <TableHead className={commonClasses}>Student</TableHead>
               <TableHead className={commonClasses}>Plan</TableHead>
@@ -122,7 +122,7 @@ export function SubscriptionTable({
           <TableBody>
             {loading ? (
               [...Array(5)].map((_, i) => (
-                <TableRow key={i} className="border-b border-slate-100 dark:border-slate-800/80">
+                <TableRow key={i} className="border-b ">
                   <TableCell colSpan={10} className="py-3">
                     <Skeleton className="h-8 w-full rounded" />
                   </TableCell>
@@ -178,15 +178,15 @@ export function SubscriptionTable({
                 return (
                   <TableRow
                     key={item.id || idx}
-                    className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800/80 last:border-none"
+                    className="hover:bg-muted dark:hover:bg-slate-800/40 transition-colors border-b  last:border-none"
                   >
                     {/* Checkbox */}
                     <TableCell className="w-10 py-3 pl-4">
-                      <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+                      <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
                     </TableCell>
 
                     {/* Row # */}
-                    <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+                    <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
                       {rowNum}
                     </TableCell>
 
@@ -196,7 +196,7 @@ export function SubscriptionTable({
                         <div className={`size-7 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 ${avatarBg}`}>
                           {initials}
                         </div>
-                        <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate max-w-[160px]">
+                        <span className="font-semibold text-xs text-foreground truncate max-w-[160px]">
                           {parentName}
                         </span>
                       </div>
@@ -204,7 +204,7 @@ export function SubscriptionTable({
 
                     {/* Student (Icon + Name in one line) */}
                     <TableCell className={cellClasses}>
-                      <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                      <div className="flex items-center gap-1.5 text-foreground">
                         <UserCircle className="size-3.5 text-blue-500 shrink-0" />
                         <span className="truncate max-w-[140px]">{studentName}</span>
                       </div>
@@ -219,12 +219,12 @@ export function SubscriptionTable({
                           ) : (
                             <Star className="size-3.5 text-blue-500 shrink-0" />
                           )}
-                          <span className="font-medium text-slate-800 dark:text-slate-200">
+                          <span className="font-medium text-foreground">
                             {sub.planName}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-slate-400 italic text-[11px]">No Plan</span>
+                        <span className="text-muted-foreground italic text-[11px]">No Plan</span>
                       )}
                     </TableCell>
 
@@ -238,24 +238,24 @@ export function SubscriptionTable({
                       {sub ? (
                         <span className="capitalize">{sub.period}</span>
                       ) : (
-                        <span className="text-slate-400">–</span>
+                        <span className="text-muted-foreground">–</span>
                       )}
                     </TableCell>
 
                     {/* Start Date in one line */}
-                    <TableCell className={`${cellClasses} text-slate-500`}>
+                    <TableCell className={`${cellClasses} text-muted-foreground`}>
                       {formattedDate}
                     </TableCell>
 
                     {/* Total Amount in one line */}
                     <TableCell className={cellClasses}>
                       {sub ? (
-                        <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-0.5">
+                        <span className="font-semibold text-foreground flex items-center gap-0.5">
                           <IndianRupee className="size-3" />
                           {sub.amount.toLocaleString()}
                         </span>
                       ) : (
-                        <span className="text-slate-400">–</span>
+                        <span className="text-muted-foreground">–</span>
                       )}
                     </TableCell>
 
@@ -266,7 +266,7 @@ export function SubscriptionTable({
                           <DropdownMenuTrigger asChild>
                             <button
                               type="button"
-                              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+                              className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded transition-colors cursor-pointer"
                             >
                               •••
                             </button>
@@ -312,7 +312,7 @@ export function SubscriptionTable({
       </div>
 
       {!loading && totalPages > 1 && (
-        <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-5 py-3 border-t ">
           <DataTablePagination
             page={page}
             totalPages={totalPages}

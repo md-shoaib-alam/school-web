@@ -88,7 +88,7 @@ function PaginationPages({
             className={`size-8 text-xs font-semibold rounded-lg transition-colors ${
               isCurrent
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-                : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50'
+                : 'bg-card  text-foreground hover:bg-muted'
             }`}
             onClick={() => onPageChange(page)}
           >
@@ -114,7 +114,7 @@ export function ActiveExamsPagination({
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 border-t border-border/60 gap-3 bg-white dark:bg-zinc-900">
+    <div className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 border-t border-border/60 gap-3 bg-card">
       <div className="flex flex-wrap items-center gap-3 sm:gap-4">
         <p className="text-xs sm:text-sm text-muted-foreground">
           Showing{' '}
@@ -135,7 +135,7 @@ export function ActiveExamsPagination({
             value={String(pageSize)}
             onValueChange={(val) => onPageSizeChange(Number(val))}
           >
-            <SelectTrigger className="h-8 w-[72px] bg-transparent border-zinc-200 dark:border-zinc-800 text-xs rounded-lg">
+            <SelectTrigger className="h-8 w-[72px] bg-transparent  text-xs rounded-lg">
               <SelectValue placeholder={String(pageSize)} />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -153,7 +153,7 @@ export function ActiveExamsPagination({
         <Button
           variant="outline"
           size="icon"
-          className="size-8 rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+          className="size-8 rounded-lg  bg-card"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
         >
@@ -179,7 +179,7 @@ export function ActiveExamsPagination({
         <Button
           variant="outline"
           size="icon"
-          className="size-8 rounded-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+          className="size-8 rounded-lg  bg-card"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
         >

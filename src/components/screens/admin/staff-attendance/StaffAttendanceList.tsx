@@ -36,8 +36,8 @@ export function StaffAttendanceList({
 
   return (
     <div className="mt-6">
-      <Card className="rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        <CardHeader className="pb-3 sticky top-0 bg-white dark:bg-zinc-900/80 backdrop-blur-md z-10 border-b border-zinc-200 dark:border-zinc-800/40">
+      <Card className="rounded-xl shadow-sm border  overflow-hidden">
+        <CardHeader className="pb-3 sticky top-0 bg-card backdrop-blur-md z-10 border-b ">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center justify-between sm:justify-start sm:gap-4 flex-1">
               <div className="flex items-center gap-2.5">
@@ -45,10 +45,10 @@ export function StaffAttendanceList({
                   <CalendarDays className="size-4 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-zinc-800 dark:text-zinc-100 leading-none">
+                  <h3 className="text-sm sm:text-base font-semibold text-foreground leading-none">
                     {isTeacher ? 'Teachers List' : 'Staff List'}
                   </h3>
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
+                  <p className="text-[10px] text-muted-foreground mt-1 font-medium">
                     Attendance Registry
                   </p>
                 </div>
@@ -61,8 +61,8 @@ export function StaffAttendanceList({
               </Badge>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-xl sm:w-auto">
-              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-600 italic">
+            <div className="flex items-center gap-1.5 p-1 bg-muted border  rounded-xl sm:w-auto">
+              <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">
                 Quick:
               </div>
               <button
@@ -85,7 +85,7 @@ export function StaffAttendanceList({
 
         <CardContent className="p-4 pt-0">
           <div className="relative group max-w-sm mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder={`Search ${isTeacher ? 'teachers' : 'staff'}...`}
               value={searchQuery}
@@ -101,7 +101,7 @@ export function StaffAttendanceList({
                 .map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
             ) : filtered.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-zinc-400 text-sm italic">
+                <p className="text-muted-foreground text-sm italic">
                   No records found for {isTeacher ? 'teachers' : 'staff'}.
                 </p>
               </div>

@@ -2,11 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
+import { isLowPerformanceDevice } from "@/lib/perf";
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const windowLenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    // Low-end devices keep native scrolling: no RAF loop, no observers.
+    if (isLowPerformanceDevice()) return;
+
     // ─── Window-level Lenis (for full-window pages like login/landing) ─────────
     const windowLenis = new Lenis({
       duration: 1.1,

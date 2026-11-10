@@ -34,7 +34,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
       {/* 4 Quick Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Class */}
-        <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div className="bg-card border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
           <div className="size-11 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/60 dark:border-amber-800/60 shrink-0">
             <GraduationCap className="size-5" />
           </div>
@@ -45,7 +45,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
         </div>
 
         {/* Type */}
-        <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div className="bg-card border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
           <div className="size-11 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200/60 dark:border-blue-800/60 shrink-0">
             <FileText className="size-5" />
           </div>
@@ -58,7 +58,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
         </div>
 
         {/* Start Date */}
-        <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div className="bg-card border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
           <div className="size-11 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center border border-pink-200/60 dark:border-pink-800/60 shrink-0">
             <Calendar className="size-5" />
           </div>
@@ -69,7 +69,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
         </div>
 
         {/* End Date */}
-        <div className="bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
+        <div className="bg-card border border-border/70 rounded-2xl p-4 flex items-center gap-3.5 shadow-sm">
           <div className="size-11 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60 dark:border-sky-800/60 shrink-0">
             <Calendar className="size-5" />
           </div>
@@ -81,7 +81,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
       </div>
 
       {/* Subject Completion Card (Image 1) */}
-      <Card className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-border/70 shadow-sm space-y-5">
+      <Card className="p-6 rounded-2xl bg-card border border-border/70 shadow-sm space-y-5">
         <div>
           <h3 className="text-base font-bold text-foreground">Subject Completion</h3>
           <div className="flex items-center justify-between text-sm mt-1">
@@ -98,7 +98,7 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-slate-100 dark:bg-zinc-800 h-3 rounded-full overflow-hidden">
+        <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
           <div
             className="bg-emerald-500 h-full rounded-full transition-all duration-500"
             style={{ width: `${percentage}%` }}
@@ -130,13 +130,13 @@ export function ExamOverviewTab({ exam, onNavigateTab }: ExamOverviewTabProps) {
           </div>
 
           {/* Not Started */}
-          <div className="bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-2xl p-3.5 flex items-center gap-3">
+          <div className="bg-muted border  rounded-2xl p-3.5 flex items-center gap-3">
             <div className="size-8 rounded-full bg-slate-400 text-white flex items-center justify-center shrink-0">
               <CircleAlert className="size-4" />
             </div>
             <div>
-              <p className="text-xs text-slate-700 dark:text-zinc-300 font-semibold">Not Started</p>
-              <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">{notStarted}</p>
+              <p className="text-xs text-foreground font-semibold">Not Started</p>
+              <p className="text-lg font-bold text-foreground leading-tight">{notStarted}</p>
             </div>
           </div>
         </div>

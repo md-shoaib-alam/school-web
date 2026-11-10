@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
-import type { TimetableSlot } from "@/lib/types";
+import type { TimetableSlot } from "@/types";
 
 import { ViewMode, DAYS, getNow, SUBJECT_COLORS } from "./timetable/types";
 import { TimetableSkeleton } from "./timetable/timetable-skeleton";
@@ -152,11 +152,11 @@ export function StudentTimetable() {
       {timeSlots.length === 0 ? (
         <Card className="rounded-xl shadow-sm">
           <CardContent className="py-16 text-center">
-            <BookOpen className="size-12 mx-auto mb-3 text-zinc-300" />
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <BookOpen className="size-12 mx-auto mb-3 text-muted-foreground" />
+            <p className="text-sm font-medium text-muted-foreground">
               No timetable configured
             </p>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Contact your school administrator
             </p>
           </CardContent>

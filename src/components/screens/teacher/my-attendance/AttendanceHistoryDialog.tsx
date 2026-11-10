@@ -44,9 +44,9 @@ export function AttendanceHistoryDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="divide-y divide-slate-100 dark:divide-zinc-800 pt-2">
+        <div className="divide-y divide-border pt-2">
           {currentMonthRecords.length === 0 ? (
-            <p className="text-xs text-center py-6 text-slate-500 dark:text-zinc-400">
+            <p className="text-xs text-center py-6 text-muted-foreground">
               No attendance records found for {MONTH_NAMES[currentRealMonth]} {currentRealYear}.
             </p>
           ) : (
@@ -63,8 +63,8 @@ export function AttendanceHistoryDialog({
               return (
                 <div key={r.date} className="py-2.5 flex items-center justify-between text-xs">
                   <div className="space-y-0.5">
-                    <p className="font-semibold text-slate-800 dark:text-zinc-200">{formattedDate}</p>
-                    <p className="text-slate-500 dark:text-zinc-400">
+                    <p className="font-semibold text-foreground">{formattedDate}</p>
+                    <p className="text-muted-foreground">
                       {r.checkIn
                         ? `${r.checkIn}${r.checkOut ? ` - ${r.checkOut}` : ''}`
                         : r.remarks || 'No check-in recorded'}

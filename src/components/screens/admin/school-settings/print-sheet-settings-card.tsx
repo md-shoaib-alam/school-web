@@ -28,9 +28,9 @@ export function PrintSheetSettingsCard({
       <CardContent className="pt-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-7">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-xl border border-zinc-150 dark:border-zinc-800/60 w-full gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border  w-full gap-4">
               <div className="space-y-0.5">
-                <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                <h4 className="text-sm font-semibold text-foreground">
                   Print Sheet Mode
                 </h4>
                 <p className="text-xs text-muted-foreground">
@@ -46,8 +46,8 @@ export function PrintSheetSettingsCard({
           </div>
 
           {/* Right Column: Previews - Desktop Only */}
-          <div className="hidden lg:block lg:col-span-5 pl-6 border-l border-zinc-100 dark:border-zinc-800">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-500 mb-3 flex items-center gap-2">
+          <div className="hidden lg:block lg:col-span-5 pl-6 border-l ">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Interactive Preview Demonstration
             </div>

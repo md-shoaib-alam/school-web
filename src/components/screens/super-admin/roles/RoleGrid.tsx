@@ -56,7 +56,7 @@ import { PlatformRoleRecord, isSystemRole, PLATFORM_MODULES, ACTION_LABELS } fro
 import { cn } from "@/lib/utils";
 
 const ACTION_COLORS: Record<string, string> = {
-  view: "bg-zinc-100 text-zinc-700 border-zinc-200/50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/50",
+  view: "bg-muted text-foreground ",
   create: "bg-emerald-50 text-emerald-700 border-emerald-100/70 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
   edit: "bg-amber-50 text-amber-700 border-amber-100/70 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
   delete: "bg-rose-50 text-rose-700 border-rose-100/70 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30",

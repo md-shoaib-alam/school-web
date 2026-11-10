@@ -183,7 +183,7 @@ export function PromotionsTable({
             </div>
 
             {/* Mobile View */}
-            <div className="md:hidden divide-y divide-zinc-100 dark:divide-zinc-800/60">
+            <div className="md:hidden divide-y divide-border">
               {promotions.map((promo) => {
                 const config =
                   statusConfig[promo.status] || statusConfig.pending;
@@ -200,7 +200,7 @@ export function PromotionsTable({
                             .toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                          <p className="font-semibold text-sm text-foreground">
                             {promo.studentName}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -218,7 +218,7 @@ export function PromotionsTable({
                     </div>
 
                     <div className="flex items-center justify-between gap-2 text-xs py-1">
-                      <span className="text-zinc-500 dark:text-zinc-400">Class Transfer:</span>
+                      <span className="text-muted-foreground">Class Transfer:</span>
                       <div className="flex items-center gap-1.5">
                         <Badge
                           variant="outline"
@@ -236,7 +236,7 @@ export function PromotionsTable({
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 border-t border-zinc-100 dark:border-zinc-900/50 pt-2.5">
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground border-t  pt-2.5">
                       <span>{promo.academicYear}</span>
                       <span suppressHydrationWarning>{formatDate(promo.createdAt)}</span>
                     </div>

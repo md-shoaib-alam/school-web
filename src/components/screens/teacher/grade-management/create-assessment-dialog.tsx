@@ -122,7 +122,7 @@ export function CreateAssessmentDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Title / Name</Label>
+            <Label htmlFor="title" className="text-sm font-medium text-foreground">Title / Name</Label>
             <Input
               id="title"
               placeholder="e.g., Chapter 1 Algebra Quiz"
@@ -165,7 +165,7 @@ export function CreateAssessmentDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="total" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Total Marks</Label>
+              <Label htmlFor="total" className="text-sm font-medium text-foreground">Total Marks</Label>
               <Input
                 id="total"
                 type="number"
@@ -175,7 +175,7 @@ export function CreateAssessmentDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="passing" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Passing Marks</Label>
+              <Label htmlFor="passing" className="text-sm font-medium text-foreground">Passing Marks</Label>
               <Input
                 id="passing"
                 type="number"

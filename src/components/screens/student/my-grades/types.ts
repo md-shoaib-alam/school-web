@@ -1,4 +1,4 @@
-import type { GradeRecord } from "@/lib/types";
+import type { GradeRecord } from "@/types";
 
 export type AssessmentGrade = {
   id: string;

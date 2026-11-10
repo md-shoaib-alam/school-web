@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-import type { StudentInfo, FeeRecord } from "@/lib/types";
+import type { StudentInfo, FeeRecord } from "@/types";
 
 const statusConfig: Record<
   string,
@@ -143,7 +143,7 @@ export function StudentFees() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <CreditCard className="size-5 text-violet-600" />
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-lg font-semibold text-foreground">
           My Fees
         </h2>
       </div>
@@ -158,7 +158,7 @@ export function StudentFees() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Fees</p>
-                <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                <p className="text-xl font-bold text-foreground">
                   ₹{summary.total.toLocaleString()}
                 </p>
               </div>
@@ -302,7 +302,7 @@ export function StudentFees() {
           </div>
           
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center justify-between px-6 py-4 border-t ">
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Showing {Math.min(fees.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)} to{" "}
                 {Math.min(fees.length, currentPage * ITEMS_PER_PAGE)} of {fees.length} records

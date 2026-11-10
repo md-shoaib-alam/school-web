@@ -206,14 +206,14 @@ export function CheckPaymentsTab() {
       {/* Summary Cards */}
       {loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <Card className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+          <Card className="rounded-2xl border  bg-card p-5 space-y-3">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-8 w-20" />
             <Skeleton className="h-3 w-32" />
           </Card>
           <div className="lg:col-span-3 flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0">
             {[...Array(3)].map((_, i) => (
-              <Card key={i} className="min-w-[240px] sm:min-w-0 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 shadow-xs space-y-3">
+              <Card key={i} className="min-w-[240px] sm:min-w-0 rounded-2xl border  bg-card p-5 space-y-3">
                 <Skeleton className="h-4 w-28" />
                 <Skeleton className="h-8 w-20" />
                 <Skeleton className="h-3 w-32" />
@@ -234,11 +234,11 @@ export function CheckPaymentsTab() {
               dot: 'bg-emerald-500'
             };
             return (
-              <Card key={card.label} className={`relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+              <Card key={card.label} className={`relative overflow-hidden rounded-xl border  bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
                 <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                    <span className="text-[11px] text-foreground font-bold uppercase tracking-wider block">{card.label}</span>
                     <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
                       {card.icon}
                     </div>
@@ -247,7 +247,7 @@ export function CheckPaymentsTab() {
                     ₹{Math.round(card.amount).toLocaleString()}
                   </span>
                 </div>
-                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                <div className="text-[10px] text-muted-foreground mt-4 flex items-center gap-1.5 font-medium border-t pt-2 ">
                   <span className={`inline-block size-1.5 rounded-full ${cls.dot} animate-pulse`} />
                   {card.subtext}
                 </div>
@@ -287,20 +287,20 @@ export function CheckPaymentsTab() {
               const cls = colorClasses[card.color as keyof typeof colorClasses] || colorClasses.amber;
 
               return (
-                <Card key={card.label} className={`min-w-[240px] sm:min-w-0 relative overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
+                <Card key={card.label} className={`min-w-[240px] sm:min-w-0 relative overflow-hidden rounded-xl border  bg-linear-to-br from-white ${cls.gradient} dark:from-zinc-950 p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${cls.hover} transition-all duration-300 group`}>
                   <div className={`absolute top-0 right-0 w-20 h-20 ${cls.bg} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300`} />
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider block">{card.label}</span>
+                      <span className="text-[11px] text-foreground font-bold uppercase tracking-wider block">{card.label}</span>
                       <div className={`p-2 rounded-lg ${cls.iconBg} ${cls.iconText}`}>
                         {card.icon}
                       </div>
                     </div>
-                    <span className={`text-2xl font-extrabold block tracking-tight text-zinc-900 dark:text-zinc-50`}>
+                    <span className={`text-2xl font-extrabold block tracking-tight text-foreground`}>
                       ₹{Math.round(card.amount).toLocaleString()}
                     </span>
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-4 flex items-center gap-1.5 font-medium border-t pt-2 border-zinc-100 dark:border-zinc-900">
+                  <div className="text-[10px] text-muted-foreground mt-4 flex items-center gap-1.5 font-medium border-t pt-2 ">
                     <span className={`inline-block size-1.5 rounded-full ${cls.dot}`} />
                     {card.subtext}
                   </div>
@@ -313,22 +313,22 @@ export function CheckPaymentsTab() {
 
       {/* Payment Method Distribution */}
       {Object.keys(methodDistribution).length > 0 && (
-        <Card className="border-none shadow-sm bg-zinc-50/50 dark:bg-zinc-900/20">
+        <Card className="border-none shadow-sm bg-muted">
           <CardHeader className="pb-1 sm:pb-4">
-            <CardTitle className="text-[11px] sm:text-sm font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Payment Method Distribution</CardTitle>
+            <CardTitle className="text-[11px] sm:text-sm font-bold uppercase tracking-wider text-foreground">Payment Method Distribution</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 sm:pt-6">
             <div className="flex overflow-x-auto gap-2.5 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:pb-0 scrollbar-hide">
               {Object.entries(methodDistribution).map(([method, data]) => {
                 const cfg = paymentMethodConfig[method] || paymentMethodConfig.cash;
                 return (
-                  <div key={method} className="min-w-[160px] sm:min-w-0 group flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950/50 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 hover:shadow-sm transition-all duration-300">
+                  <div key={method} className="min-w-[160px] sm:min-w-0 group flex items-center gap-2.5 p-2.5 rounded-xl border  bg-card hover:border-emerald-500/30 dark:hover:border-emerald-500/20 hover:shadow-sm transition-all duration-300">
                     <div className={`size-9 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${cfg.color}`}>
                       {cfg.icon}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 capitalize">{method}</p>
-                      <p className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <p className="text-xs font-bold text-foreground capitalize">{method}</p>
+                      <p className="text-[10px] font-medium text-muted-foreground">
                         {data.count} <span className="text-[9px] opacity-70 mx-0.5">×</span> ₹{data.total.toLocaleString()}
                       </p>
                     </div>
@@ -373,7 +373,7 @@ export function CheckPaymentsTab() {
           <div className="flex flex-row gap-2 w-full sm:w-auto">
             <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-card ">
                   <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="truncate">{fromDate ? format(new Date(fromDate), "PPP") : "From"}</span>
                 </Button>
@@ -392,7 +392,7 @@ export function CheckPaymentsTab() {
             </Popover>
             <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                <Button variant="outline" className="flex-1 sm:w-44 justify-start text-left font-normal bg-card ">
                   <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="truncate">{toDate ? format(new Date(toDate), "PPP") : "To"}</span>
                 </Button>

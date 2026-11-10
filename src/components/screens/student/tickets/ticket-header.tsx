@@ -13,10 +13,10 @@ export function TicketHeader({ totalCount, openCount, onNewClick }: TicketHeader
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex items-center gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-semibold text-foreground">
             My Tickets
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {totalCount} ticket{totalCount !== 1 ? "s" : ""}
             {openCount > 0 ? ` - ${openCount} active` : ""}
           </p>

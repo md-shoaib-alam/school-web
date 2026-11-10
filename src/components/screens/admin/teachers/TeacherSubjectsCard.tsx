@@ -33,9 +33,9 @@ export function TeacherSubjectsCard({
   onSave,
 }: SubjectsCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-      <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-zinc-800/60">
-        <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm sm:text-base">
+    <div className="rounded-2xl border  bg-card p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+      <div className="flex items-center justify-between pb-3.5 border-b ">
+        <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
           <BookOpen className="size-4 text-emerald-600" />
           Assigned Subjects ({currentTeacher.subjects?.length || 0})
         </div>
@@ -48,7 +48,7 @@ export function TeacherSubjectsCard({
                 variant="outline"
                 onClick={onCancelEdit}
                 disabled={isSaving}
-                className="h-8 px-3 text-xs rounded-lg font-medium text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
               >
                 Cancel
               </Button>
@@ -66,7 +66,7 @@ export function TeacherSubjectsCard({
             canEdit && (
               <button
                 onClick={onStartEdit}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border  text-xs font-medium text-foreground hover:bg-accent transition-colors"
               >
                 <Pencil className="size-3" />
                 Edit
@@ -76,7 +76,7 @@ export function TeacherSubjectsCard({
 
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 transition-colors"
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors"
             aria-label="Toggle section"
           >
             {isCollapsed ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
@@ -93,7 +93,7 @@ export function TeacherSubjectsCard({
                 value={formData.newSubjectInput}
                 onChange={(e) => setFormData({ ...formData, newSubjectInput: e.target.value })}
                 placeholder="Add subject (e.g. Mathematics)"
-                className="h-9 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700"
+                className="h-9 text-xs rounded-xl bg-muted "
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && formData.newSubjectInput.trim()) {
                     e.preventDefault();
@@ -149,7 +149,7 @@ export function TeacherSubjectsCard({
         ) : (
           /* VIEW SUBJECTS */
           !currentTeacher.subjects || currentTeacher.subjects.length === 0 ? (
-            <p className="text-xs text-slate-400 dark:text-zinc-500 italic">No subjects assigned yet.</p>
+            <p className="text-xs text-muted-foreground italic">No subjects assigned yet.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {currentTeacher.subjects.map((subj, index) => (

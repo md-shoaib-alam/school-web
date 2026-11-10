@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/use-app-store";
 import { toast } from "sonner";
 import { Bell } from "lucide-react";
 import { useGraphQLMutation, SAVE_NOTIFICATION_TOKEN } from "@/lib/graphql/hooks";
+import { NOTIFICATIONS_REFRESH_EVENT } from "@/components/layout/notification-bell";
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAppStore();
@@ -51,6 +52,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       
       const title = payload.notification?.title || payload.data?.title || "New Notification";
       const body = payload.notification?.body || payload.data?.body || "You have a new message";
+
+      // Push is the real-time channel — tell the bell to refresh now instead
+      // of waiting for its next poll.
+      window.dispatchEvent(new Event(NOTIFICATIONS_REFRESH_EVENT));
 
       // Show Toast inside the App
       toast.success(title, {

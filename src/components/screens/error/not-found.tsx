@@ -21,8 +21,7 @@ export function NotFoundScreen() {
   };
 
   const handleLogout = () => {
-    logout();
-    window.location.href = "/";
+    window.location.href = logout() ?? "/";
   };
 
   return (
@@ -71,7 +70,7 @@ export function NotFoundScreen() {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 font-semibold text-sm py-3 px-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-foreground font-semibold text-sm py-3 px-8 rounded-full border  transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
             >
               <LogOut className="size-4" />
               Sign Out

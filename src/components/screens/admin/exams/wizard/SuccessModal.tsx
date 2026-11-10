@@ -12,12 +12,12 @@ interface SuccessModalProps {
 export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in-50 duration-200">
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative text-center space-y-6 animate-in zoom-in-95 duration-200">
+      <div className="bg-card border  rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative text-center space-y-6 animate-in zoom-in-95 duration-200">
         {/* Close X Button */}
         <button
           type="button"
           onClick={onSuccess}
-          className="absolute top-4 right-4 size-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-400 hover:text-slate-600 dark:text-zinc-400 flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 size-8 rounded-full bg-muted hover:bg-muted dark:hover:bg-zinc-700 text-muted-foreground hover:text-muted-foreground flex items-center justify-center transition-colors"
         >
           <X className="size-4" />
         </button>
@@ -39,25 +39,25 @@ export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
 
         {/* Heading & Subtitle */}
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-xl font-bold text-foreground tracking-tight">
             {summary.isEdit ? 'Exam Updated Successfully!' : 'Exam Created Successfully!'}
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed">
-            <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.examName}</span> has been{' '}
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+            <span className="font-semibold text-foreground">{summary.examName}</span> has been{' '}
             {summary.isEdit ? 'updated' : 'created'} for{' '}
-            <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.className}</span> with{' '}
-            <span className="font-semibold text-slate-700 dark:text-zinc-200">{summary.totalSubjects} subjects</span>.
+            <span className="font-semibold text-foreground">{summary.className}</span> with{' '}
+            <span className="font-semibold text-foreground">{summary.totalSubjects} subjects</span>.
           </p>
         </div>
 
         {/* Info Badges Card */}
-        <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-zinc-800/50 p-3.5 rounded-2xl border border-slate-200/80 dark:border-zinc-800 text-left">
+        <div className="grid grid-cols-3 gap-2 bg-muted p-3.5 rounded-2xl border  text-left">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
               <Calendar className="size-3.5 shrink-0" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Start Date</span>
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Start Date</span>
             </div>
-            <p className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate">
+            <p className="text-xs font-bold text-foreground truncate">
               {summary.startDate}
             </p>
           </div>
@@ -65,9 +65,9 @@ export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
               <Calendar className="size-3.5 shrink-0" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">End Date</span>
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">End Date</span>
             </div>
-            <p className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate">
+            <p className="text-xs font-bold text-foreground truncate">
               {summary.endDate}
             </p>
           </div>
@@ -75,9 +75,9 @@ export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
               <BookOpen className="size-3.5 shrink-0" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Subjects</span>
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total Subjects</span>
             </div>
-            <p className="text-xs font-bold text-slate-800 dark:text-zinc-100">
+            <p className="text-xs font-bold text-foreground">
               {summary.totalSubjects}
             </p>
           </div>
@@ -88,7 +88,7 @@ export function SuccessModal({ summary, onSuccess }: SuccessModalProps) {
           <Button
             variant="outline"
             onClick={onSuccess}
-            className="flex-1 h-11 rounded-xl text-xs sm:text-sm font-medium border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:bg-slate-50"
+            className="flex-1 h-11 rounded-xl text-xs sm:text-sm font-medium  text-foreground hover:bg-muted"
           >
             View Exam Details
           </Button>

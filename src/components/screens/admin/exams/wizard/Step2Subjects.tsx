@@ -8,7 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
-import { parseLocalDate, formatLocalDate } from '@/lib/utils';
+import {
+  parseLocalDate,
+  formatLocalDate,
+} from '@/lib/date';
 import { ClassOption } from '../types';
 import { BulkSubjectRow } from './wizardTypes';
 
@@ -40,15 +43,15 @@ export function Step2Subjects({
   onNext,
 }: Step2SubjectsProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
-      <div className="flex items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-zinc-800">
+    <div className="bg-card border  rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="flex items-start sm:items-center justify-between gap-3 pb-2 border-b ">
         <div className="flex items-start sm:items-center gap-3">
           <div className="size-9 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 font-bold flex items-center justify-center text-sm shrink-0 mt-0.5 sm:mt-0">
             2
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Select Subjects & Schedule</h2>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+            <h2 className="text-base font-bold text-foreground leading-tight">Select Subjects & Schedule</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Select examination papers for {selectedClasses.map(c => `${c.name} - ${c.section}`).join(', ')} and set universal time and marks.
             </p>
           </div>
@@ -61,9 +64,9 @@ export function Step2Subjects({
       </div>
 
       {/* Desktop Subjects Table */}
-      <div className="hidden sm:block border border-slate-200 dark:border-zinc-800 rounded-xl overflow-x-auto">
+      <div className="hidden sm:block border  rounded-xl overflow-x-auto">
         <Table>
-          <TableHeader className="bg-slate-50/70 dark:bg-zinc-900/60">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead className="w-12 text-center">
                 <Checkbox
@@ -82,7 +85,7 @@ export function Step2Subjects({
           <TableBody>
             {currentBulkRows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-slate-400">
+                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No subjects configured for the selected classes yet. Please add subjects first in Subject management.
                 </TableCell>
               </TableRow>
@@ -95,9 +98,9 @@ export function Step2Subjects({
                       onCheckedChange={() => toggleSelectSubject(row.key)}
                     />
                   </TableCell>
-                  <TableCell className="font-semibold text-slate-800 dark:text-zinc-200">
+                  <TableCell className="font-semibold text-foreground">
                     {row.subjectName}
-                    {row.code && <span className="text-xs text-slate-400 font-normal ml-1.5">({row.code})</span>}
+                    {row.code && <span className="text-xs text-muted-foreground font-normal ml-1.5">({row.code})</span>}
                   </TableCell>
                   <TableCell>
                     <DatePicker
@@ -147,7 +150,7 @@ export function Step2Subjects({
       {/* Mobile Subjects View */}
       <div className="sm:hidden space-y-3">
         <div className="flex items-center justify-between pb-1 px-1">
-          <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 flex items-center gap-2">
+          <label className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
             <Checkbox
               checked={selectedCount === distinctSubjects.length && distinctSubjects.length > 0}
               onCheckedChange={(c) => toggleAllSubjects(!!c)}
@@ -157,7 +160,7 @@ export function Step2Subjects({
         </div>
 
         {currentBulkRows.length === 0 ? (
-          <div className="text-center py-10 px-4 border border-dashed rounded-2xl text-slate-400 text-xs">
+          <div className="text-center py-10 px-4 border border-dashed rounded-2xl text-muted-foreground text-xs">
             No subjects configured for the selected classes.
           </div>
         ) : (
@@ -167,10 +170,10 @@ export function Step2Subjects({
               className={`border rounded-2xl p-4 transition-all ${
                 row.selected
                   ? 'border-blue-200 dark:border-blue-900/60 bg-blue-50/20 dark:bg-blue-950/10 shadow-xs'
-                  : 'border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 opacity-70'
+                  : ' bg-card opacity-70'
               }`}
             >
-              <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div className="flex items-start justify-between gap-3 pb-3 border-b ">
                 <div className="flex items-center gap-3">
                   <Checkbox
                     checked={row.selected}
@@ -178,11 +181,11 @@ export function Step2Subjects({
                     className="size-5 rounded-md"
                   />
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                    <h4 className="text-sm font-bold text-foreground leading-tight">
                       {row.subjectName}
                     </h4>
                     {row.code && (
-                      <span className="text-[11px] text-slate-400 font-mono">Code: {row.code}</span>
+                      <span className="text-[11px] text-muted-foreground font-mono">Code: {row.code}</span>
                     )}
                   </div>
                 </div>
@@ -195,43 +198,43 @@ export function Step2Subjects({
 
               <div className="pt-3 space-y-3">
                 <div className="space-y-1">
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
                     <Calendar className="size-3 text-blue-500" /> Exam Date *
                   </span>
                   <DatePicker
                     date={parseLocalDate(row.date)}
                     onChange={(d) => updateSubjectField(row.key, 'date', formatLocalDate(d))}
                     disabled={isSubjectDateDisabled}
-                    className="h-10 w-full rounded-xl text-xs bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800"
+                    className="h-10 w-full rounded-xl text-xs bg-card "
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
                       <Clock className="size-3 text-blue-500" /> Start Time
                     </span>
                     <TimePicker
                       value={row.startTime}
                       onChange={(v) => updateSubjectField(row.key, 'startTime', v)}
-                      className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 w-full"
+                      className="h-10 text-xs rounded-xl bg-card  w-full"
                     />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
                       <Clock className="size-3 text-blue-500" /> End Time
                     </span>
                     <TimePicker
                       value={row.endTime}
                       onChange={(v) => updateSubjectField(row.key, 'endTime', v)}
-                      className="h-10 text-xs rounded-xl bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800 w-full"
+                      className="h-10 text-xs rounded-xl bg-card  w-full"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
                       <Star className="size-3 text-amber-500" /> Total Marks
                     </span>
                     <div className="relative">
@@ -239,12 +242,12 @@ export function Step2Subjects({
                         type="number"
                         value={row.totalMarks}
                         onChange={(e) => updateSubjectField(row.key, 'totalMarks', e.target.value)}
-                        className="pl-8.5 h-10 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800"
+                        className="pl-8.5 h-10 text-xs font-semibold rounded-xl bg-card "
                       />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
                       <Star className="size-3 text-emerald-500" /> Passing
                     </span>
                     <div className="relative">
@@ -252,7 +255,7 @@ export function Step2Subjects({
                         type="number"
                         value={row.passingMarks}
                         onChange={(e) => updateSubjectField(row.key, 'passingMarks', e.target.value)}
-                        className="pl-8.5 h-10 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-900 border-slate-200/90 dark:border-zinc-800"
+                        className="pl-8.5 h-10 text-xs font-semibold rounded-xl bg-card "
                       />
                     </div>
                   </div>
@@ -264,17 +267,17 @@ export function Step2Subjects({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-zinc-800">
+      <div className="flex items-center justify-between gap-3 pt-4 border-t ">
         <Button
           variant="outline"
           onClick={onBack}
-          className="h-11 px-5 rounded-2xl border-slate-200 dark:border-zinc-700 gap-2 shrink-0 flex-1 sm:flex-initial"
+          className="h-11 px-5 rounded-2xl  gap-2 shrink-0 flex-1 sm:flex-initial"
         >
           <ArrowLeft className="size-4" />
           <span>Back</span>
         </Button>
         <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-end">
-          <Button variant="outline" onClick={onCancel} className="hidden sm:inline-flex h-11 px-5 rounded-xl border-slate-200 dark:border-zinc-700">
+          <Button variant="outline" onClick={onCancel} className="hidden sm:inline-flex h-11 px-5 rounded-xl ">
             Cancel
           </Button>
           <Button

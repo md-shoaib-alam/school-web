@@ -15,15 +15,15 @@ import {
 import { IndianRupee, Clock, UserCircle, ShieldAlert } from "lucide-react";
 
 export function TableHeaders({ activeTab }: { activeTab: TabType }) {
-  const commonClasses = "text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5";
+  const commonClasses = "text-xs font-semibold text-muted-foreground py-3.5";
   switch (activeTab) {
     case "students":
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Student Name</TableHead>
           <TableHead className={commonClasses}>Admission No.</TableHead>
           <TableHead className={commonClasses}>Class</TableHead>
@@ -37,9 +37,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Teacher Name</TableHead>
           <TableHead className={commonClasses}>Qualification</TableHead>
           <TableHead className={commonClasses}>Experience</TableHead>
@@ -52,9 +52,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Parent Name</TableHead>
           <TableHead className={commonClasses}>Email</TableHead>
           <TableHead className={commonClasses}>Phone</TableHead>
@@ -67,9 +67,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Class Name</TableHead>
           <TableHead className={commonClasses}>Grade / Section</TableHead>
           <TableHead className={`${commonClasses} text-center`}>Students</TableHead>
@@ -81,9 +81,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Student</TableHead>
           <TableHead className={commonClasses}>Fee Type</TableHead>
           <TableHead className={`${commonClasses} text-right`}>Amount</TableHead>
@@ -96,9 +96,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Student</TableHead>
           <TableHead className={commonClasses}>Class</TableHead>
           <TableHead className={commonClasses}>Date</TableHead>
@@ -110,9 +110,9 @@ export function TableHeaders({ activeTab }: { activeTab: TabType }) {
       return (
         <>
           <TableHead className="w-10 py-3.5 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableHead>
-          <TableHead className="w-12 text-xs font-semibold text-slate-500 dark:text-slate-400 py-3.5">#</TableHead>
+          <TableHead className="w-12 text-xs font-semibold text-muted-foreground py-3.5">#</TableHead>
           <TableHead className={commonClasses}>Notice Title</TableHead>
           <TableHead className={commonClasses}>Author</TableHead>
           <TableHead className={commonClasses}>Target Role</TableHead>
@@ -151,7 +151,7 @@ const AVATAR_COLORS = [
 ];
 
 export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType; item: any; index?: number }) {
-  const cellClasses = "py-3 text-xs font-medium text-slate-700 dark:text-slate-300";
+  const cellClasses = "py-3 text-xs font-medium text-foreground";
   const avatarBg = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
   switch (activeTab) {
@@ -161,9 +161,9 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
@@ -171,21 +171,21 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               <div className={`size-7 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 ${avatarBg}`}>
                 {initials}
               </div>
-              <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+              <span className="font-semibold text-xs text-foreground">
                 {s.name}
               </span>
             </div>
           </TableCell>
-          <TableCell className={`${cellClasses} font-mono text-[11px] text-slate-500`}>
+          <TableCell className={`${cellClasses} font-mono text-[11px] text-muted-foreground`}>
             {s.rollNumber || `ADM${String(index + 1).padStart(3, '0')}`}
           </TableCell>
           <TableCell className={cellClasses}>
-            <span className="text-slate-700 dark:text-slate-300 font-medium">
+            <span className="text-foreground font-medium">
               {s.className || `Class ${((index % 6) + 1)}`}
             </span>
           </TableCell>
           <TableCell className={cellClasses}>
-            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+            <div className="flex items-center gap-1.5 text-foreground">
               <UserCircle className="size-3.5 text-blue-500" />
               <span>{s.phone ? (s.gender === 'Female' ? 'Neha Patel' : 'Amit Verma') : 'Parent Name'}</span>
             </div>
@@ -193,11 +193,11 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
           <TableCell className={cellClasses}>
             <StatusBadge status={s.status || "active"} />
           </TableCell>
-          <TableCell className={`${cellClasses} text-slate-500`}>
+          <TableCell className={`${cellClasses} text-muted-foreground`}>
             {format(new Date(Date.now() - index * 86400000 * 2), "MMM dd, yyyy")}
           </TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -210,9 +210,9 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
@@ -220,20 +220,20 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               <div className={`size-7 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 ${avatarBg}`}>
                 {initials}
               </div>
-              <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+              <span className="font-semibold text-xs text-foreground">
                 {t.name}
               </span>
             </div>
           </TableCell>
-          <TableCell className={`${cellClasses} text-slate-600 dark:text-slate-400`}>{t.qualification}</TableCell>
-          <TableCell className={`${cellClasses} text-slate-500`}>{t.experience}</TableCell>
+          <TableCell className={`${cellClasses} text-foreground`}>{t.qualification}</TableCell>
+          <TableCell className={`${cellClasses} text-muted-foreground`}>{t.experience}</TableCell>
           <TableCell className={cellClasses}>
-            <div className="text-xs font-medium text-slate-800 dark:text-slate-200">{t.email}</div>
-            <div className="text-[11px] text-slate-400">{t.phone}</div>
+            <div className="text-xs font-medium text-foreground">{t.email}</div>
+            <div className="text-[11px] text-muted-foreground">{t.phone}</div>
           </TableCell>
           <TableCell className={cellClasses}><StatusBadge status={t.status} /></TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -246,9 +246,9 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
@@ -256,17 +256,17 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               <div className={`size-7 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 ${avatarBg}`}>
                 {initials}
               </div>
-              <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+              <span className="font-semibold text-xs text-foreground">
                 {p.name}
               </span>
             </div>
           </TableCell>
-          <TableCell className={`${cellClasses} text-slate-600 dark:text-slate-400`}>{p.email}</TableCell>
-          <TableCell className={`${cellClasses} text-slate-500`}>{p.phone}</TableCell>
-          <TableCell className={`${cellClasses} text-slate-600 dark:text-slate-400`}>{p.occupation}</TableCell>
+          <TableCell className={`${cellClasses} text-foreground`}>{p.email}</TableCell>
+          <TableCell className={`${cellClasses} text-muted-foreground`}>{p.phone}</TableCell>
+          <TableCell className={`${cellClasses} text-foreground`}>{p.occupation}</TableCell>
           <TableCell className={cellClasses}><StatusBadge status={p.status} /></TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -278,9 +278,9 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
@@ -288,21 +288,21 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               <div className="size-7 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 flex items-center justify-center font-bold text-xs shrink-0">
                 {c.name.charAt(0)}
               </div>
-              <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+              <span className="font-semibold text-xs text-foreground">
                 {c.name}
               </span>
             </div>
           </TableCell>
           <TableCell className={cellClasses}>
             <div className="flex items-center gap-1.5">
-              <Badge variant="outline" className="text-[11px] font-medium border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Grade {c.grade}</Badge>
-              <Badge variant="outline" className="text-[11px] font-medium border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Sec {c.section}</Badge>
+              <Badge variant="outline" className="text-[11px] font-medium  text-foreground">Grade {c.grade}</Badge>
+              <Badge variant="outline" className="text-[11px] font-medium  text-foreground">Sec {c.section}</Badge>
             </div>
           </TableCell>
           <TableCell className={`${cellClasses} text-center font-semibold text-purple-600`}>{c.studentCount}</TableCell>
-          <TableCell className={`${cellClasses} text-center text-slate-500`}>{c.capacity}</TableCell>
+          <TableCell className={`${cellClasses} text-center text-muted-foreground`}>{c.capacity}</TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -319,18 +319,18 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
-            <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
-              <UserCircle className="size-4 text-slate-400" />
+            <div className="flex items-center gap-2 font-semibold text-foreground">
+              <UserCircle className="size-4 text-muted-foreground" />
               {f.studentName}
             </div>
           </TableCell>
-          <TableCell className={`${cellClasses} text-[11px] font-medium text-slate-500 uppercase tracking-wider`}>{f.type}</TableCell>
+          <TableCell className={`${cellClasses} text-[11px] font-medium text-muted-foreground uppercase tracking-wider`}>{f.type}</TableCell>
           <TableCell className={`${cellClasses} text-right font-semibold`}>
             <div className="flex items-center justify-end text-emerald-600">
               <IndianRupee className="size-3.5 mr-0.5" />
@@ -342,11 +342,11 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               {f.status}
             </Badge>
           </TableCell>
-          <TableCell className={`${cellClasses} text-right text-xs text-slate-500`} suppressHydrationWarning>
+          <TableCell className={`${cellClasses} text-right text-xs text-muted-foreground`} suppressHydrationWarning>
             {format(new Date(f.dueDate), "dd MMM yyyy")}
           </TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -363,20 +363,20 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
-            <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">{a.studentName}</span>
+            <span className="font-semibold text-xs text-foreground">{a.studentName}</span>
           </TableCell>
           <TableCell className={cellClasses}>
             <Badge variant="secondary" className="text-[11px] font-medium border-none">{a.className}</Badge>
           </TableCell>
           <TableCell className={cellClasses} suppressHydrationWarning>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              <Clock className="size-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="size-3.5 text-muted-foreground" />
               {format(new Date(a.date), "dd MMM yyyy")}
             </div>
           </TableCell>
@@ -386,7 +386,7 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
             </Badge>
           </TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>
@@ -403,18 +403,18 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
       return (
         <>
           <TableCell className="w-10 py-3 pl-4">
-            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5" />
+            <input type="checkbox" className="rounded  text-blue-600 focus:ring-blue-500 size-3.5" />
           </TableCell>
-          <TableCell className="w-12 py-3 text-xs font-semibold text-slate-400">
+          <TableCell className="w-12 py-3 text-xs font-semibold text-muted-foreground">
             {index + 1}
           </TableCell>
           <TableCell className={cellClasses}>
-            <div className="font-semibold text-xs text-slate-900 dark:text-slate-100">{n.title}</div>
-            <div className="text-[11px] text-slate-400 truncate max-w-[200px]">{n.content}</div>
+            <div className="font-semibold text-xs text-foreground">{n.title}</div>
+            <div className="text-[11px] text-muted-foreground truncate max-w-[200px]">{n.content}</div>
           </TableCell>
-          <TableCell className={`${cellClasses} text-slate-600 dark:text-slate-400`}>{n.authorName}</TableCell>
+          <TableCell className={`${cellClasses} text-foreground`}>{n.authorName}</TableCell>
           <TableCell className={cellClasses}>
-            <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wider h-5 bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400">
+            <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wider h-5 bg-muted text-foreground">
               {n.targetRole}
             </Badge>
           </TableCell>
@@ -424,7 +424,7 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
               {n.priority}
             </Badge>
           </TableCell>
-          <TableCell className={`${cellClasses} text-right text-xs text-slate-500`} suppressHydrationWarning>
+          <TableCell className={`${cellClasses} text-right text-xs text-muted-foreground`} suppressHydrationWarning>
             {(() => {
               try {
                 const date = new Date(n.createdAt);
@@ -436,7 +436,7 @@ export function TableCells({ activeTab, item, index = 0 }: { activeTab: TabType;
             })()}
           </TableCell>
           <TableCell className="text-right pr-4 py-3">
-            <button type="button" className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold px-1.5 py-0.5 rounded">
+            <button type="button" className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground font-bold px-1.5 py-0.5 rounded">
               •••
             </button>
           </TableCell>

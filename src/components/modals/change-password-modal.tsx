@@ -118,19 +118,19 @@ export function ChangePasswordModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-b from-[#0F2042] to-[#061024] border-zinc-800 text-white shadow-2xl">
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-b from-[#0F2042] to-[#061024]  text-white shadow-2xl">
         <DialogHeader>
           <div className="mx-auto size-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-2">
             <KeyRound className="size-6 text-cyan-400" />
           </div>
           <DialogTitle className="text-center text-xl text-white">Change Password</DialogTitle>
-          <DialogDescription className="text-center text-zinc-400 text-sm">
+          <DialogDescription className="text-center text-muted-foreground text-sm">
             Enter your current password and choose a secure new one.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="oldPassword" className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">Current Password</Label>
+            <Label htmlFor="oldPassword" className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Current Password</Label>
             <div className="relative">
               <Input
                 id="oldPassword"
@@ -143,7 +143,7 @@ export function ChangePasswordModal({
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showOldPassword' })}
               >
                 {showOldPassword ? (
@@ -155,7 +155,7 @@ export function ChangePasswordModal({
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="newPassword" className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">New Password</Label>
+            <Label htmlFor="newPassword" className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">New Password</Label>
             <div className="relative">
               <Input
                 id="newPassword"
@@ -168,7 +168,7 @@ export function ChangePasswordModal({
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showNewPassword' })}
               >
                 {showNewPassword ? (
@@ -180,7 +180,7 @@ export function ChangePasswordModal({
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-zinc-300 text-xs font-semibold uppercase tracking-wider">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Confirm New Password</Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
@@ -193,7 +193,7 @@ export function ChangePasswordModal({
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showConfirmPassword' })}
               >
                 {showConfirmPassword ? (
@@ -215,7 +215,7 @@ export function ChangePasswordModal({
               variant="outline"
               onClick={() => handleOpenChange(false)}
               disabled={changePasswordMutation.isPending}
-              className="flex-1 bg-white/5 border-white/20 text-zinc-300 hover:bg-white/10 hover:text-white rounded-full h-11"
+              className="flex-1 bg-white/5 border-white/20 text-muted-foreground hover:bg-white/10 hover:text-white rounded-full h-11"
             >
               Cancel
             </Button>

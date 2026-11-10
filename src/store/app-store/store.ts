@@ -7,6 +7,32 @@ import {
 import { getCookie } from '@/lib/cookies';
 import { API_BASE, api, logoutWithElysia } from '@/lib/api';
 import { env } from '@/lib/env';
+import {
+  addAccount,
+  clearVault,
+  dashboardHref,
+  getActiveAccount,
+  removeAccount,
+  setActiveAccount,
+  updateAccountUser,
+} from './accounts';
+
+function wipeBrowsingData(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    clearVault();
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch { /* ignore */ }
+  try {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const [name] = cookie.split("=");
+      document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    }
+  } catch { /* ignore */ }
+}
 
 function getInitialUser(): { isLoggedIn: boolean; currentUser: AppUser | null } {
   if (typeof window === 'undefined') return { isLoggedIn: false, currentUser: null };
@@ -91,20 +117,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentTenantName: getInitialTenantInfo().name || initialUser.currentUser?.tenantName || null,
   currentTenantLogo: getInitialTenantInfo().logo || null,
 
-  login: (user) => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-        // Persist tenant info so getInitialTenantInfo() restores correctly on fresh page load
-        localStorage.setItem('schoolsaas_tenant_id', user.tenantId || '');
-        localStorage.setItem('schoolsaas_tenant_slug', user.tenantSlug || '');
-        localStorage.setItem('schoolsaas_tenant_name', user.tenantName || '');
-        localStorage.setItem('schoolsaas_tenant_logo', user.tenantLogo || '');
-        // Pre-populate the profile cache timestamp so refreshPermissions() skips
-        // the /auth/me call on the next page load (we JUST got this data from login)
-        localStorage.setItem('schoolsaas_profile_cache_time', String(Date.now()));
-      } catch { /* ignore */ }
-    }
+  login: (user, session) => {
+    // The vault owns persistence: addAccount(…, activate) projects the tokens, cookie, user and
+    // tenant keys the rest of the app reads, so nothing here writes them a second time.
+    const added = addAccount({ user, token: session.token, refreshToken: session.refreshToken }, { activate: true });
+    if (!added.ok) return false;
+
     invalidateCache();
     set({
       isLoggedIn: true,
@@ -118,40 +136,46 @@ export const useAppStore = create<AppState>((set, get) => ({
     // DO NOT call refreshPermissions() here — we already have fresh data from the
     // login response. Calling it immediately races with the logout denylist write
     // in Redis and can cause a 401 → logout() → 404 loop.
+    return true;
   },
 
   logout: () => {
-    // Fire-and-forget server-side token revocation
+    const active = getActiveAccount();
+
+    // Fire-and-forget server-side revocation reads the active account's tokens, so it goes first.
     logoutWithElysia().catch(() => {});
 
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.clear(); // COMPLETE wipe of all local data
-        sessionStorage.clear(); // COMPLETE wipe of current session memory
-      } catch { /* ignore */ }
+    const next = active ? removeAccount(active.user.id).next : null;
+    if (!next) {
+      wipeBrowsingData();
+      invalidateCache();
+      set({
+        isLoggedIn: false,
+        currentUser: null,
+        currentScreen: 'dashboard',
+        sidebarOpen: false,
+        currentTenantId: null,
+        currentTenantSlug: null,
+        currentTenantName: null,
+        currentTenantLogo: null,
+      });
+      return null;
     }
+
+    setActiveAccount(next.user.id);
+    // Cached queries belong to the account that just signed out.
     invalidateCache();
-    if (typeof window !== 'undefined') {
-      try {
-        // Clear all cookies
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i];
-          const [name] = cookie.split("=");
-          document.cookie = name.trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-        }
-      } catch { /* ignore */ }
-    }
     set({
-      isLoggedIn: false,
-      currentUser: null,
+      isLoggedIn: true,
+      currentUser: next.user,
       currentScreen: 'dashboard',
       sidebarOpen: false,
-      currentTenantId: null,
-      currentTenantSlug: null,
-      currentTenantName: null,
-      currentTenantLogo: null,
+      currentTenantId: next.user.tenantId || null,
+      currentTenantSlug: next.user.tenantSlug || null,
+      currentTenantName: next.user.tenantName || null,
+      currentTenantLogo: next.user.tenantLogo || null,
     });
+    return dashboardHref(next.user);
   },
 
   refreshPermissions: async () => {
@@ -207,6 +231,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         platformRole: userData.platformRole || null,
       };
       set({ currentUser: updatedUser });
+      updateAccountUser(updatedUser.id, updatedUser);
 
       // Sync logo if available in user data but missing in tenant state
       if (userData.tenantLogo && !get().currentTenantLogo) {
@@ -226,10 +251,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     } catch (error: any) {
       if (error?.status === 404 || error?.status === 401 || error?.message === 'Session expired') {
-        get().logout();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/';
-        }
+        window.location.href = get().logout() ?? '/';
       }
     } finally {
       isRefreshingPermissions = false;

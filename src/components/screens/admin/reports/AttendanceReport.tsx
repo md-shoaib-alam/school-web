@@ -23,7 +23,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart3, TrendingUp, AlertTriangle } from "lucide-react";
-import { ClassInfo, AttendanceRecord } from "@/lib/types";
+import { ClassInfo, AttendanceRecord } from "@/types";
 import { AttendanceSummary, DailyAttendance, attendanceChartConfig } from "./types";
 import { SummaryCardSkeleton, ChartSkeleton } from "./SummaryComponents";
 

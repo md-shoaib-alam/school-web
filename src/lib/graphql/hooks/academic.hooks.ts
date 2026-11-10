@@ -16,7 +16,9 @@ export function useSubjects(tenantId?: string, page?: number, limit?: number) {
   return useQuery<SubjectsResponse>({
     queryKey: [...queryKeys.subjects, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ subjects: SubjectsResponse }>(SUBJECTS, { tenantId, page, limit }).then(d => d.subjects),
-    staleTime: 0,
+    // Subject writes call invalidateQueries(queryKeys.subjects) from their own
+    // onSuccess, so the 5-minute QueryClient default only covers reads between
+    // writes rather than making every mount re-read.
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -26,7 +28,9 @@ export function useClassesMin(tenantId?: string, page?: number, limit?: number) 
   return useQuery<ClassesResponse>({
     queryKey: [...queryKeys.classes, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
-    staleTime: 0,
+    // staleTime comes from the 5-minute QueryClient default; class writes go
+    // through /api/classes, and triggerGlobalRefresh() maps any "class" path to
+    // the ["classes"] prefix, so this cache is still cleared on every write.
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -47,7 +51,9 @@ export function useClassesInfinite(tenantId?: string, filters?: { limit?: number
       const totalPages = lastPage.totalPages;
       return currentPage < totalPages ? (currentPage + 1) : undefined;
     },
-    staleTime: 0,
+    // Same reasoning as useClassesMin: ["classes"] is invalidated on every class
+    // write, so this can ride the 5-minute default instead of refetching on
+    // every remount (ClassSelect remounts whenever a screen re-renders its tree).
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -57,20 +63,19 @@ export function useTeachersMin(tenantId?: string, page?: number, limit?: number)
   return useQuery<TeachersResponse>({
     queryKey: [...queryKeys.teachers, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ teachers: TeachersResponse }>(TEACHERS, { tenantId, page, limit }).then(d => d.teachers),
-    staleTime: 0,
+    // ["teachers"] is invalidated by triggerGlobalRefresh() on every teacher
+    // write, so this can ride the 5-minute default.
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
 }
 
+// Shares useClassesMin's cache key and (now) its options, so the two hooks read
+// the same ["classes"] entry instead of one pinning it stale on every mount.
 export function useClasses(tenantId?: string, page?: number, limit?: number) {
   return useQuery<ClassesResponse>({
     queryKey: [...queryKeys.classes, tenantId, page, limit],
-    queryFn: async () => {
-      const data = await graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit })
-      return data.classes
-    },
-    staleTime: 0,
+    queryFn: () => graphqlQuery<{ classes: ClassesResponse }>(CLASSES, { tenantId, page, limit }).then(d => d.classes),
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -92,7 +97,9 @@ export function useStudents(tenantId?: string, classId?: string, search?: string
   return useQuery<StudentsResponse>({
     queryKey: [...queryKeys.students, tenantId, classId, search, status, gender, page, limit],
     queryFn: () => graphqlQuery<{ students: StudentsResponse }>(STUDENTS, { tenantId, classId, search, status, gender, page, limit }).then(d => d.students),
-    staleTime: 0,
+    // staleTime comes from the 5-minute QueryClient default; every student
+    // mutation calls invalidateQueries(queryKeys.students), so opening a
+    // profile and coming back no longer re-reads the whole list.
     gcTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     enabled: !!tenantId,
@@ -118,7 +125,7 @@ export function useNotices(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ notices: NoticesResponse }>(NOTICES, { tenantId, page, limit })
       return data.notices
     },
-    staleTime: 0,
+    // ["notices"] is invalidated by triggerGlobalRefresh() on every notice write.
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -131,7 +138,9 @@ export function useFees(tenantId?: string, page?: number, limit?: number) {
       const data = await graphqlQuery<{ fees: FeesResponse }>(FEES, { tenantId, page, limit })
       return data.fees
     },
-    staleTime: 0,
+    // Shorter than the 5-minute default on purpose: the Expo app collects fees
+    // out of band, so a web-only invalidation can't cover those writes.
+    staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -141,7 +150,9 @@ export function useAttendance(tenantId?: string, page?: number, limit?: number) 
   return useQuery<AttendanceResponse>({
     queryKey: [...queryKeys.attendance, tenantId, page, limit],
     queryFn: () => graphqlQuery<{ attendance: AttendanceResponse }>(ATTENDANCE, { tenantId, page, limit }).then(d => d.attendance),
-    staleTime: 0,
+    // Same reasoning as useFees: teachers mark attendance from the Expo app, and
+    // those writes never reach this client's invalidation map.
+    staleTime: 30 * 1000,
     gcTime: 15 * 60 * 1000,
     enabled: !!tenantId,
   })
@@ -151,7 +162,8 @@ export function useStaff(tenantId?: string, role?: string, search?: string, page
   return useQuery<StaffResponse>({
     queryKey: [...queryKeys.staff, tenantId, role, search, page, limit],
     queryFn: () => graphqlQuery<{ staff: StaffResponse }>(STAFF, { tenantId, role, search, page, limit }).then(d => d.staff),
-    staleTime: 0,
+    // ["staff"] is invalidated by triggerGlobalRefresh() and directly by the
+    // role-assignment mutation, so this can ride the 5-minute default.
     gcTime: 15 * 60 * 1000,
     placeholderData: keepPreviousData,
     enabled: !!tenantId,

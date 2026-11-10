@@ -107,7 +107,7 @@ const parentQuickActions: QuickAction[] = [
     label: "Tickets",
     screen: "tickets",
     category: "Support & Info",
-    color: "bg-zinc-600 dark:bg-zinc-500",
+    color: "bg-zinc-600 dark:bg-muted0",
     icon: <LifeBuoy className="size-5" />
   },
   {
@@ -156,8 +156,7 @@ export function MinimalDashboard() {
 
   const navigateTo = (screen: string) => {
     if (screen === "logout-action") {
-      logout();
-      replace("/");
+      replace(logout() ?? "/");
       return;
     }
 
@@ -211,27 +210,27 @@ export function MinimalDashboard() {
     <div className="space-y-8 w-full mt-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
         <div className="space-y-1">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
             Quick Actions
           </h3>
         </div>
         
         {/* Search bar */}
         <div className="relative w-full sm:max-w-[280px] group">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-500 group-focus-within:text-amber-500 transition-colors" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-amber-500 transition-colors" />
           <input
             type="text"
             placeholder="Search dashboard..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-xs rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500/50 text-zinc-800 dark:text-zinc-200 shadow-sm transition-all placeholder:text-zinc-500"
+            className="w-full pl-10 pr-4 py-2.5 text-xs rounded-2xl border  bg-card focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500/50 text-foreground shadow-sm transition-all placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       {filteredQuickActions.length === 0 ? (
-        <div className="py-12 text-center rounded-3xl border border-dashed border-zinc-300 dark:border-zinc-800">
-          <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+        <div className="py-12 text-center rounded-3xl border border-dashed ">
+          <p className="text-foreground text-sm">
             No matching quick actions found. Try a different search term.
           </p>
         </div>
@@ -253,14 +252,14 @@ export function MinimalDashboard() {
                     key={`rec-${action.screen}`}
                     type="button"
                     onClick={() => navigateTo(action.screen)}
-                    className="flex flex-col items-center justify-center p-6 rounded-3xl border border-amber-200/60 dark:border-amber-900/20 hover:shadow-xl hover:shadow-amber-500/10 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/50 text-center group gap-4 cursor-pointer"
+                    className="flex flex-col items-center justify-center p-6 rounded-3xl border border-amber-200/60 dark:border-amber-900/20 hover:shadow-xl hover:shadow-amber-500/10 transition-all bg-card hover:border-amber-500/50 text-center group gap-4 cursor-pointer"
                   >
                     <div
                       className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-lg`}
                     >
                       {action.icon}
                     </div>
-                    <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 tracking-tight">
+                    <span className="text-xs font-semibold text-foreground tracking-tight">
                       {action.label}
                     </span>
                   </button>
@@ -276,10 +275,10 @@ export function MinimalDashboard() {
             return (
               <div key={category} className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <h4 className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
+                  <h4 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                     {category}
                   </h4>
-                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-900" />
+                  <div className="h-px flex-1 bg-muted" />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                   {actions.map((action) => (
@@ -287,14 +286,14 @@ export function MinimalDashboard() {
                       key={action.screen}
                       type="button"
                       onClick={() => navigateTo(action.screen)}
-                      className="flex flex-col items-center justify-center p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 hover:shadow-xl hover:shadow-zinc-500/5 transition-all bg-white dark:bg-zinc-950 hover:border-amber-500/30 text-center group gap-4 cursor-pointer"
+                      className="flex flex-col items-center justify-center p-6 rounded-3xl border  hover:shadow-xl hover:shadow-zinc-500/5 transition-all bg-card hover:border-amber-500/30 text-center group gap-4 cursor-pointer"
                     >
                       <div
                         className={`p-4 rounded-2xl text-white ${action.color} transition-all group-hover:scale-110 shadow-md`}
                       >
                         {action.icon}
                       </div>
-                      <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 tracking-tight">
+                      <span className="text-xs font-semibold text-foreground tracking-tight">
                         {action.label}
                       </span>
                     </button>

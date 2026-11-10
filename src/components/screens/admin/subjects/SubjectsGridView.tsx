@@ -65,7 +65,7 @@ export function SubjectsGridView({
                   </div>
 
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                    <h3 className="font-semibold text-foreground truncate">
                       {subject.name}
                     </h3>
                     <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
@@ -73,21 +73,21 @@ export function SubjectsGridView({
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+                  <div className="mt-4 pt-4 border-t  space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Class</span>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter">Class</span>
                       <Badge variant="secondary" className="text-[10px] px-2 py-0">
                         {subject.className}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Teacher</span>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter">Teacher</span>
                       {subject.teacherName && subject.teacherName !== "Not Assigned" ? (
                         <div className="flex items-center gap-1.5">
                           <div className="size-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-[8px] font-bold">
                             {subject.teacherName.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                           </div>
-                          <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 max-w-[100px] truncate">
+                          <span className="text-xs font-medium text-foreground max-w-[100px] truncate">
                             {subject.teacherName}
                           </span>
                         </div>

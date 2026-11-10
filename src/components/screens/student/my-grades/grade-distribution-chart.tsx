@@ -31,7 +31,7 @@ export function GradeDistributionChart({
   chartConfig,
 }: GradeDistributionChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm border-zinc-200/60 dark:border-zinc-800 h-full">
+    <Card className="rounded-xl shadow-sm  h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 font-semibold">
           <CircleDot className="size-4 text-violet-500" />
@@ -86,7 +86,7 @@ export function GradeDistributionChart({
                       backgroundColor: gradeColorMap[g.grade] || "#9ca3af",
                     }}
                   />
-                  <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                  <span className="text-foreground font-medium">
                     {g.grade}
                   </span>
                   <Badge
@@ -100,7 +100,7 @@ export function GradeDistributionChart({
             </div>
           </div>
         ) : (
-          <div className="h-[200px] flex items-center justify-center text-zinc-400 dark:text-zinc-500 border-2 border-dashed rounded-xl border-zinc-100 dark:border-zinc-800">
+          <div className="h-[200px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl ">
             <p className="text-sm font-medium">No distribution data</p>
           </div>
         )}

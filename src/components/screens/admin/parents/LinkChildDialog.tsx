@@ -167,15 +167,15 @@ export function LinkChildDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-[95vw] sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
+        className="w-[95vw] sm:w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl p-0 overflow-hidden border  bg-card shadow-2xl rounded-2xl max-h-[92vh] flex flex-col focus:outline-none"
         data-lenis-prevent
         showCloseButton={false}
       >
         {/* Top Header Section with mint gradient aura and linkchilderntop.avif illustration */}
-        <div className="relative px-5 sm:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5 border-b border-slate-100 dark:border-zinc-800/80 bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
+        <div className="relative px-5 sm:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5 border-b  bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/20 dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 shrink-0 overflow-hidden">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors z-20"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:text-muted-foreground transition-colors z-20"
             aria-label="Close"
           >
             <X className="size-5" />
@@ -191,10 +191,10 @@ export function LinkChildDialog({
                   LINK CHILD TO PARENT
                 </p>
               </div>
-              <DialogTitle className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+              <DialogTitle className="text-lg sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
                 Link Child to {selectedParent?.name || "Parent"}
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Select a student to link as a child for this parent.
               </DialogDescription>
             </div>
@@ -219,7 +219,7 @@ export function LinkChildDialog({
         >
           {/* Parent Summary Card matching the screenshot */}
           {selectedParent && (
-            <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-3.5 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex items-center gap-3 sm:gap-4">
+            <div className="rounded-2xl border  bg-card p-3.5 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex items-center gap-3 sm:gap-4">
               {/* Vibrant Orange Avatar with Initials */}
               <div className="size-14 sm:size-18 rounded-full bg-amber-500 text-white font-bold text-lg sm:text-2xl flex items-center justify-center shrink-0 shadow-sm">
                 {getInitials(selectedParent.name)}
@@ -227,7 +227,7 @@ export function LinkChildDialog({
 
               <div className="flex-1 min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground truncate">
                     {selectedParent.name}
                   </h3>
                   {selectedParent.occupation && (
@@ -237,16 +237,16 @@ export function LinkChildDialog({
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-slate-500 dark:text-zinc-400">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
                   {selectedParent.email && (
                     <span className="flex items-center gap-1.5 truncate">
-                      <Mail className="size-3.5 text-slate-400 shrink-0" />
+                      <Mail className="size-3.5 text-muted-foreground shrink-0" />
                       {selectedParent.email}
                     </span>
                   )}
                   {selectedParent.phone && (
                     <span className="flex items-center gap-1.5">
-                      <Phone className="size-3.5 text-slate-400 shrink-0" />
+                      <Phone className="size-3.5 text-muted-foreground shrink-0" />
                       {selectedParent.phone.startsWith("+") ? selectedParent.phone : `+91 ${selectedParent.phone}`}
                     </span>
                   )}
@@ -258,7 +258,7 @@ export function LinkChildDialog({
           {/* Currently Linked Children List (if any) */}
           {selectedParent && selectedParent.children && selectedParent.children.length > 0 && (
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-slate-600 dark:text-zinc-400">
+              <Label className="text-xs font-semibold text-muted-foreground">
                 Currently Linked Children ({selectedParent.children.length})
               </Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -272,10 +272,10 @@ export function LinkChildDialog({
                         {getInitials(child.name)}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-900 dark:text-zinc-100 truncate">
+                        <p className="text-xs font-bold text-foreground truncate">
                           {child.name}
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
+                        <p className="text-[11px] text-muted-foreground truncate">
                           {child.className || "Class"} • Roll {child.rollNumber || "–"}
                         </p>
                       </div>
@@ -283,7 +283,7 @@ export function LinkChildDialog({
                     <button
                       type="button"
                       onClick={() => onUnlinkChild(selectedParent.id, child.id)}
-                      className="size-7 rounded-lg hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400 text-slate-400 flex items-center justify-center transition-colors shrink-0"
+                      className="size-7 rounded-lg hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400 text-muted-foreground flex items-center justify-center transition-colors shrink-0"
                       title="Unlink child"
                       disabled={linking}
                     >
@@ -296,16 +296,16 @@ export function LinkChildDialog({
           )}
 
           {/* Find Student Section Card */}
-          <div className="rounded-2xl border border-slate-200/90 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
             {/* Find Student Header Row with Class Select and Unlinked Toggle */}
-            <div className="flex flex-col gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800/60">
+            <div className="flex flex-col gap-3 pb-3 border-b ">
               <div className="hidden sm:flex items-center gap-2">
                 <GraduationCap className="size-5 text-emerald-600" />
                 <div>
-                  <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                  <h4 className="text-sm sm:text-base font-bold text-foreground">
                     Find Student
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  <p className="text-xs text-muted-foreground">
                     Search and select a student to link with this parent.
                   </p>
                 </div>
@@ -314,7 +314,7 @@ export function LinkChildDialog({
               {/* Class Select and Unlinked Toggle: full-width / spread on mobile matching screenshot */}
               <div className="flex items-center justify-between gap-3 w-full">
                 <Select value={selectedClass} onValueChange={setSelectedClass}>
-                  <SelectTrigger className="h-10 sm:h-9 flex-1 sm:flex-initial sm:w-[160px] text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700">
+                  <SelectTrigger className="h-10 sm:h-9 flex-1 sm:flex-initial sm:w-[160px] text-xs rounded-xl bg-muted ">
                     <SelectValue placeholder="All Classes" />
                   </SelectTrigger>
                   <SelectContent>
@@ -329,7 +329,7 @@ export function LinkChildDialog({
 
                 {/* Unlinked Only toggle */}
                 {setUnlinkedOnly && (
-                  <div className="flex items-center gap-2.5 h-10 sm:h-9 px-3.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/50 select-none shrink-0">
+                  <div className="flex items-center gap-2.5 h-10 sm:h-9 px-3.5 rounded-xl border  bg-muted select-none shrink-0">
                     <Switch
                       id="unlinked-only-toggle"
                       checked={unlinkedOnly}
@@ -338,7 +338,7 @@ export function LinkChildDialog({
                     />
                     <Label
                       htmlFor="unlinked-only-toggle"
-                      className="text-xs text-slate-700 dark:text-zinc-300 font-semibold cursor-pointer"
+                      className="text-xs text-foreground font-semibold cursor-pointer"
                     >
                       Unlinked Only
                     </Label>
@@ -349,10 +349,10 @@ export function LinkChildDialog({
 
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
                 placeholder="Search by name, roll number or class..."
-                className="pl-9 h-10 text-xs rounded-xl bg-slate-50/50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+                className="pl-9 h-10 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -363,14 +363,14 @@ export function LinkChildDialog({
               {loading ? (
                 <div className="text-center py-12">
                   <Loader2 className="size-8 animate-spin mx-auto text-emerald-600 mb-2" />
-                  <p className="text-xs text-slate-500">Searching students...</p>
+                  <p className="text-xs text-muted-foreground">Searching students...</p>
                 </div>
               ) : searchedStudents.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50/50 dark:bg-zinc-800/20 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
-                  <p className="text-slate-500 dark:text-zinc-400 text-xs font-semibold">
+                <div className="text-center py-12 bg-muted rounded-xl border border-dashed ">
+                  <p className="text-muted-foreground text-xs font-semibold">
                     No students found
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
                     Try changing the class filter or searching with a different keyword.
                   </p>
                 </div>
@@ -387,7 +387,7 @@ export function LinkChildDialog({
                         className={`flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer select-none ${
                           isChecked
                             ? "bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800/80 shadow-xs"
-                            : "bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 hover:bg-slate-50/80 dark:hover:bg-zinc-800/50"
+                            : "bg-card  hover:bg-muted"
                         }`}
                       >
                         <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
@@ -396,7 +396,7 @@ export function LinkChildDialog({
                             className={`size-5 rounded-md flex items-center justify-center border transition-colors shrink-0 ${
                               isChecked
                                 ? "bg-emerald-600 border-emerald-600 text-white"
-                                : "border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800"
+                                : " bg-white"
                             }`}
                           >
                             {isChecked && <Check className="size-3.5 stroke-[3]" />}
@@ -410,10 +410,10 @@ export function LinkChildDialog({
                           </div>
 
                           <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">
+                            <p className="text-xs sm:text-sm font-bold text-foreground truncate">
                               {student.name}
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium truncate">
+                            <p className="text-[11px] text-muted-foreground font-medium truncate">
                               {student.className || "Class"} • Roll {student.rollNumber || "–"}
                               {student.parentName && ` • Parent: ${student.parentName}`}
                             </p>
@@ -423,14 +423,14 @@ export function LinkChildDialog({
                         {/* Right side: Chevron arrow on mobile, Link button or badge on desktop */}
                         <div className="shrink-0 flex items-center">
                           {/* Mobile: subtle chevron arrow matching the mobile screenshot */}
-                          <div className="sm:hidden text-slate-400 dark:text-zinc-500 pl-2">
+                          <div className="sm:hidden text-muted-foreground pl-2">
                             <ChevronRight className="size-4" />
                           </div>
 
                           {/* Desktop: Link button or Linked badge */}
                           <div className="hidden sm:block">
                             {student.parentId ? (
-                              <span className="text-[11px] font-semibold text-slate-400 dark:text-zinc-500 bg-slate-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-zinc-700">
+                              <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-xl border ">
                                 Linked
                               </span>
                             ) : (
@@ -462,7 +462,7 @@ export function LinkChildDialog({
                   {hasNextPage && (
                     <div ref={triggerRef} className="py-4 flex justify-center items-center gap-2">
                       <Loader2 className="size-4 animate-spin text-emerald-600" />
-                      <span className="text-xs text-slate-500">Loading more students...</span>
+                      <span className="text-xs text-muted-foreground">Loading more students...</span>
                     </div>
                   )}
                 </div>
@@ -472,12 +472,12 @@ export function LinkChildDialog({
         </div>
 
         {/* Modal Action Footer matching the screenshot */}
-        <div className="px-6 sm:px-8 py-4 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div className="px-6 sm:px-8 py-4 bg-card border-t  flex items-center justify-between shrink-0">
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="text-xs font-semibold text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl px-5 h-10"
+            className="text-xs font-semibold text-foreground  hover:bg-accent rounded-xl px-5 h-10"
           >
             Cancel
           </Button>

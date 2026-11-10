@@ -50,8 +50,8 @@ export function BatchPrintContainers({
                     <div 
                       key={card.cardNumber} 
                       className={isDualTemplate
-                        ? "flex items-center justify-center h-[130mm] w-full p-[2mm] border border-dashed border-zinc-200 shrink-0"
-                        : "flex items-center justify-center h-[130mm] w-[90mm] p-[1.5mm] border border-dashed border-zinc-300 print:border-zinc-400 shrink-0"
+                        ? "flex items-center justify-center h-[130mm] w-full p-[2mm] border border-dashed  shrink-0"
+                        : "flex items-center justify-center h-[130mm] w-[90mm] p-[1.5mm] border border-dashed  print: shrink-0"
                       }
                       style={{ 
                         pageBreakInside: 'avoid',
@@ -81,8 +81,8 @@ export function BatchPrintContainers({
             <div className="w-[210mm] h-[297mm] p-[10mm] flex flex-col items-center justify-start single-card-page">
               <div 
                 className={templateId === 'compact_dual'
-                  ? "flex items-center justify-center h-[128mm] w-full p-[2mm] border border-dashed border-zinc-300 print:border-zinc-400"
-                  : "flex items-center justify-center h-[138mm] w-[130mm] p-[2mm] border border-dashed border-zinc-300 print:border-zinc-400"
+                  ? "flex items-center justify-center h-[128mm] w-full p-[2mm] border border-dashed  print:"
+                  : "flex items-center justify-center h-[138mm] w-[130mm] p-[2mm] border border-dashed  print:"
                 }
               >
                 <div className="size-full flex items-center justify-center p-[1mm]">

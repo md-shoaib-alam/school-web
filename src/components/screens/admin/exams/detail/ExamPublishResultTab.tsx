@@ -97,7 +97,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
   return (
     <div className="space-y-5">
       {/* Title Header with Publish button (Image 4) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm">
         <div className="flex items-center gap-3.5">
           <div className="size-11 sm:size-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
             <FileCheck2 className="size-6" />
@@ -157,7 +157,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
       {/* 2-Column Cards Grid (Image 4) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left: Publication Settings Card */}
-        <Card className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-border/70 shadow-sm space-y-6">
+        <Card className="p-6 rounded-2xl bg-card border border-border/70 shadow-sm space-y-6">
           <h3 className="text-base font-bold text-foreground">Publication Settings</h3>
 
           {/* Publish To */}
@@ -214,14 +214,14 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
         </Card>
 
         {/* Right: Result Summary Card (Image 4) */}
-        <Card className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-border/70 shadow-sm space-y-4">
+        <Card className="p-6 rounded-2xl bg-card border border-border/70 shadow-sm space-y-4">
           <h3 className="text-base font-bold text-foreground">Result Summary</h3>
 
           <div className="space-y-3.5 divide-y divide-border/60 text-sm">
             {/* Class */}
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <GraduationCap className="size-4 text-slate-500" />
+                <GraduationCap className="size-4 text-muted-foreground" />
                 <span>Class</span>
               </div>
               <span className="font-bold text-foreground">{exam.className}</span>
@@ -230,7 +230,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
             {/* Total Students */}
             <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Users className="size-4 text-slate-500" />
+                <Users className="size-4 text-muted-foreground" />
                 <span>Total Students</span>
               </div>
               <span className="font-bold text-foreground tabular-nums">{totalStudents}</span>
@@ -239,7 +239,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
             {/* Total Subjects */}
             <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <BookOpen className="size-4 text-slate-500" />
+                <BookOpen className="size-4 text-muted-foreground" />
                 <span>Total Subjects</span>
               </div>
               <span className="font-bold text-foreground tabular-nums">{totalSubjects}</span>
@@ -248,7 +248,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
             {/* Total Marks */}
             <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Award className="size-4 text-slate-500" />
+                <Award className="size-4 text-muted-foreground" />
                 <span>Total Marks</span>
               </div>
               <span className="font-bold text-foreground tabular-nums">{totalMarks}</span>
@@ -257,7 +257,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
             {/* Marks Entered */}
             <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <CheckCircle2 className="size-4 text-slate-500" />
+                <CheckCircle2 className="size-4 text-muted-foreground" />
                 <span>Marks Entered</span>
               </div>
               <span className="font-bold text-foreground tabular-nums">
@@ -271,7 +271,7 @@ export function ExamPublishResultTab({ exam, onSuccessPublished }: ExamPublishRe
             {/* Status */}
             <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2.5 text-muted-foreground">
-                <Calendar className="size-4 text-slate-500" />
+                <Calendar className="size-4 text-muted-foreground" />
                 <span>Status</span>
               </div>
               <div>

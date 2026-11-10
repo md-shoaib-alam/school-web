@@ -117,7 +117,7 @@ export function SubmissionsDialog({
             ))}
           </div>
         ) : submissions.length === 0 ? (
-          <div className="py-12 text-center text-zinc-400 dark:text-zinc-500 flex-1">
+          <div className="py-12 text-center text-muted-foreground flex-1">
             <Users className="size-10 mx-auto mb-2 opacity-40" />
             <p className="text-sm">No students assigned</p>
           </div>
@@ -135,12 +135,12 @@ export function SubmissionsDialog({
                     className={`p-4 rounded-lg border flex items-center justify-between gap-4 transition-all ${
                       isSubmitted
                         ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/20 dark:bg-emerald-950/10"
-                        : "border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/10 opacity-90"
+                        : "border-dashed  bg-muted opacity-90"
                     } ${isChanged ? "ring-2 ring-blue-500/50" : ""}`}
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                        <p className="text-sm font-semibold text-foreground truncate">
                           {sub.studentName}
                         </p>
                         <Badge
@@ -148,7 +148,7 @@ export function SubmissionsDialog({
                           className={`text-[9px] px-1.5 py-0.5 rounded-sm uppercase tracking-wider font-extrabold ${
                             isSubmitted
                               ? "bg-emerald-600 hover:bg-emerald-600 text-white border-0"
-                              : "bg-zinc-100 hover:bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700"
+                              : "bg-muted hover:bg-muted text-foreground "
                           }`}
                         >
                           {isSubmitted ? "Submitted" : "Pending"}
@@ -159,7 +159,7 @@ export function SubmissionsDialog({
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                         Roll No: {sub.studentRollNumber || 'N/A'} • Class: {sub.studentClass}
                       </p>
                     </div>
@@ -192,7 +192,7 @@ export function SubmissionsDialog({
             </div>
 
             {hasChanges && (
-              <div className="mt-2 pt-4 border-t border-zinc-150 dark:border-zinc-800 bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
+              <div className="mt-2 pt-4 border-t  bg-background sticky bottom-0 animate-in fade-in slide-in-from-bottom-3 duration-200">
                 <Button
                   size="lg"
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-md py-5 text-sm transition-all flex items-center justify-center"

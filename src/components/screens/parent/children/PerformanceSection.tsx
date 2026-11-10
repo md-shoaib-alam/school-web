@@ -18,13 +18,13 @@ interface PerformanceSectionProps {
 
 export function PerformanceSection({ data }: PerformanceSectionProps) {
   return (
-    <Card className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-white dark:bg-zinc-950 hover:shadow-md transition-all duration-300">
-      <CardHeader className="p-5 pb-3 border-b border-zinc-100 dark:border-zinc-900">
+    <Card className="rounded-3xl border  shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-card hover:shadow-md transition-all duration-300">
+      <CardHeader className="p-5 pb-3 border-b ">
         <div className="flex items-center gap-2.5 text-left">
           <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
             <TrendingUp className="size-4" />
           </div>
-          <CardTitle className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+          <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Subject-wise Performance
           </CardTitle>
         </div>
@@ -34,11 +34,11 @@ export function PerformanceSection({ data }: PerformanceSectionProps) {
           {data.map((sp) => (
             <div key={sp.subject} className="space-y-2 text-left group">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-amber-500 transition-colors">
+                <span className="text-xs font-semibold text-foreground group-hover:text-amber-500 transition-colors">
                   {sp.subject}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-tight">
+                  <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-tight">
                     {sp.exams} {sp.exams === 1 ? "exam" : "exams"}
                   </span>
                   <Badge
@@ -58,9 +58,9 @@ export function PerformanceSection({ data }: PerformanceSectionProps) {
               <div className="flex items-center gap-3">
                 <Progress
                   value={sp.avgPct}
-                  className="h-2 flex-1 bg-zinc-100 dark:bg-zinc-900 [&>div]:bg-gradient-to-r [&>div]:from-amber-400 [&>div]:to-orange-500"
+                  className="h-2 flex-1 bg-muted [&>div]:bg-gradient-to-r [&>div]:from-amber-400 [&>div]:to-orange-500"
                 />
-                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 w-10 text-right">
+                <span className="text-xs font-semibold text-foreground w-10 text-right">
                   {sp.avgPct}%
                 </span>
               </div>

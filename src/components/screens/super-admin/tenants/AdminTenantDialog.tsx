@@ -81,7 +81,7 @@ export function AdminTenantDialog({
               Email Address
             </Label>
             <div className="relative group">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
               <Input
                 type="email"
                 placeholder="admin@school.com"
@@ -101,7 +101,7 @@ export function AdminTenantDialog({
               Phone Number (Optional)
             </Label>
             <div className="relative group">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
               <Input
                 placeholder="+1 (555) 000-0000"
                 className="pl-11 h-11 rounded-xl"
@@ -120,7 +120,7 @@ export function AdminTenantDialog({
               Initial Password
             </Label>
             <div className="relative group">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-zinc-400" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
               <Input
                 type={showAdminPassword ? "text" : "password"}
                 placeholder="Create a secure password"

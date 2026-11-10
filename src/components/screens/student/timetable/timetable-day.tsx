@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, User, MapPin, Timer } from "lucide-react";
-import type { TimetableSlot } from "@/lib/types";
+import type { TimetableSlot } from "@/types";
 import { DAYS, DAY_LABELS, DAY_FULL_LABELS, formatTime } from "./types";
 
 interface TimetableDayProps {
@@ -51,7 +51,7 @@ export function TimetableDay({
                   ? "bg-violet-600 text-white hover:bg-violet-700 shadow-sm"
                   : isToday
                     ? "border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20"
-                    : "text-zinc-500 dark:text-zinc-400"
+                    : "text-muted-foreground"
               }`}
             >
               {DAY_LABELS[day]}
@@ -68,7 +68,7 @@ export function TimetableDay({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-base font-semibold text-foreground">
                 {DAY_FULL_LABELS[selectedDay]}
                 {selectedDay === todayKey && (
                   <span className="ml-2 text-sm font-normal text-violet-500">
@@ -76,19 +76,19 @@ export function TimetableDay({
                   </span>
                 )}
               </h3>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {selectedDaySlots.length} classes scheduled
               </p>
             </div>
             {selectedDaySlots.length > 0 && (
               <div className="text-right">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   {formatTime(selectedDaySlots[0].startTime)} –{" "}
                   {formatTime(
                     selectedDaySlots[selectedDaySlots.length - 1].endTime,
                   )}
                 </p>
-                <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                <p className="text-[11px] text-muted-foreground">
                   {(() => {
                     const totalMin = selectedDaySlots.reduce((acc, s) => {
                       const [sh, sm] = s.startTime.split(":").map(Number);
@@ -112,7 +112,7 @@ export function TimetableDay({
       <div className="relative space-y-3">
         {/* Timeline line */}
         {selectedDaySlots.length > 0 && (
-          <div className="absolute left-[23px] top-8 bottom-8 w-px bg-zinc-200 dark:bg-zinc-700 hidden sm:block" />
+          <div className="absolute left-[23px] top-8 bottom-8 w-px bg-muted dark:bg-zinc-700 hidden sm:block" />
         )}
 
         {timeSlots.map((ts, idx) => {
@@ -131,16 +131,16 @@ export function TimetableDay({
             // Free Period
             return (
               <div key={`${selectedDay}-${ts.start}`} className="relative">
-                <Card className="rounded-xl border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50">
+                <Card className="rounded-2xl border-dashed  bg-muted">
                   <CardContent className="p-4 flex items-center gap-4">
                     <div className="hidden sm:flex flex-col items-center z-10">
-                      <div className="size-5 rounded-full border-2 border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900" />
+                      <div className="size-5 rounded-full border-2  bg-card" />
                     </div>
                     <div className="flex-1 flex items-center gap-3">
-                      <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium min-w-[90px]">
+                      <div className="text-xs text-muted-foreground font-medium min-w-[90px]">
                         {formatTime(ts.start)} – {formatTime(ts.end)}
                       </div>
-                      <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500">
+                      <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="size-3.5" />
                         <span className="text-xs font-medium border-none">
                           Free Period
@@ -155,7 +155,7 @@ export function TimetableDay({
 
           const colorClass =
             subjectColorMap[slot.subjectName] ||
-            "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700";
+            "bg-muted text-foreground ";
 
           return (
             <div key={slot.id} className="relative">
@@ -165,7 +165,7 @@ export function TimetableDay({
                     ? "border-violet-300 shadow-lg shadow-violet-100 dark:shadow-none"
                     : isPastSlot
                       ? "opacity-60"
-                      : "border-zinc-200 dark:border-zinc-700"
+                      : ""
                 }`}
               >
                 <CardContent className="p-4">
@@ -174,14 +174,14 @@ export function TimetableDay({
                     <div className="hidden sm:flex flex-col items-center z-10 pt-0.5">
                       {isCurrentSlotActive ? (
                         <div className="size-5 rounded-full bg-violet-500 border-2 border-violet-300 flex items-center justify-center">
-                          <div className="size-2 rounded-full bg-white dark:bg-zinc-900 animate-pulse" />
+                          <div className="size-2 rounded-full bg-card animate-pulse" />
                         </div>
                       ) : (
                         <div
                           className={`size-5 rounded-full border-2 ${
                             isPastSlot
-                              ? "border-zinc-300 dark:border-zinc-600 bg-zinc-200 dark:bg-zinc-700"
-                              : "border-violet-400 bg-white dark:bg-zinc-900"
+                              ? " bg-muted dark:bg-zinc-700"
+                              : "border-violet-400 bg-card"
                           }`}
                         />
                       )}
@@ -193,7 +193,7 @@ export function TimetableDay({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4
-                              className={`text-sm font-bold truncate ${colorClass.split(" ")[1] || "text-zinc-900 dark:text-zinc-100"}`}
+                              className={`text-sm font-bold truncate ${colorClass.split(" ")[1] || "text-foreground"}`}
                             >
                               {slot.subjectName}
                             </h4>
@@ -206,7 +206,7 @@ export function TimetableDay({
                         </div>
                       </div>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="size-3.5" />
                           {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
@@ -269,7 +269,7 @@ export function TimetableDay({
                           isCurrentSlotActive
                             ? "bg-violet-600 text-white"
                             : isPastSlot
-                              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500"
+                              ? "bg-muted text-muted-foreground"
                               : colorClass
                         }`}
                       >

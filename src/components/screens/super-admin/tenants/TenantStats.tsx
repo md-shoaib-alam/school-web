@@ -42,11 +42,11 @@ const StatCard = memo(function StatCard({
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[9px] sm:text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase truncate">
+          <p className="text-[9px] sm:text-[10px] font-bold tracking-wider text-muted-foreground uppercase truncate">
             {title}
           </p>
           <div className="flex flex-wrap items-baseline gap-1 sm:gap-1.5 mt-0.5">
-            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
               {value}
             </span>
             {trendText && (
@@ -66,7 +66,7 @@ const StatCard = memo(function StatCard({
               </span>
             )}
           </div>
-          <p className="text-[10px] sm:text-[11px] text-slate-500/90 dark:text-slate-400/90 mt-0.5 font-normal truncate">
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 font-normal truncate">
             {subtitle}
           </p>
         </div>

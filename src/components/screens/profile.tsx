@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
 // UI Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +20,7 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/clipboard";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();
@@ -32,6 +33,7 @@ export function UserProfileScreen() {
   const [editPhone, setEditPhone] = useState("");
   const [editAddress, setEditAddress] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
 
   if (!currentUser) return null;
 
@@ -67,9 +69,9 @@ export function UserProfileScreen() {
   };
 
   const handleLogout = () => {
-    logout();
-    replace("/");
-    toast.success("Successfully logged out");
+    const handover = logout();
+    replace(handover ?? "/");
+    toast.success(handover ? "Signed out of this account" : "Successfully logged out");
   };
 
   const handlePasswordChange = () => {
@@ -78,36 +80,51 @@ export function UserProfileScreen() {
 
   const handleOpenEdit = () => {
     setEditName(currentUser?.name || "");
-    setEditPhone(currentUser?.phone || "+91 98765 43210");
-    setEditAddress(currentUser?.address || "7/A, Sector-4, HSR Layout, Bangalore, India");
+    setEditPhone(currentUser?.phone || "");
+    setEditAddress(currentUser?.address || "");
     setEditAvatar(currentUser?.avatar || "");
     setIsEditOpen(true);
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editName.trim()) {
       toast.error("Name cannot be empty!");
       return;
     }
-    
-    const updatedUser = {
-      ...currentUser!,
-      name: editName,
-      phone: editPhone,
-      address: editAddress,
-      avatar: editAvatar,
-    };
-    
-    // Save to store and local storage
-    useAppStore.setState({ currentUser: updatedUser });
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
-      localStorage.removeItem("schoolsaas_profile_cache_time");
+
+    setSavingProfile(true);
+    try {
+      const res = await apiFetch("/api/auth/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName.trim(),
+          phone: editPhone,
+          address: editAddress,
+          avatar: editAvatar,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        toast.error(data.error || "Failed to update profile");
+        return;
+      }
+
+      const updatedUser = { ...currentUser!, ...(data.user ?? {}) };
+      useAppStore.setState({ currentUser: updatedUser });
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+        localStorage.removeItem("schoolsaas_profile_cache_time");
+      }
+
+      setIsEditOpen(false);
+      toast.success("Profile updated successfully!");
+    } catch {
+      toast.error("Error updating profile");
+    } finally {
+      setSavingProfile(false);
     }
-    
-    setIsEditOpen(false);
-    toast.success("Profile updated successfully!");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +156,7 @@ export function UserProfileScreen() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-zinc-100/80 dark:bg-zinc-900/60 p-1.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/30 backdrop-blur-md h-12 shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 bg-muted p-1.5 rounded-2xl border  backdrop-blur-md h-12 shadow-sm">
               <TabsTrigger 
                 value="overview" 
                 className="rounded-xl font-bold text-xs sm:text-sm gap-2 transition-all duration-200 hover:text-emerald-600 dark:hover:text-emerald-400 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-md hover:scale-[1.01] active:scale-[0.99]"
@@ -202,6 +219,7 @@ export function UserProfileScreen() {
         setEditAvatar={setEditAvatar}
         onFileChange={handleFileChange}
         onSave={handleSaveProfile}
+        saving={savingProfile}
       />
     </div>
   );

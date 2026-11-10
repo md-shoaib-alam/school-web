@@ -58,7 +58,7 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
         <div className="border border-black">
           {/* Header Panel */}
           <div className="flex items-center border-b border-black p-3">
-            <div className="w-16 h-16 border border-zinc-300 flex items-center justify-center bg-zinc-50 shrink-0 mr-4 overflow-hidden">
+            <div className="w-16 h-16 border  flex items-center justify-center bg-muted shrink-0 mr-4 overflow-hidden">
               {schoolLogo ? (
                 <img src={schoolLogo} alt="School Logo" className="w-full h-full object-contain" />
               ) : (
@@ -74,7 +74,7 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
           </div>
 
           {/* Subheader / Copy Title */}
-          <div className="text-center font-bold border-b border-black py-1 uppercase tracking-wide bg-zinc-50 text-[11px]">
+          <div className="text-center font-bold border-b border-black py-1 uppercase tracking-wide bg-muted text-[11px]">
             Student Copy
           </div>
 
@@ -84,12 +84,12 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
             <div className="col-span-7 border-r border-black p-2.5 space-y-1">
               <div><span className="font-semibold inline-block w-24">Student ID:</span><span className="font-mono">{receipt.studentId?.substring(0, 12).toUpperCase() || "N/A"}</span></div>
               <div><span className="font-semibold inline-block w-24">Student Name:</span><span className="font-bold uppercase">{receipt.studentName}</span></div>
-              <div><span className="font-semibold inline-block w-24">Mr./Mrs.:</span><span className="font-bold uppercase text-zinc-700">{parentName || "Guardian"}</span></div>
+              <div><span className="font-semibold inline-block w-24">Mr./Mrs.:</span><span className="font-bold uppercase text-foreground">{parentName || "Guardian"}</span></div>
               <div><span className="font-semibold inline-block w-24">Class:</span><span>{className || "N/A"}</span></div>
             </div>
 
             {/* Right Block: Receipt Info */}
-            <div className="col-span-5 p-2.5 space-y-1 bg-zinc-50/50">
+            <div className="col-span-5 p-2.5 space-y-1 bg-muted">
               <div><span className="font-semibold inline-block w-24">Receipt No.:</span><span className="font-bold">{receipt.receiptNumber}</span></div>
               <div><span className="font-semibold inline-block w-24">Receipt Date:</span><span>{receipt.paidDate}</span></div>
               <div><span className="font-semibold inline-block w-24">Session:</span><span>2025-26</span></div>
@@ -98,18 +98,18 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
           </div>
 
           {/* Particulars Table Header */}
-          <div className="grid grid-cols-12 border-b border-black font-bold uppercase tracking-wider bg-zinc-100 text-[10px] text-center">
+          <div className="grid grid-cols-12 border-b border-black font-bold uppercase tracking-wider bg-muted text-[10px] text-center">
             <div className="col-span-9 border-r border-black py-1.5 text-left pl-3">Particulars</div>
             <div className="col-span-3 py-1.5 text-right pr-4">Amount</div>
           </div>
 
           {/* Particulars Items */}
-          <div className="min-h-[140px] divide-y divide-zinc-200">
+          <div className="min-h-[140px] divide-y divide-border">
             {receipt.feeItems && receipt.feeItems.map((item, index) => (
               <div key={item.id || index} className="grid grid-cols-12 text-[11px] py-2 items-center">
                 <div className="col-span-9 pl-3 pr-2">
                   <div className="font-bold capitalize">{item.feeCategoryName || 'Fee Collection'}</div>
-                  <div className="text-[9px] text-zinc-500 italic">Academic Fee Session 2025-26</div>
+                  <div className="text-[9px] text-muted-foreground italic">Academic Fee Session 2025-26</div>
                 </div>
                 <div className="col-span-3 text-right pr-4 font-mono font-bold">
                   {item.paidAmount.toFixed(2)}
@@ -119,13 +119,13 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
           </div>
 
           {/* Total Receipt Row */}
-          <div className="grid grid-cols-12 border-t border-b border-black font-bold uppercase text-[11px] bg-zinc-50">
+          <div className="grid grid-cols-12 border-t border-b border-black font-bold uppercase text-[11px] bg-muted">
             <div className="col-span-9 border-r border-black py-2 pl-3">WE THANKFULLY ACKNOWLEDGE THE RECEIPT OF Rs.:</div>
             <div className="col-span-3 py-2 text-right pr-4 font-mono text-xs">{receipt.paidAmount.toFixed(2)}</div>
           </div>
 
           {/* Bank Transaction Info */}
-          <div className="grid grid-cols-12 border-b border-black text-[10px] bg-zinc-100/50">
+          <div className="grid grid-cols-12 border-b border-black text-[10px] bg-muted">
             <div className="col-span-4 border-r border-black p-1.5"><span className="font-semibold">Bank Name:</span> <span className="capitalize font-medium">{receipt.paymentMethod === 'cash' ? 'Cash Counter' : receipt.paymentMethod}</span></div>
             <div className="col-span-4 border-r border-black p-1.5"><span className="font-semibold">Txn Date:</span> <span className="font-medium">{receipt.paidDate}</span></div>
             <div className="col-span-4 p-1.5"><span className="font-semibold">Txn No:</span> <span className="font-mono font-medium">{receipt.id.substring(0, 16).toUpperCase()}</span></div>
@@ -134,7 +134,7 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
           {/* In Words */}
           <div className="border-b border-black p-2 text-[10px]">
             <span className="font-semibold">In Words : </span>
-            <span className="font-bold capitalize text-zinc-900">{inWords}</span>
+            <span className="font-bold capitalize text-foreground">{inWords}</span>
           </div>
 
           {/* Remarks */}
@@ -145,8 +145,8 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
 
           {/* Note / Terms Grid */}
           <div className="grid grid-cols-12 text-[9px] leading-relaxed">
-            <div className="col-span-8 p-3 border-r border-black space-y-0.5 text-zinc-600">
-              <p className="font-bold text-black border-b border-zinc-200 pb-1 mb-1">Note :</p>
+            <div className="col-span-8 p-3 border-r border-black space-y-0.5 text-foreground">
+              <p className="font-bold text-black border-b  pb-1 mb-1">Note :</p>
               <p>1. Fees once paid are not transferable or refundable under any circumstances.</p>
               <p>2. Kindly deposit the fee on or before the due date to avoid any inconvenience and fine.</p>
               <p>3. This receipt is not Addition to Bank Challan / NEFT / Transfer, this is in confirmation of as above transaction.</p>
@@ -155,7 +155,7 @@ export const AdminReceiptTemplate = React.forwardRef<HTMLDivElement, AdminReceip
               <p>6. For any queries please Email: accounts@demoacademy.org.</p>
               <p>7. This is a computer generated receipt, no signature is required.</p>
             </div>
-            <div className="col-span-4 p-3 flex flex-col justify-end items-center bg-zinc-50/30">
+            <div className="col-span-4 p-3 flex flex-col justify-end items-center bg-muted">
               <div className="w-32 border-b border-black mb-1.5" />
               <p className="font-bold text-[9px] uppercase tracking-wide">Accounts Officer</p>
             </div>

@@ -27,15 +27,15 @@ export function ParentsHeader({
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="hidden sm:block">
-          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-2xl font-semibold text-foreground">
             Parents
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {totalParents} parents registered • {totalChildren} children linked
           </p>
         </div>
         <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}
               size="sm"

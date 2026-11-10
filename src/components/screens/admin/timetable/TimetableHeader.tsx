@@ -29,7 +29,7 @@ export function TimetableHeader({
   onManageClick,
 }: TimetableHeaderProps) {
   const viewSwitcher = (
-    <div className="inline-flex items-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-0.5 shadow-xs shrink-0">
+    <div className="inline-flex items-center rounded-lg border  bg-card p-0.5 shadow-xs shrink-0">
       <Button
         size="sm"
         variant={viewMode === "grid" ? "default" : "ghost"}
@@ -102,7 +102,7 @@ export function TimetableHeader({
           <Button
             variant="outline"
             size="sm"
-            className="h-9 px-2.5 sm:px-3 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 shadow-xs shrink-0"
+            className="h-9 px-2.5 sm:px-3 bg-card hover:bg-accent  shadow-xs shrink-0"
             onClick={onSettingsClick}
             title="Timetable Settings"
           >

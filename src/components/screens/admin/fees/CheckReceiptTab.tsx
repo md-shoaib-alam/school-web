@@ -261,7 +261,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
         <div className="flex flex-row gap-2 w-full lg:w-auto">
           <Popover open={isFromCalendarOpen} onOpenChange={setIsFromCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-card  h-9 px-3">
                 <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <span className="text-xs truncate">{fromDate ? format(new Date(fromDate), "PP") : "From"}</span>
               </Button>
@@ -281,7 +281,7 @@ export function CheckReceiptTab({ canEdit, canDelete }: CheckReceiptTabProps) {
           </Popover>
           <Popover open={isToCalendarOpen} onOpenChange={setIsToCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 px-3">
+              <Button variant="outline" className="flex-1 lg:w-36 justify-start text-left font-normal bg-card  h-9 px-3">
                 <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <span className="text-xs truncate">{toDate ? format(new Date(toDate), "PP") : "To"}</span>
               </Button>

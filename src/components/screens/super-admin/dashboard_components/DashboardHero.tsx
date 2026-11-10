@@ -32,10 +32,10 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
           <p className="text-[10px] sm:text-[11px] font-bold tracking-wider text-blue-600 dark:text-blue-400 uppercase mb-0.5">
             WELCOME BACK, ADMIN
           </p>
-          <h1 className="text-base sm:text-2xl font-bold tracking-tight text-[#0F172A] dark:text-slate-100 leading-tight">
+          <h1 className="text-base sm:text-2xl font-bold tracking-tight text-[#0F172A] leading-tight">
             Platform Dashboard
           </h1>
-          <p className="hidden sm:block text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
+          <p className="hidden sm:block text-xs sm:text-sm text-muted-foreground mt-1 font-normal">
             Overview of schools, users, revenue, and active subscriptions.
           </p>
         </div>
@@ -63,7 +63,7 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
           Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs snap-start"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs snap-start"
             >
               <div className="flex items-center justify-between">
                 <Skeleton className="size-8.5 sm:size-9 rounded-xl" />
@@ -81,17 +81,17 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 1. Schools */}
             <div
               onClick={() => onNavigate?.("tenants")}
-              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all snap-start"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
                 <div className="size-8.5 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <Building2 className="size-4 sm:size-4.5" />
                 </div>
-                <ChevronRight className="size-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div className="mt-2.5">
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Schools</p>
-                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-[11px] font-semibold text-muted-foreground">Schools</p>
+                <p className="text-xl font-bold tracking-tight text-foreground mt-0.5">
                   {(data?.tenants.total ?? 0).toLocaleString()}
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
@@ -104,17 +104,17 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 2. Users */}
             <div
               onClick={() => onNavigate?.("users")}
-              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-800 transition-all snap-start"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
                 <div className="size-8.5 sm:size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <Users className="size-4 sm:size-4.5" />
                 </div>
-                <ChevronRight className="size-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div className="mt-2.5">
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Users</p>
-                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-[11px] font-semibold text-muted-foreground">Users</p>
+                <p className="text-xl font-bold tracking-tight text-foreground mt-0.5">
                   {(data?.users.total ?? 0).toLocaleString()}
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
@@ -127,17 +127,17 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 3. Revenue */}
             <div
               onClick={() => onNavigate?.("billing")}
-              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-800 transition-all snap-start"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
                 <div className="size-8.5 sm:size-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
                   <IndianRupee className="size-4 sm:size-4.5" />
                 </div>
-                <ChevronRight className="size-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div className="mt-2.5">
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Revenue</p>
-                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-[11px] font-semibold text-muted-foreground">Revenue</p>
+                <p className="text-xl font-bold tracking-tight text-foreground mt-0.5">
                   {formatINR(data?.revenue.total ?? 0)}
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
@@ -150,17 +150,17 @@ export function DashboardHero({ loading, data, onNavigate }: DashboardHeroProps)
             {/* 4. Subscriptions */}
             <div
               onClick={() => onNavigate?.("school-subscriptions")}
-              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-800 transition-all snap-start"
+              className="min-w-[165px] sm:min-w-[210px] lg:min-w-0 flex-1 shrink-0 group relative cursor-pointer overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-800 transition-all snap-start"
             >
               <div className="flex items-center justify-between">
                 <div className="size-8.5 sm:size-9 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-100 dark:border-purple-900/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
                   <CreditCard className="size-4 sm:size-4.5" />
                 </div>
-                <ChevronRight className="size-3.5 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div className="mt-2.5">
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Subscriptions</p>
-                <p className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mt-0.5">
+                <p className="text-[11px] font-semibold text-muted-foreground">Subscriptions</p>
+                <p className="text-xl font-bold tracking-tight text-foreground mt-0.5">
                   {(data?.subscriptions.active ?? 0).toLocaleString()}
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">

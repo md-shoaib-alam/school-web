@@ -33,7 +33,7 @@ export function ProfileDetails({
   getSchoolUrl,
 }: ProfileDetailsProps) {
   return (
-    <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-2xl">
+    <Card className="border  shadow-sm rounded-2xl">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
         <div>
           <CardTitle className="text-lg font-bold">Profile Details</CardTitle>
@@ -59,9 +59,9 @@ export function ProfileDetails({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-            <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Full Name</p>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-6">{user.name}</p>
+          <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Full Name</p>
+            <p className="text-sm font-semibold text-foreground truncate pr-6">{user.name}</p>
             <Button
               variant="ghost"
               size="icon"
@@ -72,12 +72,12 @@ export function ProfileDetails({
             </Button>
           </div>
 
-          <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
+          <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
             <div className="flex items-center gap-1.5">
-              <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Email Address</p>
+              <p className="text-[10px] uppercase font-bold text-muted-foreground">Email Address</p>
               <Badge variant="outline" className="text-[8px] h-3.5 px-1 py-0 border-emerald-500/30 text-emerald-500 bg-emerald-500/5 font-bold">Verified</Badge>
             </div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-6">{user.email}</p>
+            <p className="text-sm font-semibold text-foreground truncate pr-6">{user.email}</p>
             <Button
               variant="ghost"
               size="icon"
@@ -88,46 +88,48 @@ export function ProfileDetails({
             </Button>
           </div>
 
-          <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1">
-            <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Primary Authority Role</p>
+          <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Primary Authority Role</p>
             <div className="flex items-center gap-1.5 mt-0.5">
               <Shield className="size-4 text-emerald-500" />
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 capitalize">{user.role.replace("_", " ")}</span>
+              <span className="text-sm font-semibold text-foreground capitalize">{user.role.replace("_", " ")}</span>
             </div>
           </div>
 
-          <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-            <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Mobile Number</p>
+          <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Mobile Number</p>
             <div className="flex items-center gap-1.5 mt-0.5 pr-6">
               <Phone className="size-4 text-blue-500" />
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {user.phone || "+91 98765 43210"}
+              <span className="text-sm font-semibold text-foreground">
+                {user.phone || "Not set"}
               </span>
             </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => onCopy(user.phone || "+91 98765 43210", "Mobile Number")}
+              disabled={!user.phone}
+              onClick={() => onCopy(user.phone || "", "Mobile Number")}
               className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {copiedField === "Mobile Number" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
             </Button>
           </div>
 
-          <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group md:col-span-2">
-            <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">Residential Address</p>
+          <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group md:col-span-2">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Residential Address</p>
             <div className="flex items-start gap-1.5 mt-0.5 pr-6">
               <MapPin className="size-4 text-rose-500 shrink-0 mt-0.5" />
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-normal">
-                {user.address || "7/A, Sector-4, HSR Layout, Bangalore, India"}
+              <span className="text-sm font-semibold text-foreground leading-normal">
+                {user.address || "Not set"}
               </span>
             </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => onCopy(user.address || "7/A, Sector-4, HSR Layout, Bangalore, India", "Address")}
+              disabled={!user.address}
+              onClick={() => onCopy(user.address || "", "Address")}
               className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {copiedField === "Address" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
@@ -140,7 +142,7 @@ export function ProfileDetails({
                 <div className="p-4 bg-violet-500/5 dark:bg-violet-500/10 border border-violet-500/15 rounded-xl space-y-2 md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative group">
                   <div className="space-y-0.5 min-w-0 flex-1">
                     <p className="text-[10px] uppercase font-bold text-violet-600 dark:text-violet-400">Shareable School Portal URL</p>
-                    <p className="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 break-all">
+                    <p className="text-xs font-mono font-bold text-foreground break-all">
                       {getSchoolUrl()}
                     </p>
                   </div>
@@ -154,9 +156,9 @@ export function ProfileDetails({
                   </Button>
                 </div>
               )}
-              <div className="p-4 bg-zinc-50/50 dark:bg-[#0c0c0e]/30 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl space-y-1 relative group">
-                <p className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400">School URL Identifier</p>
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all pr-10">{user.tenantSlug || "N/A"}</p>
+              <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
+                <p className="text-[10px] uppercase font-bold text-muted-foreground">School URL Identifier</p>
+                <p className="text-sm font-semibold text-foreground break-all pr-10">{user.tenantSlug || "N/A"}</p>
                 <Button
                   variant="ghost"
                   size="icon"

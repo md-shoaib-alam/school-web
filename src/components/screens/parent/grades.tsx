@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { BarChart3, TrendingUp, BookOpen, Award, CheckCircle2, ClipboardList, GraduationCap, FileText } from "lucide-react";
-import type { StudentInfo, GradeRecord } from "@/lib/types";
+import type { StudentInfo, GradeRecord } from "@/types";
 
 // Sub-components
 import { GradesSummary } from "./grades/GradesSummary";
@@ -157,10 +157,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-xl shadow-sm border-zinc-100 dark:border-zinc-800">
+      <Card className="rounded-xl shadow-sm ">
         <CardContent className="p-12 text-center flex flex-col items-center">
           <TrendingUp className="size-12 text-muted-foreground/30" />
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">No children linked</h3>
+          <h3 className="text-lg font-semibold text-foreground mt-4">No children linked</h3>
           <p className="text-sm text-muted-foreground mt-1">Contact account services to enroll or link students.</p>
         </CardContent>
       </Card>
@@ -174,7 +174,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
-      <div className="flex flex-col gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+      <div className="flex flex-col gap-4 border-b  pb-5">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             {topLevelTab === "exams" ? (
@@ -182,7 +182,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
             ) : (
               <ClipboardList className="size-5 text-violet-600" />
             )}
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+            <h2 className="text-lg font-semibold text-foreground uppercase tracking-tight">
               {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
             </h2>
           </div>
@@ -250,32 +250,32 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
               <>
                 {/* Assessment Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                  <Card className="rounded-xl shadow-none ">
                     <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                       <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                         <TrendingUp className="size-5" />
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.avg}%</p>
+                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.avg}%</p>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Average Score</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                  <Card className="rounded-xl shadow-none ">
                     <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                       <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
                         <Award className="size-5" />
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.total}</p>
+                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.total}</p>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800">
+                  <Card className="rounded-xl shadow-none ">
                     <CardContent className="p-5 flex flex-col items-center justify-center text-center">
                       <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
                         <CheckCircle2 className="size-5" />
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">{assessmentStats.passCount}</p>
+                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.passCount}</p>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Assessments</p>
                     </CardContent>
                   </Card>
@@ -289,9 +289,9 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
                   {/* List Assessments */}
                   <div className="lg:col-span-3">
-                    <Card className="rounded-xl shadow-none border-zinc-200/60 dark:border-zinc-800 h-full">
-                      <CardHeader className="p-4 border-b border-zinc-100/60 dark:border-zinc-800/50">
-                        <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <Card className="rounded-xl shadow-none  h-full">
+                      <CardHeader className="p-4 border-b ">
+                        <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
                           <ClipboardList className="size-4 text-violet-500" />
                           {selectedStudent.name}&apos;s Assessments
                         </CardTitle>
@@ -306,7 +306,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                           ) : (
                             <Table>
                               <TableHeader className="bg-muted/20 sticky top-0">
-                                <TableRow className="border-zinc-100 dark:border-zinc-800/70">
+                                <TableRow className="">
                                   <TableHead className="text-xs font-semibold h-9">Subject/Title</TableHead>
                                   <TableHead className="text-xs font-semibold h-9">Type</TableHead>
                                   <TableHead className="text-center text-xs font-semibold h-9">Score</TableHead>
@@ -318,10 +318,10 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                                   const pct = Math.round((g.marksObtained / g.totalMarks) * 100);
                                   const isPass = g.marksObtained >= g.passingMarks;
                                   return (
-                                    <TableRow key={g.id} className="border-zinc-100 dark:border-zinc-800/60">
+                                    <TableRow key={g.id} className="">
                                       <TableCell className="py-2.5 text-left">
                                         <div className="flex flex-col text-left">
-                                          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{g.title}</span>
+                                          <span className="text-xs font-semibold text-foreground">{g.title}</span>
                                           <span className="text-[10px] text-muted-foreground">{g.subjectName}</span>
                                         </div>
                                       </TableCell>

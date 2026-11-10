@@ -1,4 +1,4 @@
-import { GradeRecord, AttendanceRecord } from "@/lib/types";
+import { GradeRecord, AttendanceRecord } from "@/types";
 
 export const getAttendanceForStudent = (studentId: string, attendance: AttendanceRecord[]) => {
   const records = attendance.filter((a) => a.studentId === studentId);

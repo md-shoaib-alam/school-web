@@ -87,7 +87,7 @@ export function TenantBillingTable({
             ? [...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-zinc-950 rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs space-y-3"
+                  className="bg-card rounded-2xl p-4 border-2 border-foreground shadow-2xs space-y-3"
                 >
                   <div className="flex items-center gap-3">
                     <Skeleton className="size-11 rounded-2xl" />
@@ -113,14 +113,14 @@ export function TenantBillingTable({
                 return (
                   <div
                     key={tenant.id}
-                    className="bg-white dark:bg-zinc-950 text-foreground rounded-2xl p-4 border-2 border-neutral-900 dark:border-white shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
+                    className="bg-card text-foreground rounded-2xl p-4 border-2 border-foreground shadow-2xs hover:shadow-xs transition-all duration-200 flex flex-col justify-between"
                   >
                     <div>
                       {/* Top Header: Emblem, Title, /slug */}
                       <div className="flex items-start justify-between gap-2.5">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="size-11 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                            <span className="text-neutral-900 dark:text-white font-bold text-sm">
+                          <div className="size-11 rounded-2xl bg-muted dark:bg-neutral-900 border-2 border-foreground flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                            <span className="text-foreground font-bold text-sm">
                               {tenant.name?.slice(0, 2).toUpperCase() || "SC"}
                             </span>
                           </div>
@@ -178,7 +178,7 @@ export function TenantBillingTable({
                         {isSchoolMode ? (
                           <>
                             {/* Plan Price */}
-                            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
+                            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
                               <span className="text-[10px] text-muted-foreground font-medium">Plan Price</span>
                               <div className="flex items-center text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                                 <IndianRupee className="size-3 mr-0.5" />
@@ -187,7 +187,7 @@ export function TenantBillingTable({
                               </div>
                             </div>
                             {/* Total Users */}
-                            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
+                            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
                               <span className="text-[10px] text-muted-foreground font-medium">Total Users</span>
                               <div className="flex items-center gap-1 text-sm font-bold text-foreground mt-0.5">
                                 <Users className="size-3.5 text-muted-foreground" />
@@ -198,7 +198,7 @@ export function TenantBillingTable({
                         ) : (
                           <>
                             {/* Active Revenue */}
-                            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
+                            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
                               <span className="text-[10px] text-muted-foreground font-medium">Active Rev</span>
                               <div className="flex items-center text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                                 <IndianRupee className="size-3 mr-0.5" />
@@ -206,7 +206,7 @@ export function TenantBillingTable({
                               </div>
                             </div>
                             {/* Active Subs / Total Users */}
-                            <div className="bg-white dark:bg-zinc-950 border-2 border-neutral-900 dark:border-white rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
+                            <div className="bg-card border-2 border-foreground rounded-xl p-2.5 flex flex-col justify-between shadow-2xs">
                               <span className="text-[10px] text-muted-foreground font-medium">Active Subs</span>
                               <div className="flex items-center gap-1 text-sm font-bold text-foreground mt-0.5">
                                 <Users className="size-3.5 text-muted-foreground" />

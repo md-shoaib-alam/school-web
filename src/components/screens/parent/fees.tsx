@@ -6,7 +6,7 @@ import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import type { StudentInfo, FeeRecord } from "@/lib/types";
+import type { StudentInfo, FeeRecord } from "@/types";
 
 // Sub-components
 import { FeeSummary } from "./fees/FeeSummary";
@@ -125,10 +125,10 @@ export function ParentFees() {
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 shadow-sm">
+      <Card className="rounded-3xl border  bg-card shadow-sm">
         <CardContent className="p-16 text-center">
           <CreditCard className="size-12 mx-auto text-muted-foreground/40" />
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mt-4">
+          <h3 className="text-lg font-semibold text-foreground mt-4">
             No children found
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
@@ -144,11 +144,11 @@ export function ParentFees() {
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/60 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b  pb-5">
         <div className="space-y-3.5 text-left">
           <div className="flex items-center gap-2">
             <CreditCard className="size-5 text-amber-600" />
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">
+            <h2 className="text-lg font-semibold text-foreground uppercase tracking-tight">
               Fee Management
             </h2>
           </div>

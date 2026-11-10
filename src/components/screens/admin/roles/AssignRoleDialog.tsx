@@ -94,14 +94,14 @@ export function AssignRoleDialog({
                 <button
                   type="button"
                   onClick={() => setIsAssignedExpanded(!isAssignedExpanded)}
-                  className="w-full flex items-center justify-between text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors py-1.5 px-1 hover:bg-zinc-55 dark:hover:bg-zinc-800/30 rounded-lg cursor-pointer"
+                  className="w-full flex items-center justify-between text-xs sm:text-sm font-bold text-foreground hover:text-foreground transition-colors py-1.5 px-1 hover: rounded-lg cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
                     <Users className="size-4 text-emerald-500 shrink-0" />
                     <span>Assigned Staff ({assignedUsers.length})</span>
                   </div>
                   <ChevronDown 
-                    className={`size-4 text-zinc-400 transition-transform duration-200 ${
+                    className={`size-4 text-muted-foreground transition-transform duration-200 ${
                       isAssignedExpanded ? "rotate-180" : ""
                     }`} 
                   />
@@ -109,7 +109,7 @@ export function AssignRoleDialog({
 
                 {isAssignedExpanded && (
                   assignedUsers.length === 0 ? (
-                    <p className="text-xs sm:text-sm text-zinc-400 dark:text-zinc-500 py-6 text-center bg-zinc-50 dark:bg-zinc-800/40 border border-dashed rounded-xl">
+                    <p className="text-xs sm:text-sm text-muted-foreground py-6 text-center bg-muted border border-dashed rounded-xl">
                       No staff assigned yet. Add from the list below.
                     </p>
                   ) : (
@@ -128,10 +128,10 @@ export function AssignRoleDialog({
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                            <p className="text-sm font-semibold text-foreground truncate">
                               {user.name}
                             </p>
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                            <p className="text-[11px] text-muted-foreground truncate">
                               {user.email}
                             </p>
                           </div>
@@ -159,13 +159,13 @@ export function AssignRoleDialog({
 
               {/* Available Users */}
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-zinc-750 dark:text-zinc-350 mb-2.5 flex items-center gap-2">
+                <h4 className="text-xs sm:text-sm font-bold  mb-2.5 flex items-center gap-2">
                   <UserPlus className="size-4 text-blue-500 shrink-0" />
                   <span>Available to Assign ({filteredAvailable.length})</span>
                 </h4>
                 {/* Search */}
                 <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 dark:text-zinc-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     placeholder="Search teachers & staff..."
                     className="pl-9 h-9.5 text-xs sm:text-sm rounded-xl"
@@ -176,7 +176,7 @@ export function AssignRoleDialog({
                     <button
                       type="button"
                       onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover: dark:hover:text-muted-foreground"
                     >
                       <X className="size-3.5" />
                     </button>
@@ -185,7 +185,7 @@ export function AssignRoleDialog({
 
                 <ScrollArea className="max-h-[200px] overflow-y-auto pr-1">
                   {filteredAvailable.length === 0 ? (
-                    <p className="text-xs sm:text-sm text-zinc-400 dark:text-zinc-500 py-6 text-center">
+                    <p className="text-xs sm:text-sm text-muted-foreground py-6 text-center">
                       {searchQuery
                         ? "No users found matching your search."
                         : "All users already have a role assigned."}
@@ -198,18 +198,18 @@ export function AssignRoleDialog({
                           <div
                             key={user.id}
                             ref={isLast ? lastElementRef : undefined}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-800/60"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-accent/40 transition-colors border border-transparent hover: dark:hover:"
                           >
                             <Avatar className="size-7.5 shrink-0">
-                              <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 text-xs font-bold">
+                              <AvatarFallback className="bg-muted  text-xs font-bold">
                                 {getInitial(user.name)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs sm:text-sm text-zinc-850 dark:text-zinc-200 font-medium truncate">
+                              <p className="text-xs sm:text-sm  font-medium truncate">
                                 {user.name}
                               </p>
-                              <p className="text-[10px] text-zinc-400 dark:text-zinc-550 truncate">
+                              <p className="text-[10px] text-muted-foreground truncate">
                                 {user.email}
                               </p>
                             </div>
@@ -243,7 +243,7 @@ export function AssignRoleDialog({
                       })}
                       {visibleCount < filteredAvailable.length && (
                         <div className="flex justify-center py-2">
-                          <Loader2 className="size-4 animate-spin text-zinc-400" />
+                          <Loader2 className="size-4 animate-spin text-muted-foreground" />
                         </div>
                       )}
                     </div>

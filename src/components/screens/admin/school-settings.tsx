@@ -128,7 +128,7 @@ export function AdminSchoolSettings() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="size-8 animate-spin text-emerald-500" />
-        <span className="ml-3 text-zinc-500 dark:text-zinc-400">
+        <span className="ml-3 text-muted-foreground">
           Loading settings...
         </span>
       </div>
@@ -139,10 +139,10 @@ export function AdminSchoolSettings() {
     <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-xl sm:text-2xl font-semibold text-foreground">
           School Settings
         </h2>
-        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Configure school preferences and template defaults
         </p>
       </div>
@@ -181,8 +181,8 @@ export function AdminSchoolSettings() {
       />
 
       {/* Summary and Save - Dashboard Page Level Footer */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-card border border-zinc-100 dark:border-zinc-800/80 rounded-xl shadow-sm">
-        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-card border  rounded-xl shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2
             className={`size-4 ${
               state.hasChanges ? "text-amber-500" : "text-emerald-500"

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useExpenses } from "@/hooks/use-expenses";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
-import { formatLocalDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/date";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -179,7 +179,7 @@ export function ExpensesScreen() {
             <Wallet className="size-6 text-rose-600 dark:text-rose-400" />
           </div>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground">
               Expenses
             </h2>
             <p className="text-muted-foreground mt-1">
