@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import {
   ArrowLeftRight,
   Check,
+  ChevronRight,
   Crown,
   KeyRound,
   LifeBuoy,
-  Loader2,
   LogOut,
   Monitor,
   Moon,
@@ -24,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -33,6 +34,8 @@ import {
 import { cn } from "@/lib/utils";
 import { roleColors, roleLabels } from "../nav-config";
 import { AddAccountDialog } from "./AddAccountDialog";
+import { AccountSubmenuSheet, type SubmenuKind } from "./AccountSubmenuSheet";
+import { SignoutConfirmDialog, type SignoutMode } from "./SignoutConfirmDialog";
 import { revokeSession } from "@/lib/api";
 import { toast } from "sonner";
 import {
@@ -64,13 +67,38 @@ const roleRings: Record<AppUser["role"], string> = {
   parent: "ring-amber-500/25",
 };
 
+const APPEARANCE_OPTIONS = [
+  { value: "light", label: "Light", Icon: Sun },
+  { value: "dark", label: "Dark", Icon: Moon },
+  { value: "system", label: "System", Icon: Monitor },
+] as const;
+
+/**
+ * Submenus open sideways, and on a phone there is no sideways room — the switcher and the
+ * appearance choices get listed inline instead, in the same panel.
+ */
+function useIsCompact() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 639px)");
+    const sync = () => setCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+  return compact;
+}
+
 export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChange }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [accounts, setAccounts] = useState<StoredAccount[]>(() => listAccounts());
-  const [dropping, setDropping] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ mode: SignoutMode; account: StoredAccount } | null>(null);
+  const [sheet, setSheet] = useState<SubmenuKind | null>(null);
+  const [busy, setBusy] = useState(false);
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { logout } = useAppStore();
+  const compact = useIsCompact();
 
   const activeId = getActiveAccount()?.user.id ?? currentUser.id;
   // What is on screen, for the trigger's glyph; `chosen` is what the reader picked, for the tick.
@@ -94,18 +122,41 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
     window.location.href = dashboardHref(account.user);
   };
 
-  const signOut = () => {
-    window.location.href = logout() ?? "/";
+  const askSignOut = () => {
+    const active = accounts.find((each) => each.user.id === activeId) ?? {
+      user: currentUser,
+      token: "",
+      refreshToken: "",
+      addedAt: 0,
+    };
+    setPending({ mode: "logout", account: active });
   };
 
-  /** Forgets an account you are not using: revoke its session server-side, then drop the entry. */
-  const dropAccount = async (account: StoredAccount) => {
-    setDropping(account.user.id);
-    await revokeSession(account.token, account.refreshToken);
-    dropVaultAccount(account.user.id);
+  const askRemove = (account: StoredAccount) => {
+    // The dropdown would otherwise keep focus, so hand the screen over to the dialog.
+    setOpen(false);
+    setPending({ mode: "remove", account });
+  };
+
+  const openSheet = (kind: SubmenuKind) => {
+    setOpen(false);
+    setSheet(kind);
+  };
+
+  const confirmPending = async () => {
+    if (!pending) return;
+    if (pending.mode === "logout") {
+      window.location.href = logout() ?? "/";
+      return;
+    }
+
+    setBusy(true);
+    await revokeSession(pending.account.token, pending.account.refreshToken);
+    dropVaultAccount(pending.account.user.id);
     setAccounts(listAccounts());
-    setDropping(null);
-    toast.success(`${account.user.name} is no longer signed in on this browser.`);
+    setBusy(false);
+    setPending(null);
+    toast.success(`${pending.account.user.name} is no longer signed in on this browser.`);
   };
 
   const renderAccountRow = (account: StoredAccount, isActive: boolean) => (
@@ -139,16 +190,33 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
             // Without this the row's own select fires first and switches to the account instead.
             event.preventDefault();
             event.stopPropagation();
-            if (dropping !== account.user.id) void dropAccount(account);
+            askRemove(account);
           }}
         >
-          {dropping === account.user.id ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <MoreVertical className="size-4" />
-          )}
+          <MoreVertical className="size-4" />
         </span>
       )}
+    </DropdownMenuItem>
+  );
+
+  const renderAppearanceRow = ({ value, label, Icon }: (typeof APPEARANCE_OPTIONS)[number]) => (
+    <DropdownMenuItem key={value} className="gap-2 text-xs" onSelect={() => setTheme(value)}>
+      <Icon className="size-4" />
+      {label}
+      {chosen === value && <Check className="ml-auto size-4 text-blue-600 dark:text-blue-400" />}
+    </DropdownMenuItem>
+  );
+
+  const renderAddAccountItem = () => (
+    <DropdownMenuItem
+      className="gap-2 rounded-lg text-xs font-medium"
+      onSelect={() => {
+        setOpen(false);
+        setAddOpen(true);
+      }}
+    >
+      <Plus className="size-4 text-blue-600 dark:text-blue-400" />
+      Add account
     </DropdownMenuItem>
   );
 
@@ -178,7 +246,11 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="mt-2 w-72 rounded-2xl border-0 bg-transparent p-0 shadow-none">
+        <DropdownMenuContent
+          align="end"
+          collisionPadding={10}
+          className="mt-2 w-[min(18rem,calc(100vw-1.25rem))] rounded-2xl border-0 bg-transparent p-0 shadow-none"
+        >
           {/* The card: who is signed in, then the account's entries. */}
           <div className="rounded-2xl border bg-popover p-1.5 shadow-xl shadow-black/10">
             <div className="mb-1 flex items-center gap-2.5 rounded-xl bg-muted p-2.5">
@@ -199,33 +271,26 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
               My Profile
             </DropdownMenuItem>
 
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium">
+            {compact ? (
+              <DropdownMenuItem
+                className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium"
+                onSelect={() => openSheet("appearance")}
+              >
                 {resolved === "dark" ? <Moon className="size-4 text-blue-400" /> : <Sun className="size-4 text-amber-500" />}
                 Appearance
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-44">
-                {([
-                  { value: "light", label: "Light", icon: Sun },
-                  { value: "dark", label: "Dark", icon: Moon },
-                  { value: "system", label: "System", icon: Monitor },
-                ] as const).map(({ value, label, icon: Icon }) => (
-                  <DropdownMenuItem
-                    key={value}
-                    className="gap-2 text-xs"
-                    onSelect={(event) => {
-                      // Keep the menu open so the flip is visible, the way the reference does it.
-                      event.preventDefault();
-                      setTheme(value);
-                    }}
-                  >
-                    <Icon className="size-4" />
-                    {label}
-                    {chosen === value && <Check className="ml-auto size-4 text-blue-600 dark:text-blue-400" />}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+                <ChevronRight className="ml-auto size-4 text-muted-foreground" />
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium">
+                  {resolved === "dark" ? <Moon className="size-4 text-blue-400" /> : <Sun className="size-4 text-amber-500" />}
+                  Appearance
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-44">
+                  {APPEARANCE_OPTIONS.map(renderAppearanceRow)}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
 
             <DropdownMenuItem className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium" onSelect={onPasswordChange}>
               <KeyRound className="size-4 text-orange-500" />
@@ -257,33 +322,38 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
 
           {/* The ledge: the two actions that leave or change the account you are on. */}
           <div className="mt-1 rounded-2xl border bg-popover p-1.5 shadow-lg shadow-black/5">
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium">
+            {compact ? (
+              <DropdownMenuItem
+                className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium"
+                onSelect={() => openSheet("accounts")}
+              >
                 <ArrowLeftRight className="size-4 text-blue-600 dark:text-blue-400" />
                 Switch account
                 <span className="ml-auto text-[10px] font-semibold text-muted-foreground">
                   {accounts.length}/{MAX_ACCOUNTS}
                 </span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-64">
-                {accounts.map((account) => renderAccountRow(account, account.user.id === activeId))}
-                <DropdownMenuSeparator className="my-1" />
-                <DropdownMenuItem
-                  className="gap-2 rounded-lg text-xs font-medium"
-                  onSelect={() => {
-                    setOpen(false);
-                    setAddOpen(true);
-                  }}
-                >
-                  <Plus className="size-4 text-blue-600 dark:text-blue-400" />
-                  Add account
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+                <ChevronRight className="size-4 text-muted-foreground" />
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium">
+                  <ArrowLeftRight className="size-4 text-blue-600 dark:text-blue-400" />
+                  Switch account
+                  <span className="ml-auto text-[10px] font-semibold text-muted-foreground">
+                    {accounts.length}/{MAX_ACCOUNTS}
+                  </span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-64">
+                  {accounts.map((account) => renderAccountRow(account, account.user.id === activeId))}
+                  <DropdownMenuSeparator className="my-1" />
+                  {renderAddAccountItem()}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
 
             <DropdownMenuItem
               className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/30"
-              onSelect={signOut}
+              onSelect={askSignOut}
             >
               <LogOut className="size-4" />
               Log out
@@ -292,6 +362,29 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <AccountSubmenuSheet
+        kind={sheet}
+        onClose={() => setSheet(null)}
+        appearanceOptions={APPEARANCE_OPTIONS}
+        chosenTheme={chosen}
+        onSelectTheme={(value) => { setTheme(value); setSheet(null); }}
+        accounts={accounts}
+        activeId={activeId}
+        onPickAccount={(account) => { setSheet(null); switchTo(account); }}
+        onAskRemove={(account) => { setSheet(null); askRemove(account); }}
+        onAddAccount={() => { setSheet(null); setOpen(false); setAddOpen(true); }}
+      />
+
+      <SignoutConfirmDialog
+        open={pending !== null}
+        onOpenChange={(next) => { if (!next) setPending(null); }}
+        mode={pending?.mode ?? "logout"}
+        name={pending?.account.user.name ?? currentUser.name}
+        others={Math.max(0, accounts.length - 1)}
+        busy={busy}
+        onConfirm={() => void confirmPending()}
+      />
 
       <AddAccountDialog
         open={addOpen}
