@@ -135,6 +135,8 @@ export function ProfileSection({
 
   return (
     <div
+      role="region"
+      aria-label={typeof title === "string" ? title : undefined}
       className={`bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden transition-[opacity,filter] duration-300 ${
         dimmed ? "opacity-60 blur-[1.5px]" : ""
       }`}
@@ -181,6 +183,7 @@ export function ProfileSection({
             canEdit &&
             onEdit && (
               <button
+                type="button"
                 onClick={onEdit}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground px-3 py-1.5 rounded-lg border  hover:bg-accent transition-colors"
               >
@@ -191,6 +194,7 @@ export function ProfileSection({
 
           {onToggleCollapse && (
             <button
+              type="button"
               onClick={onToggleCollapse}
               className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground ml-1"
               aria-label="Toggle section"
