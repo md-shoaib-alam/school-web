@@ -42,7 +42,7 @@ export function StaffTable({
   return (
     <div className="overflow-x-auto px-4 sm:px-6">
       <Table>
-        <TableHeader className="bg-muted">
+        <TableHeader>
           <TableRow>
             <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Member</TableHead>
             <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden sm:table-cell">Contact</TableHead>

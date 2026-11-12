@@ -31,7 +31,7 @@ export function ClassesTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+            <thead className="[&_tr]:border-b text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-6 py-4">Class Details</th>
                 <th className="px-6 py-4">Section</th>
