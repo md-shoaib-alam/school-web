@@ -29,6 +29,7 @@ import { TeacherPersonalCard } from "./TeacherPersonalCard";
 import { TeacherProfessionalCard } from "./TeacherProfessionalCard";
 import { TeacherSubjectsCard } from "./TeacherSubjectsCard";
 import { TeacherClassesCard } from "./TeacherClassesCard";
+import { TeacherProfileSkeleton } from "@/components/screens/profile/TeacherProfileSkeleton";
 
 interface TeacherProfileViewProps {
   teacher: TeacherInfo;
@@ -208,32 +209,7 @@ export function TeacherProfileView({
   const displayJoiningDate = currentTeacher.joiningDate || "12 Aug 2024";
 
   if (isLoading) {
-    return (
-      <div className="min-h-[460px] flex flex-col items-center justify-center py-16 px-4">
-        <div className="w-full max-w-sm rounded-3xl bg-white border  p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
-          <div className="relative w-40 h-28 mb-5 flex items-center justify-center">
-            <Image
-              src="/assets/admin/table.avif"
-              alt="Loading teacher details"
-              width={160}
-              height={112}
-              className="object-contain drop-shadow-sm"
-              priority
-            />
-          </div>
-          <div className="relative size-12 mb-4 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-[3.5px] " />
-            <div className="absolute inset-0 rounded-full border-[3.5px] border-emerald-600 dark:border-emerald-400 border-t-transparent border-r-transparent animate-spin" />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-            Loading Teacher Profile...
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Please wait a moment
-          </p>
-        </div>
-      </div>
-    );
+    return <TeacherProfileSkeleton />;
   }
 
   return (
@@ -291,8 +267,8 @@ export function TeacherProfileView({
       <div className="relative rounded-2xl border  bg-card p-5 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex flex-row items-center gap-4 sm:gap-5 w-full">
-            {/* Avatar Circle */}
-            <div className="size-20 sm:size-24 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2  flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
+            {/* Avatar Square */}
+            <div className="size-20 sm:size-24 rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60 flex items-center justify-center text-teal-800 dark:text-teal-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
               {getInitials(currentTeacher.name)}
             </div>
 
@@ -303,28 +279,23 @@ export function TeacherProfileView({
               </h1>
 
               {/* Status and Role badges */}
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border/80">
+                  <span className="font-mono text-muted-foreground/70">#</span>
+                  {displayTeacherId}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200/80 dark:border-teal-800/80">
+                  <Building2 className="size-3" />
                   {displayRole}
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
-                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
                   {currentTeacher.status ? currentTeacher.status.charAt(0).toUpperCase() + currentTeacher.status.slice(1) : "Active"}
                 </span>
               </div>
 
-              {/* Email line */}
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium truncate pt-0.5">
-                <Mail className="size-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">{currentTeacher.email}</span>
-              </div>
-
-              {/* Teacher ID with Copy Button */}
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
-                <span>Teacher ID:</span>
-                <span className="font-semibold text-foreground">{displayTeacherId}</span>
-                <CopyButton value={displayTeacherId} toastSubject="Teacher ID" size="sm" />
-              </div>
+              <p className="text-xs text-muted-foreground pt-0.5">
+                Session: 2026-27
+              </p>
             </div>
           </div>
 

@@ -1,6 +1,20 @@
 "use client";
 
-import { User, Upload } from "lucide-react";
+import {
+  User,
+  Upload,
+  Calendar,
+  Droplets,
+  Users,
+  Globe,
+  Star,
+  Mail,
+  Phone,
+  CreditCard,
+  ShieldCheck,
+  XCircle,
+  Building2,
+} from "lucide-react";
 import { ProfileSection } from "@/components/ui/profile-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -144,30 +158,193 @@ export function TeacherPersonalCard({
         </div>
       }
       view={
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs sm:text-sm">
-          <div>
-            <p data-fade className="text-[11px] text-muted-foreground font-medium">Full Name</p>
-            <p data-travel="name" className="font-semibold text-foreground mt-0.5">{currentTeacher.name}</p>
+        <div className="space-y-6 text-xs sm:text-sm">
+          {/* Section: Basic Information */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="size-6 rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+                <User className="size-3.5" />
+              </div>
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Basic Information
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-4 rounded-xl border border-border/80 bg-muted/20">
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <User className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Full Name</p>
+                  <p data-travel="name" className="font-semibold text-foreground mt-0.5">{currentTeacher.name}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <Calendar className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Date of Birth</p>
+                  <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).dateOfBirth || "7 March 1988"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <User className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Gender</p>
+                  <p className="font-semibold text-foreground mt-0.5 capitalize">{(currentTeacher as any).gender || "Male"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <Droplets className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Blood Group</p>
+                  <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).bloodGroup || "—"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <Users className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Marital Status</p>
+                  <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).maritalStatus || "—"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <Globe className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Nationality</p>
+                  <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).nationality || "Indian"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                  <Star className="size-4" />
+                </div>
+                <div>
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Religion</p>
+                  <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).religion || "—"}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <p data-fade className="text-[11px] text-muted-foreground font-medium">Email Address</p>
-            <p data-travel="email" className="font-semibold text-foreground mt-0.5 truncate">{currentTeacher.email}</p>
+          {/* Section: Contact Information */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="size-6 rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+                <Phone className="size-3.5" />
+              </div>
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Contact Information
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl border border-border/80 bg-muted/20">
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/50 dark:border-teal-800/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Mail className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Email</p>
+                  <a
+                    href={`mailto:${currentTeacher.email}`}
+                    data-travel="email"
+                    className="font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
+                  >
+                    {currentTeacher.email}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/50 dark:border-teal-800/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Phone className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Mobile</p>
+                  <a
+                    href={`tel:${currentTeacher.phone}`}
+                    data-travel="phone"
+                    className="font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
+                  >
+                    {currentTeacher.phone || "+916207142699"}
+                  </a>
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Address</p>
+                <p data-travel="address" className="font-semibold text-foreground mt-0.5">{displayAddress}</p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <p data-fade className="text-[11px] text-muted-foreground font-medium">Phone Number</p>
-            <p data-travel="phone" className="font-semibold text-foreground mt-0.5">{currentTeacher.phone || "—"}</p>
-          </div>
+          {/* Section: Statutory Information */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="size-6 rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+                <Building2 className="size-3.5" />
+              </div>
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Statutory Information
+              </h4>
+            </div>
 
-          <div>
-            <p data-fade className="text-[11px] text-muted-foreground font-medium">Teacher ID</p>
-            <p data-travel="teacherId" className="font-semibold text-foreground mt-0.5">{displayTeacherId}</p>
-          </div>
+            <div className="p-4 rounded-xl border border-border/80 bg-muted/20 space-y-4">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                  <XCircle className="size-3.5 text-muted-foreground" />
+                  PF Disabled
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                  <XCircle className="size-3.5 text-muted-foreground" />
+                  ESI Disabled
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                  <XCircle className="size-3.5 text-muted-foreground" />
+                  PT Disabled
+                </span>
+              </div>
 
-          <div className="sm:col-span-2">
-            <p data-fade className="text-[11px] text-muted-foreground font-medium">Address</p>
-            <p data-travel="address" className="font-semibold text-foreground mt-0.5">{displayAddress}</p>
+              <div className="border-t border-border/60" />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="flex items-start gap-3">
+                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                    <CreditCard className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">PAN NUMBER</p>
+                    <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).panNumber || "—"}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                    <ShieldCheck className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">AADHAAR NUMBER</p>
+                    <p className="font-semibold text-foreground mt-0.5">{(currentTeacher as any).aadhaarNumber || "—"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       }

@@ -20,6 +20,8 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
+import { TeacherProfile } from "./profile/TeacherProfile";
+import { TeacherProfileSkeleton } from "./profile/TeacherProfileSkeleton";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();
@@ -33,7 +35,7 @@ export function UserProfileScreen() {
   const [editAvatar, setEditAvatar] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
 
-  if (!currentUser) return null;
+  if (!currentUser) return <TeacherProfileSkeleton />;
 
   const initials = currentUser.name
     .split(" ")
@@ -123,6 +125,36 @@ export function UserProfileScreen() {
     };
     reader.readAsDataURL(file);
   };
+
+  if (currentUser.role === "teacher") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <TeacherProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
