@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo, useState } from "react";
+import { useReducer, useEffect, useMemo, useRef, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ import {
 import { ParentsHeader } from "./parents/ParentsHeader";
 import { ParentsTableView } from "./parents/ParentsTableView";
 import { ParentsGridView } from "./parents/ParentsGridView";
+import { LayoutGroup } from "framer-motion";
 import { ParentsEmptyState } from "./parents/ParentsEmptyState";
 import { EditParentDialog } from "./parents/ParentDialog";
 import { CreateParentDialog } from "./parents/CreateParentDialog";
@@ -270,6 +271,14 @@ export function AdminParents() {
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
   }, [rawParents]);
+
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    if (!loadingParents && parents.length > 0) painted.current = true;
+  }, [loadingParents, parents]);
 
   // Derive selected parent dynamically from the latest parents list to keep modal synchronised reactively
   const selectedParent = useMemo(() => {
@@ -619,24 +628,30 @@ export function AdminParents() {
 
           {parents.length === 0 ? (
             <ParentsEmptyState />
-          ) : viewMode === "table" ? (
-            <ParentsTableView
-              parents={parents}
-              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-              onDelete={handleDelete}
-              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-              onView={handleOpenParentProfile}
-            />
           ) : (
-            <ParentsGridView
-              parents={parents}
-              linking={linking}
-              onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
-              onDelete={handleDelete}
-              onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
-              onUnlinkChild={handleUnlinkChild}
-              onView={handleOpenParentProfile}
-            />
+            <LayoutGroup id="parents">
+              {viewMode === "table" ? (
+                <ParentsTableView
+                  parents={parents}
+                  enter={enter}
+                  onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+                  onDelete={handleDelete}
+                  onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+                  onView={handleOpenParentProfile}
+                />
+              ) : (
+                <ParentsGridView
+                  parents={parents}
+                  enter={enter}
+                  linking={linking}
+                  onEdit={(p) => dispatch({ type: 'OPEN_EDIT_DIALOG', payload: p })}
+                  onDelete={handleDelete}
+                  onLinkOpen={(p) => dispatch({ type: 'OPEN_LINK_DIALOG', payload: p })}
+                  onUnlinkChild={handleUnlinkChild}
+                  onView={handleOpenParentProfile}
+                />
+              )}
+            </LayoutGroup>
           )}
 
           <Pagination

@@ -5,11 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { UserCheck, Users, Pencil, Trash2 } from "lucide-react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
 import type { ClassInfo } from "@/types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface ClassesGridViewProps {
   classes: ClassInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onViewStudents: (cls: ClassInfo) => void;
@@ -20,6 +29,7 @@ interface ClassesGridViewProps {
 
 export function ClassesGridView({
   classes,
+  enter,
   canEdit,
   canDelete,
   onViewStudents,
@@ -29,18 +39,19 @@ export function ClassesGridView({
 }: ClassesGridViewProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      <LazyMotion features={domAnimation}>
+      <LazyMotion features={domMax}>
         <AnimatePresence mode="popLayout">
-          {classes.map((cls) => {
+          {classes.map((cls, index) => {
             const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
 
             return (
               <m.div
                 key={cls.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                id={`class-item-${cls.id}`}
+                layoutId={`class-${cls.id}`}
+                initial={enter ? { opacity: 0, y: 8 } : undefined}
+                animate={enter ? { opacity: 1, y: 0 } : undefined}
+                transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
               >
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">
                   <CardContent className="p-6">

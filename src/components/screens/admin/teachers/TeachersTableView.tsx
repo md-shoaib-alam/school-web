@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Eye, MoreVertical } from "lucide-react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -34,6 +34,8 @@ const premiumLayoutTransition = {
 
 interface TeachersTableViewProps {
   teachers: TeacherInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onEdit: (t: TeacherInfo) => void;
@@ -45,6 +47,7 @@ interface TeachersTableViewProps {
 
 export function TeachersTableView({
   teachers,
+  enter,
   canEdit,
   canDelete,
   onEdit,
@@ -67,22 +70,18 @@ export function TeachersTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              <LazyMotion features={domAnimation}>
+              <LazyMotion features={domMax}>
                 <AnimatePresence mode="popLayout">
-                  {teachers.map((teacher) => {
+                  {teachers.map((teacher, index) => {
                     const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
                     return (
                       <m.tr 
                         key={teacher.id} 
                         id={`teacher-item-${teacher.id}`}
-                        layout="position"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{
-                          layout: premiumLayoutTransition,
-                          opacity: { duration: 0.2 }
-                        }}
+                        layoutId={`teacher-${teacher.id}`}
+                        initial={enter ? { opacity: 0, y: 8 } : undefined}
+                        animate={enter ? { opacity: 1, y: 0 } : undefined}
+                        transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
                         className="hover:bg-muted transition-colors cursor-pointer"
                         onClick={() => onView(teacher)}
                       >

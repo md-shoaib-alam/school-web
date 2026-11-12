@@ -5,10 +5,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface SubjectsTableViewProps {
   filtered: any[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onEdit: (s: any) => void;
@@ -17,6 +26,7 @@ interface SubjectsTableViewProps {
 
 export function SubjectsTableView({
   filtered,
+  enter,
   canEdit,
   canDelete,
   onEdit,
@@ -44,15 +54,16 @@ export function SubjectsTableView({
               </TableRow>
             </TableHeader>
             <TableBody>
-              <LazyMotion features={domAnimation}>
+              <LazyMotion features={domMax}>
                 <AnimatePresence mode="popLayout">
-                  {filtered.map((subject) => (
+                  {filtered.map((subject, index) => (
                     <m.tr
                       key={subject.id}
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                      id={`subject-item-${subject.id}`}
+                      layoutId={`subject-${subject.id}`}
+                      initial={enter ? { opacity: 0, y: 8 } : undefined}
+                      animate={enter ? { opacity: 1, y: 0 } : undefined}
+                      transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
                       className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none"
                     >
                       <TableCell>

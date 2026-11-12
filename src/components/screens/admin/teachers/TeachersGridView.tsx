@@ -1,6 +1,6 @@
 "use client";
 
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
 import { TeacherCard } from "./TeacherCard";
 import type { TeacherInfo } from "./types";
 
@@ -13,6 +13,8 @@ const premiumLayoutTransition = {
 
 interface TeachersGridViewProps {
   teachers: TeacherInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   deletingId: string | null;
@@ -24,6 +26,7 @@ interface TeachersGridViewProps {
 
 export function TeachersGridView({
   teachers,
+  enter,
   canEdit,
   canDelete,
   deletingId,
@@ -33,21 +36,20 @@ export function TeachersGridView({
   onView,
 }: TeachersGridViewProps) {
   return (
-    <LazyMotion features={domAnimation}>
+    <LazyMotion features={domMax}>
       <m.div 
         layout
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
       >
         <AnimatePresence mode="popLayout">
-          {teachers.map((teacher) => (
+          {teachers.map((teacher, index) => (
             <m.div 
               key={teacher.id}
               id={`teacher-item-${teacher.id}`}
-              layout
-              transition={premiumLayoutTransition}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              layoutId={`teacher-${teacher.id}`}
+              initial={enter ? { opacity: 0, y: 8 } : undefined}
+              animate={enter ? { opacity: 1, y: 0 } : undefined}
+              transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
             >
               <TeacherCard
                 teacher={teacher}

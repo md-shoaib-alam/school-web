@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +20,7 @@ import { ClassesHeader } from "./classes/ClassesHeader";
 import { ClassesTableView } from "./classes/ClassesTableView";
 import { ClassesGridView } from "./classes/ClassesGridView";
 import { ClassDialogs } from "./classes/ClassDialogs";
+import { LayoutGroup } from "framer-motion";
 
 interface DialogState {
   addOpen: boolean;
@@ -151,6 +152,14 @@ export function AdminClasses() {
 
   // Only show full skeleton if we have NO data at all
   const loading = classesLoading && classes.length === 0;
+
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    if (!loading && classes.length > 0) painted.current = true;
+  }, [loading, classes]);
 
   const refetchClasses = () =>
     queryClient.invalidateQueries({ queryKey: ["classes", currentTenantId] });
@@ -334,26 +343,32 @@ export function AdminClasses() {
             <p className="text-sm text-muted-foreground">Create your first class to get started</p>
           </CardContent>
         </Card>
-      ) : viewMode === "table" ? (
-        <ClassesTableView 
-          classes={classes}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onViewStudents={handleViewStudents}
-          onEdit={openEditDialog}
-          onDelete={openDeleteDialog}
-          getProgressColor={getProgressColor}
-        />
       ) : (
-        <ClassesGridView 
-          classes={classes}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onViewStudents={handleViewStudents}
-          onEdit={openEditDialog}
-          onDelete={openDeleteDialog}
-          getProgressColor={getProgressColor}
-        />
+        <LayoutGroup id="classes">
+          {viewMode === "table" ? (
+            <ClassesTableView 
+              classes={classes}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onViewStudents={handleViewStudents}
+              onEdit={openEditDialog}
+              onDelete={openDeleteDialog}
+              getProgressColor={getProgressColor}
+            />
+          ) : (
+            <ClassesGridView 
+              classes={classes}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onViewStudents={handleViewStudents}
+              onEdit={openEditDialog}
+              onDelete={openDeleteDialog}
+              getProgressColor={getProgressColor}
+            />
+          )}
+        </LayoutGroup>
       )}
 
       <ClassDialogs 

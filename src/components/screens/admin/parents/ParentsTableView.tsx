@@ -22,10 +22,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LazyMotion, domMax, m } from "framer-motion";
 import type { ParentInfo } from "./types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface ParentsTableViewProps {
   parents: ParentInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   onEdit: (p: ParentInfo) => void;
   onDelete: (id: string) => void;
   onLinkOpen: (p: ParentInfo) => void;
@@ -34,6 +44,7 @@ interface ParentsTableViewProps {
 
 export function ParentsTableView({
   parents,
+  enter,
   onEdit,
   onDelete,
   onLinkOpen,
@@ -53,11 +64,17 @@ export function ParentsTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {parents.map((parent) => {
-                const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                return (
-                  <tr 
+              <LazyMotion features={domMax}>
+                {parents.map((parent, index) => {
+                  const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                  return (
+                  <m.tr 
                     key={parent.id} 
+                    id={`parent-item-${parent.id}`}
+                    layoutId={`parent-${parent.id}`}
+                    initial={enter ? { opacity: 0, y: 8 } : undefined}
+                    animate={enter ? { opacity: 1, y: 0 } : undefined}
+                    transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
                     className="hover:bg-muted transition-colors cursor-pointer"
                     onClick={() => onView(parent)}
                   >
@@ -204,9 +221,10 @@ export function ParentsTableView({
                         </div>
                       </div>
                     </td>
-                  </tr>
+                  </m.tr>
                 );
-              })}
+                })}
+              </LazyMotion>
             </tbody>
           </table>
         </div>

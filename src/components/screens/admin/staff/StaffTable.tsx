@@ -21,9 +21,19 @@ import { Pencil, Trash2, Shield, Phone, Mail, Eye, MoreVertical } from "lucide-r
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
 import { CopyButton } from "@/components/ui/copy-button";
+import { LazyMotion, domMax, m } from "framer-motion";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface StaffTableProps {
   staff: StaffMember[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
   onView: (member: StaffMember) => void;
@@ -33,6 +43,7 @@ interface StaffTableProps {
 
 export function StaffTable({
   staff,
+  enter,
   onEdit,
   onDelete,
   onView,
@@ -59,10 +70,17 @@ export function StaffTable({
               </TableCell>
             </TableRow>
           ) : (
-            staff.map((member) => (
-              <TableRow 
-                key={member.id} 
-                className="hover:bg-muted transition-colors cursor-pointer"
+            <LazyMotion features={domMax}>
+              {staff.map((member, index) => (
+              <m.tr
+                key={member.id}
+                id={`staff-item-${member.id}`}
+                layoutId={`staff-${member.id}`}
+                initial={enter ? { opacity: 0, y: 8 } : undefined}
+                animate={enter ? { opacity: 1, y: 0 } : undefined}
+                transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                data-slot="table-row"
+                className="hover:bg-muted border-b transition-colors cursor-pointer"
                 onClick={() => onView(member)}
               >
                 <TableCell>
@@ -190,8 +208,9 @@ export function StaffTable({
                     </div>
                   </div>
                 </TableCell>
-              </TableRow>
-            ))
+              </m.tr>
+              ))}
+            </LazyMotion>
           )}
         </TableBody>
       </Table>

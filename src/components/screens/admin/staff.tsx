@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useCallback, useMemo, useEffect } from "react";
+import { useReducer, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   useGraphQLMutation,
   useAssignRoleToUser,
@@ -32,6 +32,7 @@ import { useModulePermissions } from "@/hooks/use-permissions";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { LayoutGroup, LazyMotion, domMax, m } from "framer-motion";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
@@ -43,6 +44,13 @@ import { StaffProfileView } from "./staff/StaffProfileView";
 
 // Types
 import { StaffMember, StaffFormData, emptyFormData } from "./staff/types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 // --- GraphQL Operations ---
 
@@ -322,6 +330,14 @@ export function AdminStaff() {
   const totalItems = staffResponse?.total || 0;
   const totalPages = staffResponse?.totalPages || 1;
 
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    if (!loadingStaff && staff.length > 0) painted.current = true;
+  }, [loadingStaff, staff]);
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -457,29 +473,44 @@ export function AdminStaff() {
           <div className={cn(viewMode === 'table' ? "bg-card rounded-xl border  overflow-hidden" : "")}>
               {loadingStaff ? (
                 <StaffSkeleton />
-              ) : viewMode === 'table' ? (
-                <StaffTable
-                  staff={staff}
-                  onEdit={handleOpenEdit}
-                  onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-                  onView={handleOpenView}
-                  canEdit={canEdit}
-                  canDelete={canDelete}
-                />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                  {staff.map((member) => (
-                    <StaffCard
-                      key={member.id}
-                      member={member}
+                <LayoutGroup id="staff">
+                  {viewMode === 'table' ? (
+                    <StaffTable
+                      staff={staff}
+                      enter={enter}
                       onEdit={handleOpenEdit}
                       onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
                       onView={handleOpenView}
                       canEdit={canEdit}
                       canDelete={canDelete}
                     />
-                  ))}
-                </div>
+                  ) : (
+                    <LazyMotion features={domMax}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                        {staff.map((member, index) => (
+                          <m.div
+                            key={member.id}
+                            id={`staff-item-${member.id}`}
+                            layoutId={`staff-${member.id}`}
+                            initial={enter ? { opacity: 0, y: 8 } : undefined}
+                            animate={enter ? { opacity: 1, y: 0 } : undefined}
+                            transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                          >
+                            <StaffCard
+                              member={member}
+                              onEdit={handleOpenEdit}
+                              onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+                              onView={handleOpenView}
+                              canEdit={canEdit}
+                              canDelete={canDelete}
+                            />
+                          </m.div>
+                        ))}
+                      </div>
+                    </LazyMotion>
+                  )}
+                </LayoutGroup>
               )}
           </div>
 

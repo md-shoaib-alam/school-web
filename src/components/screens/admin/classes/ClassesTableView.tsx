@@ -5,10 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { UserCheck, Users, Pencil, Trash2 } from "lucide-react";
+import { LazyMotion, domMax, m } from "framer-motion";
 import type { ClassInfo } from "@/types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface ClassesTableViewProps {
   classes: ClassInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onViewStudents: (cls: ClassInfo) => void;
@@ -19,6 +29,7 @@ interface ClassesTableViewProps {
 
 export function ClassesTableView({
   classes,
+  enter,
   canEdit,
   canDelete,
   onViewStudents,
@@ -41,10 +52,19 @@ export function ClassesTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {classes.map((cls) => {
-                const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
-                return (
-                  <tr key={cls.id} className="hover:bg-muted transition-colors">
+              <LazyMotion features={domMax}>
+                {classes.map((cls, index) => {
+                  const percentage = cls.capacity > 0 ? Math.round((cls.studentCount / cls.capacity) * 100) : 0;
+                  return (
+                  <m.tr
+                    key={cls.id}
+                    id={`class-item-${cls.id}`}
+                    layoutId={`class-${cls.id}`}
+                    initial={enter ? { opacity: 0, y: 8 } : undefined}
+                    animate={enter ? { opacity: 1, y: 0 } : undefined}
+                    transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                    className="hover:bg-muted transition-colors"
+                  >
                     <td className="px-6 py-4">
                       <span className="font-bold text-foreground">{cls.name}</span>
                     </td>
@@ -89,9 +109,10 @@ export function ClassesTableView({
                         )}
                       </div>
                     </td>
-                  </tr>
+                  </m.tr>
                 );
-              })}
+                })}
+              </LazyMotion>
             </tbody>
           </table>
         </div>

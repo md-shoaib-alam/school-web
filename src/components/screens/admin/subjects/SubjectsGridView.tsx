@@ -4,10 +4,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface SubjectsGridViewProps {
   filtered: any[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onEdit: (s: any) => void;
@@ -16,6 +25,7 @@ interface SubjectsGridViewProps {
 
 export function SubjectsGridView({
   filtered,
+  enter,
   canEdit,
   canDelete,
   onEdit,
@@ -23,15 +33,16 @@ export function SubjectsGridView({
 }: SubjectsGridViewProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      <LazyMotion features={domAnimation}>
+      <LazyMotion features={domMax}>
         <AnimatePresence mode="popLayout">
-          {filtered.map((subject) => (
+          {filtered.map((subject, index) => (
             <m.div
               key={subject.id}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              id={`subject-item-${subject.id}`}
+              layoutId={`subject-${subject.id}`}
+              initial={enter ? { opacity: 0, y: 8 } : undefined}
+              animate={enter ? { opacity: 1, y: 0 } : undefined}
+              transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
               className="group"
             >
               <Card className="h-full border-0 shadow-sm hover:shadow-md transition-all duration-300 group-hover:ring-1 group-hover:ring-emerald-500/30">
@@ -93,6 +104,19 @@ export function SubjectsGridView({
                         </div>
                       ) : (
                         <span className="text-[10px] text-amber-500 font-medium italic">Unassigned</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter">Status</span>
+                      {subject.teacherName && subject.teacherName !== "Not Assigned" ? (
+                        <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px]">
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 text-[10px]">
+                          Unassigned
+                        </Badge>
                       )}
                     </div>
                   </div>
