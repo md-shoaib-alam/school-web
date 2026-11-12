@@ -1,11 +1,18 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { NavItem } from "../nav-config";
+import { groupNavItems } from "../nav-sections";
 import { useAppStore } from "@/store/use-app-store";
 import {
   ARRIVE,
@@ -63,6 +70,8 @@ export function SidebarNav({
   const hovered = useRef<HTMLElement | null>(null);
   const expanded = useRef(expandedKeys);
   const place = usePillSlider(nav);
+  const role = useAppStore((state) => state.currentUser?.role);
+  const groups = useMemo(() => groupNavItems(role, items), [role, items]);
 
   // The active screen's pill travels to its new home; a group that just opened staggers in.
   useLayoutEffect(() => {
@@ -110,7 +119,12 @@ export function SidebarNav({
   const itemClasses = (isActive: boolean, hasChildren: boolean, isChild: boolean) =>
     cn(
       "relative w-full cursor-pointer font-normal transition-all duration-300 ease-spring active:scale-[0.97]",
-      isChild ? "h-9 justify-start gap-3 px-3 text-sm" : "h-10 justify-start gap-3 px-3",
+      isChild
+        ? "h-9 justify-start gap-3 px-3 text-sm"
+        : cn(
+            "h-10 justify-start transition-all duration-300 ease-spring",
+            sidebarOpen ? "gap-3 px-3" : "gap-0 lg:px-4"
+          ),
       // Tailwind v4 puts the important marker at the END of the utility. These have to win over
       // the ghost variant's own hover background and text colour, or they paint over the pills.
       isActive && !hasChildren
@@ -128,12 +142,17 @@ export function SidebarNav({
     );
 
   return (
+    // One provider for the whole rail: the first label takes 150ms, and skipDelayDuration makes the
+    // rest of the column instant as the pointer moves down.
+    <TooltipProvider delayDuration={150} skipDelayDuration={300}>
     <nav
       ref={nav}
       data-lenis-scroll-container
       className={cn(
         "relative flex-1 overflow-y-auto p-3 sidebar-scrollbar overscroll-contain touch-pan-y",
-        !sidebarOpen && "lg:px-2",
+        // no-scrollbar is a plain class in globals.css, so it takes no lg: variant. On phones a
+        // closed drawer is off screen anyway.
+        !sidebarOpen && "lg:px-2 no-scrollbar",
       )}
       onPointerOver={(event) => {
         const target = (event.target as HTMLElement).closest<HTMLElement>("[data-nav]");
@@ -165,8 +184,22 @@ export function SidebarNav({
           />
         </>
       )}
-      <div className="relative space-y-1">
-        {items.map((item) => {
+      <div className="relative space-y-3">
+        {groups.map((group) => (
+        <div key={group.label} className="space-y-1">
+        {group.label && (
+          <p
+            className={cn(
+              "px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-foreground/70 transition-opacity duration-300 ease-spring",
+              // The slot keeps its height when the rail closes: shrinking it made every row below
+              // slide during the width transition. Only the text fades.
+              !sidebarOpen && "lg:opacity-0",
+            )}
+          >
+            {group.label}
+          </p>
+        )}
+        {group.items.map((item) => {
           const hasChildren = item.children && item.children.length > 0;
           const isExpanded = expandedKeys.includes(item.key);
           const isChildActive = !!item.children?.some((child) => child.key === resolvedScreen);
@@ -174,9 +207,8 @@ export function SidebarNav({
           /** The row whose branch is lit: drawn last, so its trunk covers the grey it shares. */
           const litBranch = (item.children ?? []).findIndex((child) => child.key === resolvedScreen);
 
-          return (
-            <div key={item.key} className="space-y-1">
-              <Button
+          const row = (
+            <Button
                 variant="ghost"
                 data-nav={item.key}
                 data-active={(isActive && !hasChildren) || undefined}
@@ -205,28 +237,48 @@ export function SidebarNav({
                 </div>
                 <span
                   className={cn(
-                    "flex-1 text-left transition-all duration-300 ease-spring",
-                    !sidebarOpen && "lg:hidden",
+                    "flex-1 text-left whitespace-nowrap transition-all duration-300 ease-spring overflow-hidden",
+                    sidebarOpen
+                      ? "opacity-100 max-w-[170px]"
+                      : "lg:w-0 lg:max-w-0 lg:opacity-0 lg:pointer-events-none",
                   )}
                 >
                   {item.label}
                 </span>
-                {sidebarOpen && (
-                  <>
-                    {hasChildren ? (
-                      isExpanded ? (
-                        <ChevronDown className="size-4 opacity-50" />
-                      ) : (
-                        <ChevronRight className="size-4 opacity-50" />
-                      )
-                    ) : item.badge && (
-                      <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </>
+                <span
+                  className={cn(
+                    "flex items-center shrink-0 transition-all duration-300 ease-spring overflow-hidden",
+                    sidebarOpen
+                      ? "opacity-100"
+                      : "lg:w-0 lg:max-w-0 lg:opacity-0 lg:pointer-events-none",
+                  )}
+                >
+                  {hasChildren ? (
+                    isExpanded ? (
+                      <ChevronDown className="size-4 opacity-50" />
+                    ) : (
+                      <ChevronRight className="size-4 opacity-50" />
+                    )
+                  ) : item.badge && (
+                    <Badge variant="secondary" className="ml-auto text-[10px] h-5 px-1.5">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </span>
+            </Button>
+          );
+
+          return (
+            <div key={item.key} className="space-y-1">
+              {/* The rail shows icons only, so the name rides in a tooltip. Open, the bubble is not
+                  rendered at all: Radix ignores delayDuration once another tooltip has opened, so a
+                  delay cannot switch it off, and unwrapping the Tooltip remounted all 21 rows. */}
+              <Tooltip>
+                <TooltipTrigger asChild>{row}</TooltipTrigger>
+                {!sidebarOpen && (
+                  <TooltipContent side="right">{item.label}</TooltipContent>
                 )}
-              </Button>
+              </Tooltip>
 
               {/* Sub Items (Accordion): hung from a trunk under the title's icon. */}
               {hasChildren && isExpanded && sidebarOpen && (
@@ -276,7 +328,10 @@ export function SidebarNav({
             </div>
           );
         })}
+        </div>
+        ))}
       </div>
     </nav>
+    </TooltipProvider>
   );
 }

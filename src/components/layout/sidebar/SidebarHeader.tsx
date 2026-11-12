@@ -27,90 +27,76 @@ export function SidebarHeader({
   return (
     <div
       className={cn(
-        isModernUI
-          ? cn(
-              "px-5 h-14 sm:h-16 flex items-center border-b  bg-sidebar",
-              sidebarOpen ? "justify-between" : "justify-center"
-            )
-          : cn(
-              "mt-3 mb-2 bg-card border  shadow-sm flex items-center",
-              sidebarOpen
-                ? "mx-3 p-3 rounded-xl justify-between"
-                : "size-12 rounded-xl justify-center mx-auto"
-            )
+        "relative h-14 sm:h-16 flex items-center border-b bg-sidebar overflow-hidden px-3.5 transition-all duration-300 ease-spring",
+        isModernUI ? "" : "mt-3 mb-2 bg-card border shadow-sm mx-3 p-3 rounded-xl"
       )}
     >
-      <div className={cn("flex items-center gap-3", !sidebarOpen && "lg:gap-0 lg:justify-center")}>
-        {sidebarOpen && (
-          <>
-            {/* SchoolConnect Graduation Cap or School Logo Container */}
-            <div
-              className={cn(
-                "size-10 rounded-xl flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0",
-                isSuperAdmin 
-                  ? "bg-gradient-to-br from-brand to-indigo-700 shadow-brand/20" 
-                  : "border  bg-card",
-              )}
-            >
-              {!isSuperAdmin ? (
-                <img 
-                  src={tenantLogo || currentUser?.tenantLogo || "/test.webp"} 
-                  alt={tenantName || "School Logo"} 
-                  className="size-full object-cover" 
-                  loading="eager"
-                />
-              ) : (
-                <GraduationCap className="size-6 text-white" />
-              )}
-            </div>
-            <div className="transition-all duration-300">
-              <h2
-                className={cn(
-                  "font-extrabold text-base leading-tight tracking-tight",
-                  isSuperAdmin
-                    ? "text-brand"
-                    : "text-foreground",
-                )}
-              >
-                {isSuperAdmin
-                  ? "SchoolConnect"
-                  : tenantName || currentUser?.tenantName || "Demo Academy"}
-              </h2>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                {isSuperAdmin
-                  ? "Platform Console"
-                  : currentUser?.role === "teacher"
-                  ? "Teacher Portal"
-                  : currentUser?.role === "student"
-                  ? "Student Portal"
-                  : currentUser?.role === "parent"
-                  ? "Parent Portal"
-                  : currentUser?.role === "staff"
-                  ? "Staff Portal"
-                  : "Admin Portal"}
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-      
-      <Button
-        variant="ghost"
-        size="icon"
+      {/* Brand logo + School name: smoothly shrinks and fades on collapse without snapping */}
+      <div
         className={cn(
-          "size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg",
-          isModernUI
-            ? "text-muted-foreground hover:text-foreground hover:bg-accent"
-            : "text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-accent",
+          "flex items-center gap-3 min-w-0 transition-all duration-300 ease-spring overflow-hidden",
+          sidebarOpen
+            ? "flex-1 opacity-100 max-w-[210px]"
+            : "w-0 max-w-0 opacity-0 pointer-events-none"
         )}
-        onClick={onToggle}
       >
-        {sidebarOpen ? (
-          <PanelLeftClose className="size-4" />
-        ) : (
-          <PanelLeftOpen className="size-4" />
+        <div
+          className={cn(
+            "size-10 rounded-xl flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0",
+            isSuperAdmin
+              ? "bg-gradient-to-br from-brand to-indigo-700 shadow-brand/20"
+              : "border bg-card",
+          )}
+        >
+          {!isSuperAdmin ? (
+            <img
+              src={tenantLogo || currentUser?.tenantLogo || "/test.webp"}
+              alt={tenantName || "School Logo"}
+              className="size-full object-cover"
+              loading="eager"
+            />
+          ) : (
+            <GraduationCap className="size-6 text-white" />
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <h2
+            className={cn(
+              "font-normal text-base leading-tight whitespace-nowrap truncate",
+              isSuperAdmin
+                ? "text-brand"
+                : "text-foreground",
+            )}
+          >
+            {isSuperAdmin
+              ? "SchoolConnect"
+              : tenantName || currentUser?.tenantName || "Demo Academy"}
+          </h2>
+        </div>
+      </div>
+
+      {/* Collapse / Expand toggle button: smoothly slides into center in collapsed rail */}
+      <div
+        className={cn(
+          "flex items-center justify-center shrink-0 transition-all duration-300 ease-spring",
+          sidebarOpen ? "ml-auto" : "mx-auto"
         )}
-      </Button>
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          className="size-8 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={onToggle}
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="size-4" />
+          ) : (
+            <PanelLeftOpen className="size-4" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

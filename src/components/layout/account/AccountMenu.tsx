@@ -40,6 +40,7 @@ import { SignoutConfirmDialog, type SignoutMode } from "./SignoutConfirmDialog";
 import { revokeSession } from "@/lib/api";
 import { toast } from "sonner";
 import {
+  beginAccountSwitch,
   dashboardHref,
   getActiveAccount,
   listAccounts,
@@ -120,6 +121,8 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
       return;
     }
     if (!setActiveAccount(account.user.id)) return;
+    // Tells the page we are about to land on to animate over its own boot.
+    beginAccountSwitch(account.user);
     // A full reload is what keeps the previous account's cached queries from being read as this one's.
     window.location.href = dashboardHref(account.user);
   };

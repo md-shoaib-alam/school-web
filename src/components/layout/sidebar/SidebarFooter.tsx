@@ -126,29 +126,38 @@ export function SidebarFooter({
               )
       )}
     >
-      {/* "Need Help?" widget matching reference image bottom left */}
-      {isModernUI && sidebarOpen && (
-        <div className="rounded-2xl border  bg-muted p-3.5 space-y-2.5">
-          <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-full bg-blue-50 flex items-center justify-center text-brand shrink-0">
-              <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-              </svg>
+      {/* "Need Help?" widget: smoothly collapses height and fades on rail collapse */}
+      {isModernUI && (
+        <div
+          className={cn(
+            "transition-all duration-300 ease-spring overflow-hidden",
+            sidebarOpen
+              ? "max-h-48 opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none p-0 m-0 border-0"
+          )}
+        >
+          <div className="rounded-2xl border bg-muted p-3.5 space-y-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-full bg-blue-50 flex items-center justify-center text-brand shrink-0">
+                <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-xs text-foreground leading-tight truncate">Need Help?</p>
+                <p className="text-[10px] text-muted-foreground font-medium truncate">Contact our support team</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-xs text-foreground leading-tight">Need Help?</p>
-              <p className="text-[10px] text-muted-foreground font-medium">Contact our support team</p>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate(isSuperAdmin ? "settings" : currentUser.role === "admin" ? "school-settings" : "tickets")}
+              className="w-full h-8 text-xs font-semibold rounded-xl bg-card text-brand hover:bg-accent shadow-2xs"
+            >
+              Help & Support
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onNavigate(isSuperAdmin ? "settings" : currentUser.role === "admin" ? "school-settings" : "tickets")}
-            className="w-full h-8 text-xs font-semibold rounded-xl bg-card  text-brand hover:bg-accent shadow-2xs"
-          >
-            Help & Support
-          </Button>
         </div>
       )}
 

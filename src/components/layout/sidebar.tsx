@@ -77,7 +77,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-out will-change-transform transform-gpu lg:transition-all lg:duration-300 lg:will-change-auto lg:transform-none lg:h-full border-r overflow-hidden",
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-spring will-change-transform transform-gpu lg:transition-[width] lg:duration-300 lg:ease-spring lg:will-change-[width] lg:transform-none lg:h-full border-r overflow-hidden max-lg:rounded-r-2xl",
         isModernUI
           ? "bg-sidebar border-r "
           : "bg-sidebar border-sidebar-border",
