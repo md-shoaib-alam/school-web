@@ -48,19 +48,19 @@ export function CalendarDialogs({
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={closeDialog}>
-        <DialogContent className="w-[92%] sm:w-full max-w-[550px] rounded-xl border  bg-card shadow-2xl p-0 overflow-hidden mx-auto">
-          <DialogHeader className="p-6 border-b ">
-            <DialogTitle className="text-lg font-bold text-foreground tracking-tight">
+        <DialogContent className="w-[92%] sm:w-full max-w-[550px] rounded-xl border bg-card shadow-2xl p-0 overflow-hidden mx-auto">
+          <DialogHeader className="p-6 border-b">
+            <DialogTitle className="text-lg font-semibold text-foreground tracking-tight">
               {editingEvent ? "Update Event" : "Create New Event"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground mt-1">
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
               {editingEvent ? "Modify the existing schedule details below." : "Add a new holiday, exam, or school event to the calendar."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto no-scrollbar">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold tracking-tight text-foreground">Event Title</Label>
+              <Label className="text-xs font-medium tracking-tight text-foreground">Event Title</Label>
               <Input
                 value={form.title}
                 onChange={(e) => updateForm("title", e.target.value)}
@@ -136,18 +136,18 @@ export function CalendarDialogs({
               <Textarea value={form.description} onChange={(e) => updateForm("description", e.target.value)} placeholder="Add more details about this event..." className="min-h-[80px] text-sm" />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-lg border  bg-muted">
+            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted">
               <div className="flex flex-col gap-0.5">
-                <Label className="text-xs font-bold text-foreground">Full Day Event</Label>
-                <span className="text-[10px] text-muted-foreground">Mark if this event lasts the entire day</span>
+                <Label className="text-xs font-medium text-foreground">Full Day Event</Label>
+                <span className="text-xs text-muted-foreground">Mark if this event lasts the entire day</span>
               </div>
               <Switch checked={form.allDay} onCheckedChange={(v) => updateForm("allDay", v)} />
             </div>
           </div>
 
-          <DialogFooter className="p-6 bg-muted border-t  flex items-center justify-end gap-3">
-            <Button variant="ghost" onClick={closeDialog} className="rounded-xl font-semibold text-sm text-foreground hover:bg-muted" disabled={submitting}>Cancel</Button>
-            <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl px-5 h-10 font-bold text-sm transition-all duration-200 active:scale-95" disabled={submitting}>
+          <DialogFooter className="p-6 bg-muted border-t flex items-center justify-end gap-3">
+            <Button variant="ghost" onClick={closeDialog} className="rounded-xl font-medium text-sm text-foreground hover:bg-muted" disabled={submitting}>Cancel</Button>
+            <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl px-5 h-10 font-medium text-sm transition-all duration-200 active:scale-95" disabled={submitting}>
               {submitting ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               {editingEvent ? "Update Schedule" : "Add Event"}
             </Button>
@@ -156,16 +156,16 @@ export function CalendarDialogs({
       </Dialog>
 
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent className="w-[92%] sm:w-full max-w-[400px] rounded-xl border  bg-card shadow-2xl p-6 mx-auto">
+        <AlertDialogContent className="w-[92%] sm:w-full max-w-[400px] rounded-xl border bg-card shadow-2xl p-6 mx-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg font-bold text-foreground">Delete Event?</AlertDialogTitle>
+            <AlertDialogTitle className="text-lg font-semibold text-foreground">Delete Event?</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-muted-foreground mt-2">
               This action is permanent and cannot be undone. Are you sure?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex gap-3">
-            <AlertDialogCancel className="rounded-lg  font-bold h-10 px-4">Discard</AlertDialogCancel>
-            <AlertDialogAction className="rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold h-10 px-4" onClick={handleConfirmDelete} disabled={deleting}>
+            <AlertDialogCancel className="rounded-lg font-medium h-10 px-4">Discard</AlertDialogCancel>
+            <AlertDialogAction className="rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium h-10 px-4" onClick={handleConfirmDelete} disabled={deleting}>
               {deleting ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               Confirm Deletion
             </AlertDialogAction>

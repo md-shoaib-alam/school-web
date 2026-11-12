@@ -33,15 +33,15 @@ export function CalendarHeader({
   description = "View school events and activities",
 }: CalendarHeaderProps) {
   return (
-    <div className="bg-card rounded-2xl border  shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
       {/* Title & Actions Top Row */}
-      <div className="p-4 sm:px-6 sm:py-5 border-b  flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
+      <div className="p-4 sm:px-6 sm:py-5 border-b flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
+            <h1 className="text-2xl font-semibold text-foreground tracking-tight">
               {title}
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            <p className="text-sm text-muted-foreground mt-1">
               {description}
             </p>
           </div>
@@ -50,7 +50,7 @@ export function CalendarHeader({
         <div className="flex items-center w-full sm:w-auto mt-1 sm:mt-0">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full sm:w-[140px] h-9 text-xs font-semibold  rounded-xl">
+              <SelectTrigger className="w-full sm:w-[140px] h-9 text-xs font-medium rounded-xl">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
@@ -68,7 +68,7 @@ export function CalendarHeader({
 
             {canCreate && (
               <Button 
-                className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl h-9 px-4 text-xs font-bold flex items-center transition-all duration-200 active:scale-95 ml-auto sm:ml-0" 
+                className="bg-blue-600 hover:bg-blue-500 dark:bg-rose-600 dark:hover:bg-rose-500 text-white shadow-sm rounded-xl h-9 px-4 text-xs font-medium flex items-center transition-all duration-200 active:scale-95 ml-auto sm:ml-0" 
                 onClick={openCreateDialog}
               >
                 <Plus className="size-3.5 mr-1.5 stroke-[2.5]" />
@@ -110,7 +110,7 @@ export function CalendarHeader({
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-8 px-4 text-xs font-bold  hover:bg-muted rounded-xl transition-all duration-150 active:scale-95 text-foreground"
+          className="h-8 px-4 text-xs font-medium hover:bg-muted rounded-xl transition-all duration-150 active:scale-95 text-foreground"
           onClick={goToToday}
         >
           Today

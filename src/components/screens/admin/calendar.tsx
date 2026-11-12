@@ -255,7 +255,7 @@ export function AdminCalendar() {
             <Eye className="size-4 shrink-0" />
           </div>
           <div>
-            <p className="text-sm text-amber-900 dark:text-amber-200 font-bold leading-none">Read-only Mode</p>
+            <p className="text-sm text-amber-900 dark:text-amber-200 font-semibold leading-none">Read-only Mode</p>
             <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">You can view but not manage school events.</p>
           </div>
         </div>
