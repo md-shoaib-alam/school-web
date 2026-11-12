@@ -118,12 +118,12 @@ export function ChangePasswordModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-b from-[#0F2042] to-[#061024]  text-white shadow-2xl">
+      <DialogContent className="sm:max-w-[425px] border  bg-card text-foreground shadow-xl">
         <DialogHeader>
-          <div className="mx-auto size-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-2">
-            <KeyRound className="size-6 text-cyan-400" />
+          <div className="mx-auto size-12 rounded-full bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center mb-2">
+            <KeyRound className="size-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <DialogTitle className="text-center text-xl text-white">Change Password</DialogTitle>
+          <DialogTitle className="text-center text-xl text-foreground">Change Password</DialogTitle>
           <DialogDescription className="text-center text-muted-foreground text-sm">
             Enter your current password and choose a secure new one.
           </DialogDescription>
@@ -139,11 +139,11 @@ export function ChangePasswordModal({
                 value={oldPassword}
                 onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'oldPassword', value: e.target.value })}
                 required
-                className="pr-10 bg-white/5 border-white/10 text-white placeholder-white/30 focus-visible:ring-cyan-400 focus-visible:border-cyan-400 rounded-full h-11 px-4"
+                className="pr-10 bg-muted border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full h-11 px-4"
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showOldPassword' })}
               >
                 {showOldPassword ? (
@@ -164,11 +164,11 @@ export function ChangePasswordModal({
                 value={newPassword}
                 onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'newPassword', value: e.target.value })}
                 required
-                className="pr-10 bg-white/5 border-white/10 text-white placeholder-white/30 focus-visible:ring-cyan-400 focus-visible:border-cyan-400 rounded-full h-11 px-4"
+                className="pr-10 bg-muted border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full h-11 px-4"
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showNewPassword' })}
               >
                 {showNewPassword ? (
@@ -189,11 +189,11 @@ export function ChangePasswordModal({
                 value={confirmPassword}
                 onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'confirmPassword', value: e.target.value })}
                 required
-                className="pr-10 bg-white/5 border-white/10 text-white placeholder-white/30 focus-visible:ring-cyan-400 focus-visible:border-cyan-400 rounded-full h-11 px-4"
+                className="pr-10 bg-muted border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full h-11 px-4"
               />
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', field: 'showConfirmPassword' })}
               >
                 {showConfirmPassword ? (
@@ -205,7 +205,7 @@ export function ChangePasswordModal({
             </div>
           </div>
           {error && (
-            <p className="text-sm font-medium text-red-400 bg-red-950/30 border border-red-500/20 p-2.5 rounded-xl">
+            <p className="text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border border-red-200/70 dark:border-red-500/20 p-2.5 rounded-xl">
               {error}
             </p>
           )}
@@ -215,14 +215,14 @@ export function ChangePasswordModal({
               variant="outline"
               onClick={() => handleOpenChange(false)}
               disabled={changePasswordMutation.isPending}
-              className="flex-1 bg-white/5 border-white/20 text-muted-foreground hover:bg-white/10 hover:text-white rounded-full h-11"
+              className="flex-1 rounded-full h-11 text-sm font-semibold"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={changePasswordMutation.isPending}
-              className="flex-1 bg-gradient-to-r from-[#4F7DF9] via-[#82F3FF] to-[#12D0F6] text-[#0A1E40] font-bold hover:opacity-90 rounded-full h-11 border-0 shadow-lg shadow-cyan-500/20"
+              className="flex-1 bg-blue-600 text-white font-semibold hover:bg-blue-700 active:scale-[0.99] rounded-full h-11 border-0 shadow-md shadow-blue-500/25"
             >
               {changePasswordMutation.isPending ? (
                 <>
