@@ -1,10 +1,16 @@
-import type { AppUser } from './types';
+import type { AppUser, UserRole } from './types';
 import { STORAGE_KEYS, SESSION_EXPIRY_DAYS } from './utils';
 import { setCookie } from '@/lib/cookies';
 
 export const MAX_ACCOUNTS = 5;
 
 const VAULT_KEY = 'schoolsaas_accounts:v1';
+const SWITCH_KEY = 'schoolsaas_account_switch:v1';
+/**
+ * Past this, the signal belongs to a page load that already happened. Kept well above a cold
+ * dev-mode boot, or the animation is thrown away before React has hydrated enough to read it.
+ */
+const SWITCH_TTL_MS = 30000;
 const TOKEN_KEY = 'school_token';
 const REFRESH_KEY = 'school_refresh_token';
 const TENANT_KEYS = {
@@ -186,6 +192,68 @@ export function setActiveAccount(userId: string): StoredAccount | null {
   write({ accounts: vault.accounts, activeUserId: userId });
   project(account);
   return account;
+}
+
+export type AccountSwitchSignal = {
+  to: string;
+  name: string;
+  role: UserRole;
+  tenantName: string;
+  startedAt: number;
+};
+
+/**
+ * Written immediately before switchTo() reloads, so the page it lands on can animate over its own
+ * boot. sessionStorage and not localStorage: the signal is for the one load it hands over to.
+ */
+export function beginAccountSwitch(user: AppUser): void {
+  if (!hasStorage()) return;
+  const signal: AccountSwitchSignal = {
+    to: user.id,
+    name: user.name,
+    role: user.role,
+    tenantName: user.tenantName ?? '',
+    startedAt: Date.now(),
+  };
+  try {
+    sessionStorage.setItem(SWITCH_KEY, JSON.stringify(signal));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** The stored signal, unparsed. A string, so a React store hook can snapshot it by value. */
+export function readAccountSwitchRaw(): string | null {
+  if (!hasStorage()) return null;
+  try {
+    return sessionStorage.getItem(SWITCH_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** null for no signal, or one left over from a page load that already happened. */
+export function parseAccountSwitch(raw: string | null): AccountSwitchSignal | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    const usable = typeof parsed?.to === 'string'
+      && typeof parsed?.name === 'string'
+      && typeof parsed?.role === 'string'
+      && Date.now() - Number(parsed?.startedAt) <= SWITCH_TTL_MS;
+    return usable ? (parsed as AccountSwitchSignal) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearAccountSwitch(): void {
+  if (!hasStorage()) return;
+  try {
+    sessionStorage.removeItem(SWITCH_KEY);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function clearVault(): void {
