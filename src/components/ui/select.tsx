@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { HoverList } from "@/components/shared/hover-list"
 
 function Select({
   ...props
@@ -77,7 +78,7 @@ function SelectContent({
               "w-full min-w-[var(--radix-select-trigger-width)]"
           )}
         >
-          {children}
+          <HoverList pillClassName="rounded-sm">{children}</HoverList>
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>

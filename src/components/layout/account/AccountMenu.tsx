@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { HoverList } from "@/components/shared/hover-list";
 import { roleColors, roleLabels } from "../nav-config";
 import { AddAccountDialog } from "./AddAccountDialog";
 import { AccountSubmenuSheet, type SubmenuKind } from "./AccountSubmenuSheet";
@@ -88,6 +89,7 @@ function useIsCompact() {
   }, []);
   return compact;
 }
+
 
 export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChange }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
@@ -200,7 +202,7 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
   );
 
   const renderAppearanceRow = ({ value, label, Icon }: (typeof APPEARANCE_OPTIONS)[number]) => (
-    <DropdownMenuItem key={value} className="gap-2 text-xs" onSelect={() => setTheme(value)}>
+    <DropdownMenuItem key={value} className="gap-2 rounded-lg text-xs" onSelect={() => setTheme(value)}>
       <Icon className="size-4" />
       {label}
       {chosen === value && <Check className="ml-auto size-4 text-blue-600 dark:text-blue-400" />}
@@ -252,7 +254,7 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
           className="mt-2 w-[min(18rem,calc(100vw-1.25rem))] rounded-2xl border-0 bg-transparent p-0 shadow-none"
         >
           {/* The card: who is signed in, then the account's entries. */}
-          <div className="rounded-2xl border bg-popover p-1.5 shadow-xl shadow-black/10">
+          <HoverList className="rounded-2xl border bg-popover p-1.5 shadow-xl shadow-black/10">
             <div className="mb-1 flex items-center gap-2.5 rounded-xl bg-muted p-2.5">
               <Avatar className="size-9 ring-2 ring-white dark:ring-border shadow-xs">
                 <AvatarImage src={currentUser.avatar} alt={currentUser.name} className="object-cover" />
@@ -287,7 +289,9 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
                   Appearance
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-44">
-                  {APPEARANCE_OPTIONS.map(renderAppearanceRow)}
+                  <HoverList>
+                    {APPEARANCE_OPTIONS.map(renderAppearanceRow)}
+                  </HoverList>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
             )}
@@ -318,10 +322,10 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
               <LifeBuoy className="size-4 text-emerald-500" />
               Help &amp; Support
             </DropdownMenuItem>
-          </div>
+          </HoverList>
 
           {/* The ledge: the two actions that leave or change the account you are on. */}
-          <div className="mt-1 rounded-2xl border bg-popover p-1.5 shadow-lg shadow-black/5">
+          <HoverList className="mt-1 rounded-2xl border bg-popover p-1.5 shadow-lg shadow-black/5">
             {compact ? (
               <DropdownMenuItem
                 className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium"
@@ -344,14 +348,17 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
                   </span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-64">
-                  {accounts.map((account) => renderAccountRow(account, account.user.id === activeId))}
-                  <DropdownMenuSeparator className="my-1" />
-                  {renderAddAccountItem()}
+                  <HoverList>
+                    {accounts.map((account) => renderAccountRow(account, account.user.id === activeId))}
+                    <DropdownMenuSeparator className="my-1" />
+                    {renderAddAccountItem()}
+                  </HoverList>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
             )}
 
             <DropdownMenuItem
+              variant="destructive"
               className="gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/30"
               onSelect={askSignOut}
             >
@@ -359,7 +366,7 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
               Log out
             </DropdownMenuItem>
 
-          </div>
+          </HoverList>
         </DropdownMenuContent>
       </DropdownMenu>
 
