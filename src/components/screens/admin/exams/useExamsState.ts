@@ -22,12 +22,14 @@ export function useExamsState(initialTab = 'exams') {
   const { academicYears } = useAcademicYears();
   const currentAcademicYear = useMemo(() => {
     const y = new Date().getFullYear();
-    return academicYears.find((ay: any) => ay.isCurrent)?.name || `${y}-${y + 1}`;
+    return academicYears.find((ay: any) => ay.isCurrent)?.name || `${y} - ${y + 1}`;
   }, [academicYears]);
 
   // Filters & Tabs
   const [classFilter, setClassFilter] = useState('all');
-  const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState(currentAcademicYear);
+  // Null until the reader picks one: seeding this with the mount-time fallback would freeze that
+  // guess in place once the real academic years arrive, and the filter would match nothing.
+  const [publishedAcademicYearFilter, setPublishedAcademicYearFilter] = useState<string | null>(null);
   const [publishedClassFilter, setPublishedClassFilter] = useState('all');
   const [activeTab, setActiveTab] = useState(() => initialTab);
 
@@ -538,8 +540,9 @@ export function useExamsState(initialTab = 'exams') {
     currentAcademicYear,
     classFilter,
     setClassFilter,
-    publishedAcademicYearFilter,
-    setPublishedAcademicYearFilter,
+    publishedAcademicYearFilter: publishedAcademicYearFilter ?? currentAcademicYear,
+    // Callers only ever pick a year; the null is the internal "not picked yet".
+    setPublishedAcademicYearFilter: (year: string) => setPublishedAcademicYearFilter(year),
     publishedClassFilter,
     setPublishedClassFilter,
     activeTab,

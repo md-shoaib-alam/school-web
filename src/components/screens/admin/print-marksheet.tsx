@@ -37,7 +37,7 @@ export function AdminPrintMarksheetContent() {
   // Academic Years
   const { academicYears } = useAcademicYears();
   const currentAcademicYear = useMemo(() => {
-    return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024-2025';
+    return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024 - 2025';
   }, [academicYears]);
 
   // Settings for inline vs tab preview

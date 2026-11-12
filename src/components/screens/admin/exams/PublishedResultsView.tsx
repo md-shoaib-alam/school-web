@@ -18,7 +18,7 @@ interface PublishedResultsViewProps {
   academicYears: any[];
   currentAcademicYear: string;
   publishedAcademicYearFilter: string;
-  setPublishedAcademicYearFilter: React.Dispatch<React.SetStateAction<string>>;
+  setPublishedAcademicYearFilter: (year: string) => void;
   publishedClassFilter: string;
   setPublishedClassFilter: React.Dispatch<React.SetStateAction<string>>;
   printingLedgerClassId: string | null;
