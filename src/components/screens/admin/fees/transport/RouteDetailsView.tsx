@@ -182,7 +182,7 @@ export function RouteDetailsView({ route, assignments, onEditRoute }: RouteDetai
                   <p className="text-center py-6 text-xs text-muted-foreground">No custom pickup points defined</p>
                 ) : (
                   routeStops.map((stop: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors">
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 dark:hover:bg-accent transition-colors">
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-semibold truncate text-foreground">{stop.name}</p>
                         <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">₹{Number(stop.fee || 0).toLocaleString()} / month</p>

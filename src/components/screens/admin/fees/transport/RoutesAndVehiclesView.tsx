@@ -142,7 +142,7 @@ import { formatVehicleType } from "./TransportDialogs";
            {vehicles.length === 0 ? (
              <p className="text-center py-8 text-xs text-muted-foreground">No vehicles registered</p>
            ) : vehicles.map((v: any) => (
-             <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors">
+             <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 dark:hover:bg-accent transition-colors">
                <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                  <Bus className="size-5" />
                </div>

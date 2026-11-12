@@ -605,7 +605,7 @@ function ListView({
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                     inProgress
                       ? "bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200 dark:ring-emerald-800"
-                      : "hover:bg-accent/50"
+                      : "hover:bg-accent/50 dark:hover:bg-accent"
                   }`}
                 >
                   <div className="flex-shrink-0 w-24 flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
