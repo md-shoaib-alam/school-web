@@ -16,11 +16,10 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Mail, GraduationCap, BookOpen, Award, Briefcase, Pencil, Trash2, Eye } from "lucide-react";
-import { TeacherInfo, avatarColors } from "./types";
+import { TeacherInfo } from "./types";
 
 interface TeacherCardProps {
   teacher: TeacherInfo;
-  index: number;
   canEdit: boolean;
   canDelete: boolean;
   deletingId: string | null;
@@ -32,7 +31,6 @@ interface TeacherCardProps {
 
 export function TeacherCard({
   teacher,
-  index,
   canEdit,
   canDelete,
   deletingId,
@@ -47,7 +45,6 @@ export function TeacherCard({
     .join("")
     .slice(0, 2)
     .toUpperCase();
-  const color = avatarColors[index % avatarColors.length];
 
   return (
     <Card 
@@ -58,7 +55,7 @@ export function TeacherCard({
         {/* Header */}
         <div className="flex items-start gap-4">
           <Avatar className="size-14 shrink-0 ring-2 ring-white dark:ring-border shadow-sm">
-            <AvatarFallback className={`${color} text-white text-sm font-bold`}>
+            <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>

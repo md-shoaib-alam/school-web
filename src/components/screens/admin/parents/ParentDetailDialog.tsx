@@ -19,13 +19,9 @@ import {
   Sparkles,
   Users,
   Link as LinkIcon,
-  Copy,
-  Check,
 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
-import { ParentInfo, getAvatarColor, getInitials } from "./types";
+import { CopyButton } from "@/components/ui/copy-button";
+import { ParentInfo, getInitials } from "./types";
 
 interface ParentDetailDialogProps {
   open: boolean;
@@ -40,16 +36,7 @@ export function ParentDetailDialog({
   parent,
   onLinkClick,
 }: ParentDetailDialogProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-
   if (!parent) return null;
-
-  const handleCopy = (text: string, fieldName: string) => {
-    copyToClipboard(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${fieldName} copied to clipboard`);
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,18 +89,7 @@ export function ParentDetailDialog({
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-emerald-600 hover:text-emerald-700"
-                      onClick={() => handleCopy(parent.username || '', 'Parent ID')}
-                    >
-                      {copiedField === 'Parent ID' ? (
-                        <Check className="size-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="size-3.5" />
-                      )}
-                    </Button>
+                    <CopyButton value={parent.username || ''} toastSubject="Parent ID" size="lg" />
                   </div>
                 </div>
               )}
@@ -128,18 +104,7 @@ export function ParentDetailDialog({
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0 ml-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 text-muted-foreground hover:text-emerald-600"
-                    onClick={() => handleCopy(parent.email, 'Email')}
-                  >
-                    {copiedField === 'Email' ? (
-                      <Check className="size-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="size-3.5" />
-                    )}
-                  </Button>
+                  <CopyButton value={parent.email} toastSubject="Email" size="lg" />
                 </div>
               </div>
 
@@ -154,18 +119,7 @@ export function ParentDetailDialog({
                 </div>
                 {parent.phone && parent.phone !== "—" && (
                   <div className="flex items-center gap-1 shrink-0 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-emerald-600"
-                      onClick={() => handleCopy(parent.phone || '', 'Phone')}
-                    >
-                      {copiedField === 'Phone' ? (
-                        <Check className="size-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="size-3.5" />
-                      )}
-                    </Button>
+                    <CopyButton value={parent.phone || ''} toastSubject="Phone" size="lg" />
                   </div>
                 )}
               </div>

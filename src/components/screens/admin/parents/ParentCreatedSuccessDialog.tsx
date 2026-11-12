@@ -11,7 +11,6 @@ import {
 import {
   Check,
   X,
-  Copy,
   CheckCircle2,
   ExternalLink,
   Mail,
@@ -24,8 +23,7 @@ import {
   Plus,
   Info,
 } from "lucide-react";
-import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 import { getInitials } from "./types";
 
 export interface ParentCreatedData {
@@ -54,27 +52,13 @@ export function ParentCreatedSuccessDialog({
   onViewProfile,
 }: ParentCreatedSuccessDialogProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   if (!data) return null;
 
   const loginId = data.username || "—";
   const password = data.password || "changeme123";
 
-  const handleCopy = (text: string, label: string) => {
-    copyToClipboard(text);
-    setCopiedField(label);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${label} copied to clipboard`);
-  };
-
-  const handleCopyBoth = () => {
-    const text = `Parent Portal Login Details:\nParent Login ID: ${loginId}\nPassword: ${password}\nLogin Portal: ${window.location.origin}/login`;
-    copyToClipboard(text);
-    setCopiedField("both");
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success("Login ID and Password copied to clipboard");
-  };
+  const bothText = `Parent Portal Login Details:\nParent Login ID: ${loginId}\nPassword: ${password}\nLogin Portal: ${window.location.origin}/login`;
 
   const handleShareWhatsApp = () => {
     const message = `Hello ${data.name},\nHere are your Parent Portal login credentials:\n\nParent Login ID: ${loginId}\nPassword: ${password}\nPortal: ${window.location.origin}/login\n\nPlease keep these credentials secure.`;
@@ -209,18 +193,7 @@ export function ParentCreatedSuccessDialog({
                     <span className="text-xs font-mono font-bold text-foreground tracking-wide select-all">
                       {loginId}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(loginId, "Login ID")}
-                      className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
-                      title="Copy Login ID"
-                    >
-                      {copiedField === "Login ID" ? (
-                        <Check className="size-4 text-emerald-600" />
-                      ) : (
-                        <Copy className="size-4" />
-                      )}
-                    </button>
+                    <CopyButton value={loginId} toastSubject="Login ID" size="sm" />
                   </div>
                 </div>
 
@@ -234,18 +207,7 @@ export function ParentCreatedSuccessDialog({
                       {showPassword ? password : "••••••••"}
                     </span>
                     <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(password, "Password")}
-                        className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
-                        title="Copy Password"
-                      >
-                        {copiedField === "Password" ? (
-                          <Check className="size-4 text-emerald-600" />
-                        ) : (
-                          <Copy className="size-4" />
-                        )}
-                      </button>
+                      <CopyButton value={password} toastSubject="Password" size="sm" />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -281,19 +243,13 @@ export function ParentCreatedSuccessDialog({
                 Share via Email
               </Button>
 
-              <Button
-                type="button"
+              <CopyButton
+                value={bothText}
+                label="Copy Both"
+                toastSubject="Login ID and password"
                 variant="outline"
-                onClick={handleCopyBoth}
-                className="h-10 text-xs font-semibold rounded-xl  text-foreground hover:bg-accent gap-2"
-              >
-                {copiedField === "both" ? (
-                  <Check className="size-4 text-emerald-600" />
-                ) : (
-                  <Copy className="size-4 text-muted-foreground" />
-                )}
-                {copiedField === "both" ? "Copied Both!" : "Copy Both"}
-              </Button>
+                size="lg"
+              />
             </div>
           </div>
 

@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, Copy, Edit2, Loader2, Mail, Phone, UserRound } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
+import { Edit2, Loader2, Mail, Phone, UserRound } from "lucide-react";
 import type { RoleConfigEntry } from "./user-detail-sheet-model";
 
 interface UserBasicInfoSectionProps {
@@ -26,11 +27,9 @@ interface UserBasicInfoSectionProps {
   editRole: string;
   setEditRole: (value: string) => void;
   isSaving: boolean;
-  copiedEmail: boolean;
   onStartEdit: () => void;
   onCancelEdit: () => void;
   onSaveEdit: () => void;
-  onCopyEmail: () => void;
 }
 
 export function UserBasicInfoSection({
@@ -48,11 +47,9 @@ export function UserBasicInfoSection({
   editRole,
   setEditRole,
   isSaving,
-  copiedEmail,
   onStartEdit,
   onCancelEdit,
   onSaveEdit,
-  onCopyEmail,
 }: UserBasicInfoSectionProps) {
   return (
     <div className="space-y-3">
@@ -213,14 +210,7 @@ export function UserBasicInfoSection({
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={onCopyEmail}
-                title="Copy Email"
-                className="p-2 rounded-xl text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-white shrink-0 transition-colors cursor-pointer border border-transparent hover: dark:hover: shadow-2xs"
-              >
-                {copiedEmail ? <Check className="size-4 text-emerald-600" /> : <Copy className="size-4" />}
-              </button>
+              <CopyButton value={email} toastSubject="Email" size="lg" className="shrink-0" />
             </div>
 
             {/* Phone Number Card - FULL WIDTH (sm:col-span-2) */}

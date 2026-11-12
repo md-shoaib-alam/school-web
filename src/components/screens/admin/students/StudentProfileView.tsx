@@ -14,8 +14,6 @@ import {
   CreditCard,
   MoreHorizontal,
   User,
-  Copy,
-  Check,
   Building2,
   Phone,
   Mail,
@@ -24,8 +22,7 @@ import {
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { StudentInfo } from "./types";
 import { StudentOverviewTab } from "./StudentOverviewTab";
 
@@ -55,15 +52,7 @@ export function StudentProfileView({
   isLoading = false,
 }: StudentProfileViewProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "academics" | "attendance" | "fees" | "more">("overview");
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const queryClient = useQueryClient();
-
-  const handleCopy = (text: string, label: string) => {
-    copyToClipboard(text);
-    setCopiedField(label);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${label} copied to clipboard`);
-  };
 
   const handlePrint = () => {
     window.print();
@@ -183,7 +172,7 @@ export function StudentProfileView({
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:hover:bg-zinc-700 text-foreground border border-emerald-100 transition-all shadow-xs"
+            className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/40 text-foreground border border-emerald-200/70 dark:border-emerald-800/60 transition-all shadow-xs"
           >
             <ChevronLeft className="size-4 text-foreground stroke-[2.5]" />
             <span className="text-xs sm:text-sm font-semibold tracking-tight">Back to Students</span>
@@ -262,17 +251,7 @@ export function StudentProfileView({
                 <div className="flex items-center gap-1.5">
                   <span>Student ID:</span>
                   <span className="font-semibold text-foreground font-mono">{displayStudentId}</span>
-                  <button
-                    onClick={() => handleCopy(displayStudentId, "Student ID")}
-                    className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
-                    aria-label="Copy Student ID"
-                  >
-                    {copiedField === "Student ID" ? (
-                      <Check className="size-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="size-3.5" />
-                    )}
-                  </button>
+                  <CopyButton value={displayStudentId} toastSubject="Student ID" size="sm" />
                 </div>
 
                 <span className="hidden sm:inline text-muted-foreground">|</span>

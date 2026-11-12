@@ -18,7 +18,6 @@ import {
   User,
   BookOpen,
   School,
-  Copy,
   Check,
   Printer,
   ChevronLeft,
@@ -31,8 +30,7 @@ import {
   StickyNote,
   Users,
 } from "lucide-react";
-import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { TeacherInfo } from "./types";
 
 interface TeacherDetailDialogProps {
@@ -62,7 +60,6 @@ export function TeacherDetailDialog({
   onEdit,
   isLoading = false,
 }: TeacherDetailDialogProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "academics" | "attendance" | "classes" | "documents" | "notes">("overview");
 
   if (!teacher && !isLoading) return null;
@@ -81,13 +78,6 @@ export function TeacherDetailDialog({
     address: "Bangalore, Karnataka",
     role: "Faculty Member",
     joiningDate: "12 Aug 2024",
-  };
-
-  const handleCopy = (text: string, fieldName: string) => {
-    copyToClipboard(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${fieldName} copied to clipboard`);
   };
 
   const handlePrint = () => {
@@ -202,17 +192,7 @@ export function TeacherDetailDialog({
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
                   <span>Teacher ID:</span>
                   <span className="font-semibold text-foreground">{displayTeacherId}</span>
-                  <button
-                    onClick={() => handleCopy(displayTeacherId, "Teacher ID")}
-                    className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
-                    aria-label="Copy Teacher ID"
-                  >
-                    {copiedField === "Teacher ID" ? (
-                      <Check className="size-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="size-3.5" />
-                    )}
-                  </button>
+                  <CopyButton value={displayTeacherId} toastSubject="Teacher ID" size="sm" />
                 </div>
               </div>
             </div>

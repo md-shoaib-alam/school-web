@@ -19,8 +19,6 @@ import {
   UserCheck,
   Edit,
   Trash2,
-  Copy,
-  Check,
   Info,
   Receipt,
   Settings,
@@ -36,7 +34,7 @@ import {
 import { Tenant } from "./types";
 import { TenantPlanBadge, TenantStatusBadge } from "./badges";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { CopyButton } from "@/components/ui/copy-button";
 
 interface DetailTenantDialogProps {
   detailOpen: boolean;
@@ -65,16 +63,8 @@ export function DetailTenantDialog({
   onDeleteClick,
 }: DetailTenantDialogProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "billing" | "settings" | "activity">("overview");
-  const [copied, setCopied] = useState(false);
 
   if (!viewingTenant) return null;
-
-  const handleCopySlug = () => {
-    navigator.clipboard.writeText(`/${viewingTenant.slug}`);
-    setCopied(true);
-    toast.success("Copied slug to clipboard");
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // Usage percentages
   const studentPct = viewingTenant.maxStudents
@@ -229,14 +219,7 @@ export function DetailTenantDialog({
                       <span className="text-xs text-muted-foreground font-normal">
                         /{viewingTenant.slug}
                       </span>
-                      <button
-                        type="button"
-                        onClick={handleCopySlug}
-                        className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors"
-                        title="Copy slug"
-                      >
-                        {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                      </button>
+                      <CopyButton value={`/${viewingTenant.slug}`} toastSubject="Slug" size="sm" />
                     </div>
 
                     <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground font-normal">

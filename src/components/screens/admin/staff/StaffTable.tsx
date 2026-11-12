@@ -17,11 +17,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye, MoreVertical } from "lucide-react";
-import { useState } from "react";
+import { Pencil, Trash2, Shield, Phone, Mail, Eye, MoreVertical } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 
 interface StaffTableProps {
   staff: StaffMember[];
@@ -40,13 +39,6 @@ export function StaffTable({
   canEdit,
   canDelete,
 }: StaffTableProps) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopy = (email: string, id: string) => {
-    copyToClipboard(email);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
   return (
     <div className="overflow-x-auto px-4 sm:px-6">
       <Table>
@@ -84,18 +76,13 @@ export function StaffTable({
                       <span className="font-bold text-sm text-foreground">{member.name}</span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-muted-foreground">{member.email}</span>
-                        <button 
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); handleCopy(member.email, member.id); }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-accent rounded"
-                          title="Copy email"
-                        >
-                          {copiedId === member.id ? (
-                            <Check className="size-2.5 text-emerald-500" />
-                          ) : (
-                            <Copy className="size-2.5 text-muted-foreground" />
-                          )}
-                        </button>
+                        <CopyButton
+                          value={member.email}
+                          toastSubject="Email"
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                          className="opacity-0 group-hover:opacity-100"
+                        />
                       </div>
                     </div>
                   </div>

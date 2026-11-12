@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Check, Shield, Phone, MapPin, Share2, CheckCircle2 } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
+import { Shield, Phone, MapPin, CheckCircle2 } from "lucide-react";
 import type { AppUser, UserRole } from "@/store/use-app-store";
 
 const roleQuotes: Record<UserRole, string> = {
@@ -17,21 +18,17 @@ const roleQuotes: Record<UserRole, string> = {
 
 interface ProfileDetailsProps {
   user: AppUser;
-  onCopy: (text: string, field: string) => void;
-  copiedField: string | null;
   onEditClick: () => void;
-  onCopySchoolUrl: () => void;
   getSchoolUrl: () => string;
 }
 
 export function ProfileDetails({
   user,
-  onCopy,
-  copiedField,
   onEditClick,
-  onCopySchoolUrl,
   getSchoolUrl,
 }: ProfileDetailsProps) {
+  const schoolUrl = getSchoolUrl();
+
   return (
     <Card className="border  shadow-sm rounded-2xl">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
@@ -41,13 +38,14 @@ export function ProfileDetails({
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto shrink-0">
           {user.role === "admin" && (
-            <Button
-              onClick={onCopySchoolUrl}
-              className="bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white font-bold rounded-xl text-xs gap-1.5 h-9 w-full sm:w-auto justify-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-violet-500/25 active:translate-y-0 active:scale-[0.98]"
-            >
-              <Share2 className="size-3.5" />
-              {copiedField === "SchoolUrl" ? "Copied URL!" : "Copy School Portal URL"}
-            </Button>
+            <CopyButton
+              value={schoolUrl}
+              label="Copy School Portal URL"
+              toastSubject="School portal URL"
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto"
+            />
           )}
           <Button 
             onClick={onEditClick} 
@@ -62,14 +60,11 @@ export function ProfileDetails({
           <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
             <p className="text-[10px] uppercase font-bold text-muted-foreground">Full Name</p>
             <p className="text-sm font-semibold text-foreground truncate pr-6">{user.name}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onCopy(user.name, "Name")}
-              className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              {copiedField === "Name" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-            </Button>
+            <CopyButton
+              value={user.name}
+              toastSubject="Name"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            />
           </div>
 
           <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
@@ -78,14 +73,11 @@ export function ProfileDetails({
               <Badge variant="outline" className="text-[8px] h-3.5 px-1 py-0 border-emerald-500/30 text-emerald-500 bg-emerald-500/5 font-bold">Verified</Badge>
             </div>
             <p className="text-sm font-semibold text-foreground truncate pr-6">{user.email}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onCopy(user.email, "Email")}
-              className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              {copiedField === "Email" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-            </Button>
+            <CopyButton
+              value={user.email}
+              toastSubject="Email"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            />
           </div>
 
           <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1">
@@ -104,16 +96,11 @@ export function ProfileDetails({
                 {user.phone || "Not set"}
               </span>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={!user.phone}
-              onClick={() => onCopy(user.phone || "", "Mobile Number")}
-              className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              {copiedField === "Mobile Number" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-            </Button>
+            <CopyButton
+              value={user.phone || ""}
+              toastSubject="Mobile number"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            />
           </div>
 
           <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group md:col-span-2">
@@ -124,16 +111,11 @@ export function ProfileDetails({
                 {user.address || "Not set"}
               </span>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={!user.address}
-              onClick={() => onCopy(user.address || "", "Address")}
-              className="size-7 absolute right-2 top-1/2 -translate-y-1/2 text-emerald-800/80 hover:text-emerald-950 dark:text-emerald-400/80 dark:hover:text-emerald-200 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              {copiedField === "Address" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-            </Button>
+            <CopyButton
+              value={user.address || ""}
+              toastSubject="Address"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            />
           </div>
 
           {user.role !== "super_admin" && (
@@ -146,27 +128,23 @@ export function ProfileDetails({
                       {getSchoolUrl()}
                     </p>
                   </div>
-                  <Button
-                    onClick={onCopySchoolUrl}
+                  <CopyButton
+                    value={getSchoolUrl()}
+                    label="Copy URL"
+                    toastSubject="School portal URL"
                     variant="outline"
-                    className="h-8 border-violet-500/25 hover:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 text-xs font-bold rounded-lg shrink-0 gap-1.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.97]"
-                  >
-                    {copiedField === "SchoolUrl" ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-                    Copy URL
-                  </Button>
+                    className="shrink-0"
+                  />
                 </div>
               )}
               <div className="p-4 bg-muted dark:bg-[#0c0c0e]/30 border  rounded-xl space-y-1 relative group">
                 <p className="text-[10px] uppercase font-bold text-muted-foreground">School URL Identifier</p>
                 <p className="text-sm font-semibold text-foreground break-all pr-10">{user.tenantSlug || "N/A"}</p>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onCopy(user.tenantSlug || "", "School Identifier")}
-                  className="size-10 sm:size-7 absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                >
-                  {copiedField === "School Identifier" ? <Check className="size-4 sm:size-3.5 text-green-500" /> : <Copy className="size-4 sm:size-3.5" />}
-                </Button>
+                <CopyButton
+                  value={user.tenantSlug || ""}
+                  toastSubject="School URL identifier"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                />
               </div>
             </>
           )}

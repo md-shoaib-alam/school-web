@@ -20,13 +20,11 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
-import { copyToClipboard } from "@/lib/clipboard";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();
   const { theme, setTheme } = useTheme();
   const { currentUser, currentTenantName, currentTenantSlug, logout } = useAppStore();
-  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -43,24 +41,6 @@ export function UserProfileScreen() {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-  const handleCopy = (text: string, field: string) => {
-    copyToClipboard(text);
-    setCopiedField(field);
-    toast.success(`${field} copied to clipboard!`);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleCopySchoolUrl = () => {
-    if (typeof window === "undefined" || !currentUser) return;
-    const slug = currentTenantSlug || currentUser.tenantSlug || "";
-    const url = `${window.location.origin}/${slug}`;
-    
-    copyToClipboard(url);
-    setCopiedField("SchoolUrl");
-    toast.success("School portal URL copied!");
-    setTimeout(() => setCopiedField(null), 2000);
-  };
 
   const getSchoolUrl = () => {
     if (typeof window === "undefined" || !currentUser) return "";
@@ -174,12 +154,9 @@ export function UserProfileScreen() {
             </TabsList>
 
             <TabsContent value="overview" className="mt-4 focus-visible:outline-none">
-              <ProfileDetails 
+              <ProfileDetails
                 user={currentUser}
-                onCopy={handleCopy}
-                copiedField={copiedField}
                 onEditClick={handleOpenEdit}
-                onCopySchoolUrl={handleCopySchoolUrl}
                 getSchoolUrl={getSchoolUrl}
               />
             </TabsContent>

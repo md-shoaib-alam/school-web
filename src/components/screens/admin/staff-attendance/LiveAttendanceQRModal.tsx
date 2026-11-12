@@ -18,8 +18,6 @@ import {
   Sparkles,
   Users,
   CheckCircle2,
-  Copy,
-  Check,
   ShieldCheck,
   Wifi,
   Maximize2,
@@ -27,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CopyButton } from '@/components/ui/copy-button';
 import { apiFetch, getValidTokenOrRefresh } from '@/lib/api';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -51,7 +50,6 @@ export function LiveAttendanceQRModal({
   const [secondsLeft, setSecondsLeft] = useState<number>(DEFAULT_QR_TTL_SECONDS);
   const [loading, setLoading] = useState<boolean>(true);
   const [recentScans, setRecentScans] = useState<Array<any>>([]);
-  const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const toggleFullscreen = () => {
@@ -270,14 +268,6 @@ export function LiveAttendanceQRModal({
     };
   }, [open, fetchActiveQR, statusLoop, serverNow, queryClient]);
 
-  const handleCopyCode = () => {
-    if (!code) return;
-    navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    toast.success('Backup code copied to clipboard!');
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
   const progressPercent = Math.min(100, (secondsLeft / qrTotalSecondsRef.current) * 100);
 
   return (
@@ -409,14 +399,7 @@ export function LiveAttendanceQRModal({
               <span className="font-mono text-sm sm:text-base font-extrabold tracking-widest text-foreground">
                 {code ? `${code.slice(0, 3)} ${code.slice(3)}` : '------'}
               </span>
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="size-6 sm:size-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground transition-colors"
-                title="Copy code"
-              >
-                {copiedCode ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
-              </button>
+              <CopyButton value={code ?? ''} toastSubject="Backup code" />
             </div>
           </div>
 

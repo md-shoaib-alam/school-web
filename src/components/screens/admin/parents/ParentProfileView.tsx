@@ -170,7 +170,7 @@ export function ParentProfileView({
       {/* Breadcrumb */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:hover:bg-zinc-700 text-foreground border border-emerald-100 transition-all shadow-xs">
+          <button onClick={onBack} className="inline-flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/40 text-foreground border border-emerald-200/70 dark:border-emerald-800/60 transition-all shadow-xs">
             <ChevronLeft className="size-4 text-foreground stroke-[2.5]" />
             <span className="text-xs sm:text-sm font-semibold tracking-tight">Back to Parents</span>
           </button>

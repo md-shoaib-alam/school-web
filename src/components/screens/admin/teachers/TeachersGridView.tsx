@@ -39,7 +39,7 @@ export function TeachersGridView({
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
       >
         <AnimatePresence mode="popLayout">
-          {teachers.map((teacher, index) => (
+          {teachers.map((teacher) => (
             <m.div 
               key={teacher.id}
               id={`teacher-item-${teacher.id}`}
@@ -51,7 +51,6 @@ export function TeachersGridView({
             >
               <TeacherCard
                 teacher={teacher}
-                index={index}
                 canEdit={canEdit}
                 canDelete={canDelete}
                 deletingId={deletingId}

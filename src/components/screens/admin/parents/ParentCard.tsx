@@ -27,7 +27,7 @@ import {
   Unlink,
   Link2,
 } from "lucide-react";
-import { ParentInfo, getAvatarColor, getInitials } from "./types";
+import { ParentInfo, getInitials } from "./types";
 
 interface ParentCardProps {
   parent: ParentInfo;
@@ -59,7 +59,7 @@ export function ParentCard({
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <Avatar className="size-11 shrink-0">
               <AvatarFallback
-                className={`${getAvatarColor(parent.name)} text-white text-sm font-semibold`}
+                className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold"
               >
                 {getInitials(parent.name)}
               </AvatarFallback>

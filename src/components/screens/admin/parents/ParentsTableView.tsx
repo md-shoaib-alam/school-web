@@ -22,7 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { avatarColors } from "../teachers/types";
 import type { ParentInfo } from "./types";
 
 interface ParentsTableViewProps {
@@ -54,9 +53,8 @@ export function ParentsTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {parents.map((parent, index) => {
+              {parents.map((parent) => {
                 const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                const color = avatarColors[index % avatarColors.length];
                 return (
                   <tr 
                     key={parent.id} 
@@ -66,7 +64,7 @@ export function ParentsTableView({
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8 shrink-0">
-                          <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                          <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                             {initials}
                           </AvatarFallback>
                         </Avatar>

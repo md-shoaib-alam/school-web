@@ -23,7 +23,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { avatarColors } from "./types";
 import type { TeacherInfo } from "./types";
 
 const premiumLayoutTransition = {
@@ -70,9 +69,8 @@ export function TeachersTableView({
             <tbody className="divide-y divide-border">
               <LazyMotion features={domAnimation}>
                 <AnimatePresence mode="popLayout">
-                  {teachers.map((teacher, index) => {
+                  {teachers.map((teacher) => {
                     const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                    const color = avatarColors[index % avatarColors.length];
                     return (
                       <m.tr 
                         key={teacher.id} 
@@ -85,20 +83,18 @@ export function TeachersTableView({
                           layout: premiumLayoutTransition,
                           opacity: { duration: 0.2 }
                         }}
-                        className="hover:bg-muted transition-colors"
+                        className="hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => onView(teacher)}
                       >
                         <TableCell className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="size-8 shrink-0">
-                              <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                              <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col min-w-0">
-                              <span 
-                                onClick={() => onView(teacher)}
-                                className="font-bold text-foreground truncate cursor-pointer hover:underline hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
-                              >
+                              <span className="font-bold text-foreground truncate">
                                 {teacher.name}
                               </span>
                               <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
@@ -120,7 +116,7 @@ export function TeachersTableView({
                           <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4">
-                          <div className="flex items-center justify-center gap-2">
+                          <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
                             {/* Desktop Actions (xl and above) */}
                             <div className="hidden xl:flex items-center gap-2">
                               <Button 
