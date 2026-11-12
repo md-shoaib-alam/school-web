@@ -15,12 +15,13 @@ import {
 import {
   ChevronLeft, Printer, Pencil, MoreVertical,
   User, Users, Phone, Mail, Briefcase,
-  Copy, Check, Calendar, MapPin, Building2,
+  Calendar, MapPin, Building2,
   FileText, StickyNote, MoreHorizontal,
-  ChevronUp, ChevronDown, Lock, Loader2, Upload, Shield, Clock, Key
+  Lock, Upload, Shield, Clock, Key
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { ProfileSection } from "@/components/ui/profile-section";
+import { CopyButton } from "@/components/ui/copy-button";
 import { useGraphQLMutation, useAssignRoleToUser } from "@/lib/graphql/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
@@ -59,7 +60,6 @@ export function StaffProfileView({
   const { mutateAsync: assignRole } = useAssignRoleToUser();
 
   const [activeTab, setActiveTab] = useState<"overview" | "attendance" | "documents" | "notes">("overview");
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState({ personal: false, role: false, security: false });
 
   // Local live state of the staff member
@@ -83,15 +83,11 @@ export function StaffProfileView({
     isActive: member.isActive,
   });
 
-  const handleCopy = (text: string, label: string) => {
-    copyToClipboard(text);
-    setCopiedField(label);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${label} copied to clipboard`);
-  };
-
   const toggleCollapse = (key: keyof typeof collapsed) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  /** Another section holds the form: this one sits behind it, dimmed. */
+  const dimmed = (sec: string) => editingSection !== null && editingSection !== sec;
 
   const startEdit = (section: string) => {
     setFormData({
@@ -272,9 +268,7 @@ export function StaffProfileView({
                   <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Staff ID</p>
                   <div className="flex items-center gap-1">
                     <p className="text-xs font-bold text-foreground font-mono">{displayStaffId}</p>
-                    <button onClick={() => handleCopy(displayStaffId, "Staff ID")} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                      {copiedField === "Staff ID" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                    </button>
+                    <CopyButton value={displayStaffId} toastSubject="Staff ID" size="sm" />
                   </div>
                 </div>
               </div>
@@ -287,9 +281,7 @@ export function StaffProfileView({
                   <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Email Address</p>
                   <div className="flex items-center gap-1">
                     <p className="text-xs font-bold text-foreground break-all">{currentMember.email}</p>
-                    <button onClick={() => handleCopy(currentMember.email, "Email")} className="text-muted-foreground hover:text-emerald-600 transition-colors shrink-0">
-                      {copiedField === "Email" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                    </button>
+                    <CopyButton value={currentMember.email} toastSubject="Email" size="sm" className="shrink-0" />
                   </div>
                 </div>
               </div>
@@ -303,9 +295,7 @@ export function StaffProfileView({
                     <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Phone Number</p>
                     <div className="flex items-center gap-1">
                       <p className="text-xs font-bold text-foreground">{currentMember.phone}</p>
-                      <button onClick={() => handleCopy(currentMember.phone!, "Phone")} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                        {copiedField === "Phone" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                      </button>
+                      <CopyButton value={currentMember.phone || ""} toastSubject="Phone" size="sm" />
                     </div>
                   </div>
                 </div>
@@ -354,300 +344,228 @@ export function StaffProfileView({
         <div className="space-y-4">
 
           {/* Card 1: Personal & Contact Information */}
-          <div className="bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b ">
-              <div className="flex items-center gap-2.5">
-                <User className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-foreground">Personal &amp; Contact Information</h2>
+          <ProfileSection
+            icon={User}
+            title="Personal & Contact Information"
+            editing={editingSection === "personal"}
+            collapsed={collapsed.personal}
+            saving={savingSection === "personal"}
+            canEdit={canEdit}
+            dimmed={dimmed("personal")}
+            onEdit={() => startEdit("personal")}
+            onCancel={cancelEdit}
+            onSave={() => saveSection("personal", "Personal & Contact Information")}
+            onToggleCollapse={() => toggleCollapse("personal")}
+            view={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Full Name</p>
+                  <p data-travel="name" className="text-sm font-semibold text-foreground truncate">{currentMember.name}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Email Address</p>
+                  <p data-travel="email" className="text-sm font-semibold text-foreground truncate">{currentMember.email}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Phone Number</p>
+                  <p data-travel="phone" className="text-sm font-semibold text-foreground truncate">{currentMember.phone || "—"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Staff ID</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{displayStaffId}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Residential Address</p>
+                  <p data-travel="address" className="text-sm font-semibold text-foreground truncate">{currentMember.address || "No address registered"}</p>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                {editingSection === "personal" ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={cancelEdit}
-                      disabled={savingSection === "personal"}
-                      className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => saveSection("personal", "Personal & Contact Information")}
-                      disabled={savingSection === "personal"}
-                      className="h-8 px-3 text-xs rounded-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm"
-                    >
-                      {savingSection === "personal" ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3.5" />}
-                      Save
-                    </Button>
+            }
+            form={
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Full Name */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Full Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      data-travel="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Staff Name"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
                   </div>
-                ) : (
-                  canEdit && (
-                    <button
-                      onClick={() => startEdit("personal")}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground px-3 py-1.5 rounded-lg border  hover:bg-accent transition-colors"
+
+                  {/* Email Address (Read-only on edit) */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Email Address
+                    </Label>
+                    <Input
+                      data-travel="email"
+                      type="email"
+                      value={formData.email}
+                      disabled
+                      className="h-9 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed"
+                    />
+                  </div>
+
+                  {/* Phone Number */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Phone Number
+                    </Label>
+                    <div
+                      data-travel="phone"
+                      className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500"
                     >
-                      <Pencil className="size-3" /> Edit
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => toggleCollapse("personal")}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground ml-1"
-                  aria-label="Toggle collapse"
-                >
-                  {collapsed.personal ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
-                </button>
-              </div>
-            </div>
-
-            {!collapsed.personal && (
-              editingSection === "personal" ? (
-                /* INLINE EDIT FORM - Matches Teacher & Parent Forms */
-                <div className="px-5 sm:px-6 py-5 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Full Name */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Full Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Staff Name"
-                        className="h-9 text-xs rounded-xl bg-muted "
+                      <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="Enter phone number"
+                        className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                       />
                     </div>
+                  </div>
 
-                    {/* Email Address (Read-only on edit) */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Email Address
-                      </Label>
-                      <Input
-                        type="email"
-                        value={formData.email}
-                        disabled
-                        className="h-9 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed"
-                      />
-                    </div>
+                  {/* Address */}
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Residential Address
+                    </Label>
+                    <Input
+                      data-travel="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="City, State / Full Address"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
+                  </div>
 
-                    {/* Phone Number */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Phone Number
-                      </Label>
-                      <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
-                        <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
-                          +91
-                        </span>
-                        <input
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="Enter phone number"
-                          className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
-                        />
+                  {/* Photo Upload */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">Staff Photo</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
+                        {getInitials(formData.name)}
                       </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="space-y-1.5 sm:col-span-2">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Residential Address
-                      </Label>
-                      <Input
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="City, State / Full Address"
-                        className="h-9 text-xs rounded-xl bg-muted "
-                      />
-                    </div>
-
-                    {/* Photo Upload */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">Staff Photo</Label>
-                      <div className="flex items-center gap-3">
-                        <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
-                          {getInitials(formData.name)}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
-                          onClick={() => toast.info("Photo upload will be saved with profile")}
-                        >
-                          <Upload className="size-3.5" />
-                          Upload Photo
-                        </Button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
+                        onClick={() => toast.info("Photo upload will be saved with profile")}
+                      >
+                        <Upload className="size-3.5" />
+                        Upload Photo
+                      </Button>
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* VIEW MODE */
-                <div className="px-5 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Full Name</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentMember.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Email Address</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentMember.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Phone Number</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentMember.phone || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Staff ID</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{displayStaffId}</p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Residential Address</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentMember.address || "No address registered"}</p>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+              </div>
+            }
+          />
 
           {/* Card 2: Role & System Information */}
-          <div className="bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b ">
-              <div className="flex items-center gap-2.5">
-                <Shield className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-foreground">Role &amp; Permissions</h2>
+          <ProfileSection
+            icon={Shield}
+            title="Role & Permissions"
+            editing={editingSection === "role"}
+            collapsed={collapsed.role}
+            saving={savingSection === "role"}
+            canEdit={canEdit}
+            dimmed={dimmed("role")}
+            onEdit={() => startEdit("role")}
+            onCancel={cancelEdit}
+            onSave={() => saveSection("role", "Role & Permissions")}
+            onToggleCollapse={() => toggleCollapse("role")}
+            view={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">System Role</p>
+                  <p data-travel="role" className="text-sm font-semibold text-foreground">{displayRole}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Registered On</p>
+                  <p className="text-sm font-semibold text-foreground">{formatDate(currentMember.createdAt)}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Status</p>
+                  <span
+                    data-travel="status"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80"
+                  >
+                    <span className={`size-1.5 rounded-full ${currentMember.isActive ? "bg-emerald-500" : "bg-zinc-400"}`} />
+                    {currentMember.isActive ? "Active" : "Inactive"}
+                  </span>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Access Level</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {currentMember.role === "admin" ? "Administrator" : "Staff Portal"}
+                  </p>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                {editingSection === "role" ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={cancelEdit}
-                      disabled={savingSection === "role"}
-                      className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
+            }
+            form={
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Assigned Role
+                    </Label>
+                    <Select
+                      value={formData.customRoleId}
+                      onValueChange={(val) => setFormData({ ...formData, customRoleId: val })}
                     >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => saveSection("role", "Role & Permissions")}
-                      disabled={savingSection === "role"}
-                      className="h-8 px-3 text-xs rounded-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm"
-                    >
-                      {savingSection === "role" ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3.5" />}
-                      Save
-                    </Button>
+                      <SelectTrigger data-travel="role" className="h-9 text-xs rounded-xl bg-muted ">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Standard Staff</SelectItem>
+                        {roles.map((r) => (
+                          <SelectItem key={r.id} value={r.id}>
+                            <div className="flex items-center gap-2">
+                              <span className="size-2 rounded-full" style={{ backgroundColor: r.color }} />
+                              {r.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                ) : (
-                  canEdit && (
-                    <button
-                      onClick={() => startEdit("role")}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground px-3 py-1.5 rounded-lg border  hover:bg-accent transition-colors"
+
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Account Status
+                    </Label>
+                    <Select
+                      value={formData.isActive ? "active" : "inactive"}
+                      onValueChange={(val) => setFormData({ ...formData, isActive: val === "active" })}
                     >
-                      <Pencil className="size-3" /> Edit
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => toggleCollapse("role")}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground ml-1"
-                  aria-label="Toggle collapse"
-                >
-                  {collapsed.role ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
-                </button>
-              </div>
-            </div>
-
-            {!collapsed.role && (
-              editingSection === "role" ? (
-                /* INLINE EDIT FOR ROLE */
-                <div className="px-5 sm:px-6 py-5 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Assigned Role
-                      </Label>
-                      <Select
-                        value={formData.customRoleId}
-                        onValueChange={(val) => setFormData({ ...formData, customRoleId: val })}
-                      >
-                        <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Standard Staff</SelectItem>
-                          {roles.map((r) => (
-                            <SelectItem key={r.id} value={r.id}>
-                              <div className="flex items-center gap-2">
-                                <span className="size-2 rounded-full" style={{ backgroundColor: r.color }} />
-                                {r.name}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Account Status
-                      </Label>
-                      <Select
-                        value={formData.isActive ? "active" : "inactive"}
-                        onValueChange={(val) => setFormData({ ...formData, isActive: val === "active" })}
-                      >
-                        <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                      <SelectTrigger data-travel="status" className="h-9 text-xs rounded-xl bg-muted ">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              ) : (
-                <div className="px-5 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">System Role</p>
-                    <p className="text-sm font-semibold text-foreground">{displayRole}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Registered On</p>
-                    <p className="text-sm font-semibold text-foreground">{formatDate(currentMember.createdAt)}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Status</p>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
-                      <span className={`size-1.5 rounded-full ${currentMember.isActive ? "bg-emerald-500" : "bg-zinc-400"}`} />
-                      {currentMember.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Access Level</p>
-                    <p className="text-sm font-semibold text-foreground">
-                      {currentMember.role === "admin" ? "Administrator" : "Staff Portal"}
-                    </p>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+              </div>
+            }
+          />
 
           {/* Row 2: Additional Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Card 3: Security & Activity */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className={`rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4 transition-[opacity,filter] duration-300 ${editingSection !== null ? "opacity-60 blur-[1.5px]" : ""}`}>
               <div className="flex items-center justify-between pb-3 border-b ">
                 <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                   <Clock className="size-4 text-emerald-600" />
@@ -667,7 +585,7 @@ export function StaffProfileView({
             </div>
 
             {/* Card 4: Department Notes */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className={`rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4 transition-[opacity,filter] duration-300 ${editingSection !== null ? "opacity-60 blur-[1.5px]" : ""}`}>
               <div className="flex items-center justify-between pb-3 border-b ">
                 <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
                   <StickyNote className="size-4 text-emerald-600" />

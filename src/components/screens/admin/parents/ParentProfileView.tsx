@@ -16,13 +16,14 @@ import { DatePicker } from "@/components/ui/date-picker";
 import {
   ChevronLeft, Printer, Pencil, MoreVertical,
   User, Users, Phone, Mail, Briefcase,
-  Link as LinkIcon, Copy, Check, GraduationCap,
+  Link as LinkIcon, GraduationCap,
   CreditCard, FileText, StickyNote, MoreHorizontal,
   Building2, ChevronUp, ChevronDown, Eye, EyeOff, Lock,
-  Loader2, Upload, MapPin, Unlink2
+  Upload, MapPin, Unlink2
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
+import { ProfileSection } from "@/components/ui/profile-section";
 import api from "@/lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
@@ -47,7 +48,6 @@ export function ParentProfileView({
 }: ParentProfileViewProps) {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"overview"|"children"|"fees"|"documents"|"notes"|"more">("overview");
-  const [copiedField, setCopiedField] = useState<string|null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [collapsed, setCollapsed] = useState({ personal: false, account: false, children: false });
 
@@ -77,15 +77,11 @@ export function ParentProfileView({
     dateOfBirth: parent.dateOfBirth || "",
   });
 
-  const handleCopy = (text: string, label: string) => {
-    copyToClipboard(text);
-    setCopiedField(label);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${label} copied to clipboard`);
-  };
-
   const toggleCollapse = (key: keyof typeof collapsed) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  /** Another section holds the form: this one sits behind it, dimmed. */
+  const dimmed = (sec: string) => editingSection !== null && editingSection !== sec;
 
   const startEdit = (section: string) => {
     setFormData({
@@ -227,9 +223,7 @@ export function ParentProfileView({
                   <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Parent Login ID</p>
                   <div className="flex items-center gap-1">
                     <p className="text-xs font-bold text-foreground font-mono">{displayId}</p>
-                    <button onClick={() => handleCopy(displayId, "Login ID")} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                      {copiedField === "Login ID" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                    </button>
+                    <CopyButton value={displayId} toastSubject="Login ID" size="sm" />
                   </div>
                 </div>
               </div>
@@ -239,9 +233,7 @@ export function ParentProfileView({
                   <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Email Address</p>
                   <div className="flex items-center gap-1">
                     <p className="text-xs font-bold text-foreground break-all">{currentParent.email}</p>
-                    <button onClick={() => handleCopy(currentParent.email, "Email")} className="text-muted-foreground hover:text-emerald-600 transition-colors shrink-0">
-                      {copiedField === "Email" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                    </button>
+                    <CopyButton value={currentParent.email} toastSubject="Email" size="sm" className="shrink-0" />
                   </div>
                 </div>
               </div>
@@ -252,9 +244,7 @@ export function ParentProfileView({
                     <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Phone Number</p>
                     <div className="flex items-center gap-1">
                       <p className="text-xs font-bold text-foreground">{currentParent.phone}</p>
-                      <button onClick={() => handleCopy(currentParent.phone!, "Phone")} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                        {copiedField === "Phone" ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-                      </button>
+                      <CopyButton value={currentParent.phone || ""} toastSubject="Phone" size="sm" />
                     </div>
                   </div>
                 </div>
@@ -293,310 +283,235 @@ export function ParentProfileView({
         <div className="space-y-4">
 
           {/* Personal & Contact Information Card */}
-          <div className="bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b ">
-              <div className="flex items-center gap-2.5">
-                <User className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-foreground">Personal &amp; Contact Information</h2>
+          <ProfileSection
+            icon={User}
+            title="Personal & Contact Information"
+            editing={editingSection === "personal"}
+            collapsed={collapsed.personal}
+            saving={savingSection === "personal"}
+            canEdit={canEdit}
+            dimmed={dimmed("personal")}
+            onEdit={() => startEdit("personal")}
+            onCancel={cancelEdit}
+            onSave={() => saveSection("personal", "Personal & Contact Information")}
+            onToggleCollapse={() => toggleCollapse("personal")}
+            view={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Full Name</p>
+                  <p data-travel="name" className="text-sm font-semibold text-foreground truncate">{currentParent.name}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Relationship</p>
+                  <p className="text-sm font-semibold text-foreground truncate">Parent / Guardian</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Phone Number</p>
+                  <p data-travel="phone" className="text-sm font-semibold text-foreground truncate">{currentParent.phone || "—"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Gender</p>
+                  <p className="text-sm font-semibold text-foreground truncate capitalize">{currentParent.gender || "—"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Date of Birth</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{currentParent.dateOfBirth || "—"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Email Address</p>
+                  <p data-travel="email" className="text-sm font-semibold text-foreground truncate">{currentParent.email}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Occupation</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{currentParent.occupation || "—"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Address</p>
+                  <p data-travel="address" className="text-sm font-semibold text-foreground truncate">{currentParent.address || "Bangalore, Karnataka"}</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Alternate Phone</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{currentParent.alternatePhone || "—"}</p>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                {editingSection === "personal" ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={cancelEdit}
-                      disabled={savingSection === "personal"}
-                      className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => saveSection("personal", "Personal & Contact Information")}
-                      disabled={savingSection === "personal"}
-                      className="h-8 px-3 text-xs rounded-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm"
-                    >
-                      {savingSection === "personal" ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3.5" />}
-                      Save
-                    </Button>
+            }
+            form={
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Full Name */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Full Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      data-travel="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Parent Name"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
                   </div>
-                ) : (
-                  canEdit && (
-                    <button
-                      onClick={() => startEdit("personal")}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground px-3 py-1.5 rounded-lg border  hover:bg-accent transition-colors"
+
+                  {/* Email Address */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Email Address <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      data-travel="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="parent@school.com"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
+                  </div>
+
+                  {/* Phone Number */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Phone Number <span className="text-red-500">*</span>
+                    </Label>
+                    <div
+                      data-travel="phone"
+                      className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500"
                     >
-                      <Pencil className="size-3" /> Edit
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => toggleCollapse("personal")}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground ml-1"
-                  aria-label="Toggle collapse"
-                >
-                  {collapsed.personal ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
-                </button>
-              </div>
-            </div>
-
-            {!collapsed.personal && (
-              editingSection === "personal" ? (
-                /* INLINE EDIT FORM - Matches Teacher Form */
-                <div className="px-5 sm:px-6 py-5 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Full Name */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Full Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Parent Name"
-                        className="h-9 text-xs rounded-xl bg-muted "
+                      <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="Enter phone number"
+                        className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                       />
                     </div>
+                  </div>
 
-                    {/* Email Address */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Email Address <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="parent@school.com"
-                        className="h-9 text-xs rounded-xl bg-muted "
-                      />
-                    </div>
+                  {/* Address */}
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Address
+                    </Label>
+                    <Input
+                      data-travel="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="City, State / Full Address"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
+                  </div>
 
-                    {/* Phone Number */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Phone Number <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
-                        <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
-                          +91
-                        </span>
-                        <input
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="Enter phone number"
-                          className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
-                        />
+                  {/* Photo Upload */}
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">Parent Photo</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
+                        {getInitials(formData.name)}
                       </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="space-y-1.5 sm:col-span-2">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Address
-                      </Label>
-                      <Input
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="City, State / Full Address"
-                        className="h-9 text-xs rounded-xl bg-muted "
-                      />
-                    </div>
-
-                    {/* Photo Upload */}
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">Parent Photo</Label>
-                      <div className="flex items-center gap-3">
-                        <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
-                          {getInitials(formData.name)}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
-                          onClick={() => toast.info("Photo upload will be saved with profile")}
-                        >
-                          <Upload className="size-3.5" />
-                          Upload Photo
-                        </Button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
+                        onClick={() => toast.info("Photo upload will be saved with profile")}
+                      >
+                        <Upload className="size-3.5" />
+                        Upload Photo
+                      </Button>
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* VIEW MODE */
-                <div className="px-5 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Full Name</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Relationship</p>
-                    <p className="text-sm font-semibold text-foreground truncate">Parent / Guardian</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Phone Number</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.phone || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Gender</p>
-                    <p className="text-sm font-semibold text-foreground truncate capitalize">{currentParent.gender || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Date of Birth</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.dateOfBirth || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Email Address</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Occupation</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.occupation || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Address</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.address || "Bangalore, Karnataka"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Alternate Phone</p>
-                    <p className="text-sm font-semibold text-foreground truncate">{currentParent.alternatePhone || "—"}</p>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+              </div>
+            }
+          />
 
           {/* Account Information Card */}
-          <div className="bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b ">
-              <div className="flex items-center gap-2.5">
-                <Lock className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-foreground">Account Information</h2>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {editingSection === "account" ? (
+          <ProfileSection
+            icon={Lock}
+            title="Account Information"
+            editing={editingSection === "account"}
+            collapsed={collapsed.account}
+            saving={savingSection === "account"}
+            canEdit={canEdit}
+            dimmed={dimmed("account")}
+            onEdit={() => startEdit("account")}
+            onCancel={cancelEdit}
+            onSave={() => saveSection("account", "Account Information")}
+            onToggleCollapse={() => toggleCollapse("account")}
+            view={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Parent Login ID</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-bold font-mono text-foreground">{displayId}</p>
+                    <CopyButton value={displayId} toastSubject="Login ID" />
+                  </div>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Password</p>
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={cancelEdit}
-                      disabled={savingSection === "account"}
-                      className="h-8 px-3 text-xs rounded-lg font-medium text-foreground  hover:bg-accent"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => saveSection("account", "Account Information")}
-                      disabled={savingSection === "account"}
-                      className="h-8 px-3 text-xs rounded-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm"
-                    >
-                      {savingSection === "account" ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3.5" />}
-                      Save
-                    </Button>
-                  </div>
-                ) : (
-                  canEdit && (
-                    <button
-                      onClick={() => startEdit("account")}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground px-3 py-1.5 rounded-lg border  hover:bg-accent transition-colors"
-                    >
-                      <Pencil className="size-3" /> Edit
+                    <p className="text-sm font-semibold text-foreground tracking-widest">••••••••••</p>
+                    <button onClick={() => setShowPassword(p => !p)} className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors">
+                      {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
                     </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => toggleCollapse("account")}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground ml-1"
-                  aria-label="Toggle collapse"
-                >
-                  {collapsed.account ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
-                </button>
+                  </div>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Created</p>
+                  <p className="text-sm font-semibold text-foreground">—</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Status</p>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60">
+                    <span className="size-1.5 rounded-full bg-emerald-500" /> Active
+                  </span>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Last Login</p>
+                  <p className="text-sm font-semibold text-foreground">Never</p>
+                </div>
+                <div>
+                  <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Created By</p>
+                  <p className="text-sm font-semibold text-foreground">School Admin</p>
+                </div>
               </div>
-            </div>
-
-            {!collapsed.account && (
-              editingSection === "account" ? (
-                /* INLINE EDIT FOR ACCOUNT / OCCUPATION */
-                <div className="px-5 sm:px-6 py-5 space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Occupation
-                      </Label>
-                      <Input
-                        value={formData.occupation}
-                        onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                        placeholder="e.g. Engineer, Business"
-                        className="h-9 text-xs rounded-xl bg-muted "
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-foreground">
-                        Alternate Phone
-                      </Label>
-                      <Input
-                        value={formData.alternatePhone}
-                        onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })}
-                        placeholder="Enter alternate phone"
-                        className="h-9 text-xs rounded-xl bg-muted "
-                      />
-                    </div>
+            }
+            form={
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Occupation
+                    </Label>
+                    <Input
+                      value={formData.occupation}
+                      onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                      placeholder="e.g. Engineer, Business"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label data-fade className="text-xs font-semibold text-foreground">
+                      Alternate Phone
+                    </Label>
+                    <Input
+                      value={formData.alternatePhone}
+                      onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })}
+                      placeholder="Enter alternate phone"
+                      className="h-9 text-xs rounded-xl bg-muted "
+                    />
                   </div>
                 </div>
-              ) : (
-                <div className="px-5 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Parent Login ID</p>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold font-mono text-foreground">{displayId}</p>
-                      <button onClick={() => handleCopy(displayId, "Login ID")} className="text-muted-foreground hover:text-emerald-600 transition-colors">
-                        {copiedField === "Login ID" ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Password</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground tracking-widest">••••••••••</p>
-                      <button onClick={() => setShowPassword(p => !p)} className="text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors">
-                        {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Created</p>
-                    <p className="text-sm font-semibold text-foreground">—</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Account Status</p>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60">
-                      <span className="size-1.5 rounded-full bg-emerald-500" /> Active
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Last Login</p>
-                    <p className="text-sm font-semibold text-foreground">Never</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Created By</p>
-                    <p className="text-sm font-semibold text-foreground">School Admin</p>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+              </div>
+            }
+          />
 
           {/* Linked Children Card */}
-          <div className="bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div className={`bg-card rounded-2xl border  shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden transition-[opacity,filter] duration-300 ${
+            editingSection !== null ? "opacity-60 blur-[1.5px]" : ""
+          }`}>
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b ">
               <div className="flex items-center gap-2.5">
                 <Users className="size-4 text-emerald-600 dark:text-emerald-400" />
