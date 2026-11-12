@@ -15,7 +15,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Mail, GraduationCap, BookOpen, Award, Briefcase, Pencil, Trash2, Eye } from "lucide-react";
+import { Mail, GraduationCap, BookOpen, Pencil, Trash2, Eye } from "lucide-react";
 import { TeacherInfo } from "./types";
 
 interface TeacherCardProps {
@@ -45,6 +45,8 @@ export function TeacherCard({
     .join("")
     .slice(0, 2)
     .toUpperCase();
+  const subjects = teacher.subjects ?? [];
+  const classes = teacher.classes ?? [];
 
   return (
     <Card 
@@ -128,51 +130,60 @@ export function TeacherCard({
           </div>
         </div>
 
-        {/* Info */}
-        <div className="mt-5 space-y-3">
-          {/* Subjects */}
-          <div className="flex items-start gap-2">
-            <BookOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="flex flex-wrap gap-1.5">
-              {(teacher.subjects || []).map((subject, idx) => (
-                <Badge
-                  key={`${subject}-${idx}`}
-                  variant="secondary"
-                  className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                >
-                  {subject}
-                </Badge>
-              ))}
-            </div>
+        {/* The two facts the table's columns carry, up front */}
+        <div className="mt-4 grid grid-cols-2 gap-4 border-t pt-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-0.5">Experience</p>
+            <p className="text-sm font-semibold text-foreground">{teacher.experience || "—"}</p>
           </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-0.5">Qualification</p>
+            <p className="text-sm font-semibold text-foreground">{teacher.qualification || "—"}</p>
+          </div>
+        </div>
 
-          {/* Classes */}
-          <div className="flex items-start gap-2">
-            <GraduationCap className="size-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="flex flex-wrap gap-1.5">
-              {(teacher.classes || []).map((cls) => (
-                <Badge key={cls} variant="outline" className="text-xs font-normal">
-                  {cls}
-                </Badge>
-              ))}
+        <div className="mt-4 space-y-3">
+          {/* Subjects: three chips, then what is hidden */}
+          {subjects.length > 0 && (
+            <div className="flex items-start gap-2">
+              <BookOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div className="flex flex-wrap gap-1.5">
+                {subjects.slice(0, 3).map((subject, idx) => (
+                  <Badge
+                    key={`${subject}-${idx}`}
+                    variant="secondary"
+                    className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                  >
+                    {subject}
+                  </Badge>
+                ))}
+                {subjects.length > 3 && (
+                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                    +{subjects.length - 3} more
+                  </Badge>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Experience & Qualification */}
-          <div className="flex items-center gap-4 pt-2 border-t">
-            {teacher.experience && (
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Briefcase className="size-3.5" />
-                <span>{teacher.experience} exp</span>
+          {/* Classes taught */}
+          {classes.length > 0 && (
+            <div className="flex items-start gap-2">
+              <GraduationCap className="size-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div className="flex flex-wrap gap-1.5">
+                {classes.slice(0, 2).map((cls) => (
+                  <Badge key={cls} variant="outline" className="text-xs font-normal">
+                    {cls}
+                  </Badge>
+                ))}
+                {classes.length > 2 && (
+                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                    +{classes.length - 2} more
+                  </Badge>
+                )}
               </div>
-            )}
-            {teacher.qualification && (
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Award className="size-3.5" />
-                <span>{teacher.qualification}</span>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
