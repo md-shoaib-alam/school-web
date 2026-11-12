@@ -8,19 +8,18 @@ import {
   User,
   GraduationCap,
   School,
-  Copy,
-  Check,
   Printer,
   ChevronLeft,
   MoreVertical,
   Calendar,
   Pencil,
+  Check,
   Building2,
   FileText,
   StickyNote,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
@@ -57,7 +56,6 @@ export function TeacherProfileView({
   isLoading = false,
 }: TeacherProfileViewProps) {
   const queryClient = useQueryClient();
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "academics" | "attendance" | "classes" | "documents" | "notes">("overview");
 
   // Local live state of the teacher profile
@@ -79,6 +77,13 @@ export function TeacherProfileView({
     setCollapsed((prev) => ({ ...prev, [sec]: !prev[sec] }));
   };
 
+  /** "all" is the whole-profile mode the header button enters: every section holds its own form. */
+  const isSectionEditing = (sec: string) => editingSection === sec || editingSection === "all";
+
+  /** Another section holds the form on its own: this one sits behind it, dimmed. */
+  const dimmed = (sec: string) =>
+    editingSection !== null && editingSection !== "all" && editingSection !== sec;
+
   // Section Form Data
   const [formData, setFormData] = useState({
     name: currentTeacher.name || "",
@@ -95,13 +100,6 @@ export function TeacherProfileView({
     newSubjectInput: "",
     newClassInput: "",
   });
-
-  const handleCopy = (text: string, fieldName: string) => {
-    copyToClipboard(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${fieldName} copied to clipboard`);
-  };
 
   const handlePrint = () => {
     window.print();
@@ -182,7 +180,8 @@ export function TeacherProfileView({
       };
 
       setCurrentTeacher(updated);
-      setEditingSection(null);
+      // One section saved while the whole profile is open: the rest stay editable.
+      setEditingSection((now) => (now === "all" ? "all" : null));
       toast.success(`${title} updated successfully`);
 
       // Refresh teachers in cache
@@ -260,11 +259,11 @@ export function TeacherProfileView({
         <div className="flex items-center gap-2">
           {canEdit && (
             <Button
-              onClick={() => startEdit("personal")}
+              onClick={() => (editingSection === "all" ? cancelEdit() : startEdit("all"))}
               className="hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
             >
-              <Pencil className="size-3.5" />
-              Edit Profile
+              {editingSection === "all" ? <Check className="size-3.5" /> : <Pencil className="size-3.5" />}
+              {editingSection === "all" ? "Done" : "Edit Profile"}
             </Button>
           )}
 
@@ -324,17 +323,7 @@ export function TeacherProfileView({
               <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
                 <span>Teacher ID:</span>
                 <span className="font-semibold text-foreground">{displayTeacherId}</span>
-                <button
-                  onClick={() => handleCopy(displayTeacherId, "Teacher ID")}
-                  className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
-                  aria-label="Copy Teacher ID"
-                >
-                  {copiedField === "Teacher ID" ? (
-                    <Check className="size-3.5 text-emerald-600" />
-                  ) : (
-                    <Copy className="size-3.5" />
-                  )}
-                </button>
+                <CopyButton value={displayTeacherId} toastSubject="Teacher ID" size="sm" />
               </div>
             </div>
           </div>
@@ -394,9 +383,10 @@ export function TeacherProfileView({
             displayTeacherId={displayTeacherId}
             displayAddress={displayAddress}
             canEdit={canEdit}
-            isEditing={editingSection === "personal"}
+            isEditing={isSectionEditing("personal")}
             isSaving={savingSection === "personal"}
             isCollapsed={collapsed.personal}
+            dimmed={dimmed("personal")}
             onToggleCollapse={() => toggleCollapse("personal")}
             onStartEdit={() => startEdit("personal")}
             onCancelEdit={cancelEdit}
@@ -412,9 +402,10 @@ export function TeacherProfileView({
             displayRole={displayRole}
             displayJoiningDate={displayJoiningDate}
             canEdit={canEdit}
-            isEditing={editingSection === "professional"}
+            isEditing={isSectionEditing("professional")}
             isSaving={savingSection === "professional"}
             isCollapsed={collapsed.professional}
+            dimmed={dimmed("professional")}
             onToggleCollapse={() => toggleCollapse("professional")}
             onStartEdit={() => startEdit("professional")}
             onCancelEdit={cancelEdit}
@@ -429,9 +420,10 @@ export function TeacherProfileView({
               formData={formData}
               setFormData={setFormData}
               canEdit={canEdit}
-              isEditing={editingSection === "subjects"}
+              isEditing={isSectionEditing("subjects")}
               isSaving={savingSection === "subjects"}
               isCollapsed={collapsed.subjects}
+              dimmed={dimmed("subjects")}
               onToggleCollapse={() => toggleCollapse("subjects")}
               onStartEdit={() => startEdit("subjects")}
               onCancelEdit={cancelEdit}
@@ -444,9 +436,10 @@ export function TeacherProfileView({
               formData={formData}
               setFormData={setFormData}
               canEdit={canEdit}
-              isEditing={editingSection === "classes"}
+              isEditing={isSectionEditing("classes")}
               isSaving={savingSection === "classes"}
               isCollapsed={collapsed.classes}
+              dimmed={dimmed("classes")}
               onToggleCollapse={() => toggleCollapse("classes")}
               onStartEdit={() => startEdit("classes")}
               onCancelEdit={cancelEdit}
@@ -465,7 +458,7 @@ export function TeacherProfileView({
       {canEdit && editingSection === null && (
         <div className="sm:hidden sticky bottom-4 z-10 pt-2">
           <Button
-            onClick={() => startEdit("personal")}
+            onClick={() => startEdit("all")}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl py-3 gap-2 shadow-lg shadow-emerald-600/20"
           >
             <Pencil className="size-4" />
