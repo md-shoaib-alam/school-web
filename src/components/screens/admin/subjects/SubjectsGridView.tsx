@@ -40,8 +40,8 @@ export function SubjectsGridView({
               key={subject.id}
               id={`subject-item-${subject.id}`}
               layoutId={`subject-${subject.id}`}
-              initial={enter ? { opacity: 0, y: 8 } : undefined}
-              animate={enter ? { opacity: 1, y: 0 } : undefined}
+              initial={enter ? { y: 6 } : undefined}
+              animate={{ y: 0 }}
               transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
               className="group"
             >

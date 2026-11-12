@@ -49,8 +49,8 @@ export function ClassesGridView({
                 key={cls.id}
                 id={`class-item-${cls.id}`}
                 layoutId={`class-${cls.id}`}
-                initial={enter ? { opacity: 0, y: 8 } : undefined}
-                animate={enter ? { opacity: 1, y: 0 } : undefined}
+                initial={enter ? { y: 6 } : undefined}
+                animate={{ y: 0 }}
                 transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
               >
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">

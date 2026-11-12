@@ -61,8 +61,8 @@ export function SubjectsTableView({
                       key={subject.id}
                       id={`subject-item-${subject.id}`}
                       layoutId={`subject-${subject.id}`}
-                      initial={enter ? { opacity: 0, y: 8 } : undefined}
-                      animate={enter ? { opacity: 1, y: 0 } : undefined}
+                      initial={enter ? { y: 6 } : undefined}
+                      animate={{ y: 0 }}
                       transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
                       className="hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-colors border-b last:border-none"
                     >

@@ -55,12 +55,14 @@ export function SignoutConfirmDialog({
           <Badge variant="secondary" className="mb-1.5 max-w-full truncate text-[11px] font-semibold">
             {name}
           </Badge>
-          <AlertDialogDescription className="text-xs sm:text-sm text-muted-foreground">
+          {/* The remove confirmation is title + name only; the sentence stays for screen readers. */}
+          <AlertDialogDescription
+            className={isRemove ? "sr-only" : "text-xs sm:text-sm text-muted-foreground"}
+          >
             {isRemove ? (
               <>
-                Sign <strong className="text-foreground">{name}</strong> out and forget them on this
-                browser. Their saved session is revoked on the server, so they would have to sign in
-                again to appear here.
+                Removes <strong className="text-foreground">{name}</strong> from this browser and
+                revokes their saved session.
               </>
             ) : (
               <>

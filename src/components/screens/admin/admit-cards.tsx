@@ -209,7 +209,6 @@ export function AdminAdmitCards() {
   
   // Load Admit Card Preview Preference
   const [enableModalAdmitCardPreview, setEnableModalAdmitCardPreview] = useState<boolean>(false);
-  const [enableGradeSelection, setEnableGradeSelection] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('classic_quad');
 
   useEffect(() => {
@@ -219,7 +218,6 @@ export function AdminAdmitCards() {
         if (res.ok) {
           const data = await res.json();
           setEnableModalAdmitCardPreview(data.enableModalAdmitCardPreview === true);
-          setEnableGradeSelection(data.enableGradeSelection === true);
         }
       } catch (err) {
         console.error("Failed to load settings:", err);
@@ -245,7 +243,6 @@ export function AdminAdmitCards() {
         id: c.id,
         name: c.name,
         section: c.section,
-        grade: c.grade,
       }));
     },
     staleTime: 10 * 60 * 1000,
@@ -543,7 +540,6 @@ export function AdminAdmitCards() {
           loadingClasses={loadingClasses}
           loadingClassData={loadingClassData}
           onSyncData={() => { queryClient.invalidateQueries({ queryKey: ['admit-card-data', selectedClassId] }); refetchClassData(); }}
-          enableGradeSelection={enableGradeSelection}
         />
 
         {classData && (

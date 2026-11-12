@@ -30,10 +30,10 @@ export function ClassSettingsCard({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border  w-full gap-4">
               <div className="space-y-0.5">
                 <h4 className="text-sm font-semibold text-foreground">
-                  Separate Grade Selection
+                  Separate Class Level Selection
                 </h4>
                 <p className="text-xs text-muted-foreground">
-                  Choose to map grades manually when creating classes
+                  Choose to set the class level manually when creating classes
                 </p>
               </div>
               
@@ -61,7 +61,7 @@ export function ClassSettingsCard({
                 <div className="h-7 rounded border  bg-card flex items-center px-2 text-[11px] text-foreground shadow-sm">Class 1</div>
               </div>
               <div className={`space-y-1 transition-all duration-500 ${enableGradeSelection ? "opacity-100" : "opacity-30"}`}>
-                <div className="text-[10px] font-semibold text-muted-foreground">Grade</div>
+                <div className="text-[10px] font-semibold text-muted-foreground">Class Level</div>
                 <div className="h-7 rounded border  bg-card flex items-center px-2 text-[11px] text-foreground shadow-sm border-dashed">1</div>
               </div>
             </div>

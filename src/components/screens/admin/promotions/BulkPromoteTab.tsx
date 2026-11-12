@@ -101,7 +101,7 @@ export function BulkPromoteTab({
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id} className="cursor-pointer">
-                        {c.name} - {c.section} (Grade {c.grade}){c.studentCount !== undefined ? ` • ${c.studentCount} students` : ''}
+                        {c.name} - {c.section}{c.studentCount !== undefined ? ` • ${c.studentCount} students` : ''}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -131,7 +131,7 @@ export function BulkPromoteTab({
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id} className="cursor-pointer">
-                        {c.name} - {c.section} (Grade {c.grade})
+                        {c.name} - {c.section}
                       </SelectItem>
                     ))}
                 </SelectContent>

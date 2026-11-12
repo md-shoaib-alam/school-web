@@ -129,6 +129,9 @@ async function refreshAccessToken(): Promise<string> {
   const res = await postRefresh(refreshToken);
   if (!res) throw transientError('Refresh request did not reach the server');
   if (res.status === 429) throw transientError('Too many refresh attempts');
+  // 503 is the server saying it could not consult the denylist, not that this
+  // token is bad — the same token works again once Redis answers.
+  if (res.status === 503) throw transientError('Server is temporarily unavailable');
   if (res.status === 409) {
     const token = await adoptConcurrentRotation(refreshToken);
     if (token) return token;
@@ -156,8 +159,15 @@ export function persistRotation(token: string, refreshToken: string): void {
   if (active) updateAccountTokens(active.user.id, token, refreshToken);
 }
 
+let isForcingLogout = false;
+
 export function forceLogout() {
   if (typeof window === 'undefined') return;
+  // One dead session must not empty the vault. Navigation is async, so every
+  // in-flight 401 reaches this before the page unloads, and each call would drop
+  // another account instead of handing over the one that actually died.
+  if (isForcingLogout) return;
+  isForcingLogout = true;
 
   const active = getActiveAccount();
   if (active) {
@@ -259,9 +269,22 @@ async function request<T>(
     try {
       await getValidTokenOrRefresh();
       return request<T>(method, path, body, options, attempt + 1);
-    } catch {
+    } catch (err) {
+      // A transient refresh failure (blip, 429, 503, lost lock race) leaves the
+      // session alone on purpose. Labeling it "Session expired" would put a
+      // logout's words on a page that never logged out.
+      if ((err as RefreshError).transient) throw err;
       throw new Error('Session expired');
     }
+  }
+
+  // A brand-new access token that is still refused means the server rejects this
+  // session for a reason refreshing cannot fix (deactivated user, revoked row).
+  // Leaving it in place only loops the page against the same answer.
+  if (res.status === 401) {
+    markRefreshFailed();
+    forceLogout();
+    throw new Error('Session expired');
   }
 
   // ── Other errors ──
@@ -423,7 +446,8 @@ export async function apiFetch(path: string, init?: RequestInit, attempt: number
       await getValidTokenOrRefresh();
       return apiFetch(path, init, attempt + 1);
     } catch {
-      // refresh already forced a logout; hand the 401 back to the caller
+      // A terminal failure has already been ended by forceLogout; a transient
+      // one has not. Either way the caller keeps its 401 to read the status from.
     }
   }
 

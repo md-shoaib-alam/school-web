@@ -161,8 +161,13 @@ export const CLASSES = `
 export const TEACHERS = `
   query Teachers($tenantId: String, $search: String, $page: Int, $limit: Int) {
     teachers(tenantId: $tenantId, search: $search, page: $page, limit: $limit) {
-      teachers { id name email phone qualification experience status subjects classes joiningDate }
-      total page totalPages
+      teachers {
+        id userId name email phone qualification experience status subjects classes joiningDate
+        employeeId address avatar department designation employmentType
+        dateOfBirth gender bloodGroup maritalStatus nationality religion alternatePhone
+        panNumber aadhaarNumber pfEnabled esiEnabled ptEnabled
+      }
+      total page totalPages currentSession
     }
   }
 `
@@ -242,11 +247,14 @@ export const STAFF = `
   query GetStaff($tenantId: String, $role: String, $search: String, $page: Int, $limit: Int) {
     staff(tenantId: $tenantId, role: $role, search: $search, page: $page, limit: $limit) {
       staff {
-        id name email phone address role isActive 
+        id name email phone address avatar role isActive
         customRole { id name color }
         createdAt
+        staffId employeeId joiningDate department designation employmentType status
+        dateOfBirth gender bloodGroup maritalStatus nationality religion alternatePhone
+        panNumber aadhaarNumber pfEnabled esiEnabled ptEnabled
       }
-      total page totalPages
+      total page totalPages currentSession
     }
   }
 `

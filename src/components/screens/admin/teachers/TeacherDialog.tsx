@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +65,23 @@ export function TeacherDialog({
 
   // Track initial snapshot for reset
   const [initialSnapshot, setInitialSnapshot] = useState<any>(formData);
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Photo must be under 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData({ ...formData, avatar: reader.result });
+      toast.success("Photo attached — save to apply");
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (open) {
@@ -90,6 +107,20 @@ export function TeacherDialog({
         subjects: "",
         joiningDate: "",
         status: "active",
+        employeeId: "",
+        department: "",
+        designation: "",
+        employmentType: "full-time",
+        bloodGroup: "",
+        maritalStatus: "",
+        nationality: "",
+        religion: "",
+        panNumber: "",
+        aadhaarNumber: "",
+        pfEnabled: false,
+        esiEnabled: false,
+        ptEnabled: false,
+        avatar: "",
       });
     } else {
       setFormData({ ...initialSnapshot });
@@ -160,33 +191,40 @@ export function TeacherDialog({
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 0: Profile Photo                                   */}
             {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
-              <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
-                <Camera className="size-4 text-emerald-600" />
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                  <Camera className="size-4 text-emerald-600" />
+                </div>
                 <div>
-                  <span>Profile Photo</span>
-                  <p className="text-[11px] font-normal text-muted-foreground">
-                    Upload a clear photo of the teacher (Optional)
-                  </p>
+                  <p className="text-sm font-semibold text-foreground">Profile Photo</p>
+                  <p className="text-[11px] text-muted-foreground">Upload a clear photo of the teacher (Optional)</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 pt-1">
-                <div className="size-16 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xl flex items-center justify-center shrink-0">
-                  {formData.name ? formData.name.slice(0, 2).toUpperCase() : <User className="size-7 text-emerald-600/70" />}
+              <div className="flex items-center gap-3">
+                <div className="size-14 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
+                  {formData.avatar ? (
+                    <img src={formData.avatar} alt="" className="size-full object-cover" />
+                  ) : formData.name ? (
+                    formData.name.slice(0, 2).toUpperCase()
+                  ) : (
+                    <User className="size-6 text-emerald-600/70" />
+                  )}
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
+                  <input ref={photoRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
-                    onClick={() => toast.info("Photo upload will be saved with profile")}
+                    onClick={() => photoRef.current?.click()}
                   >
                     <Upload className="size-3.5 text-emerald-600" />
                     Upload Photo
                   </Button>
-                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 5MB</p>
+                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 2MB</p>
                 </div>
               </div>
             </div>
@@ -313,6 +351,68 @@ export function TeacherDialog({
                     className="pl-9 h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Row 3: Blood Group, Marital Status, Nationality, Religion */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Blood Group</Label>
+                <Select
+                  value={formData.bloodGroup || undefined}
+                  onValueChange={(val) => setFormData({ ...formData, bloodGroup: val })}
+                >
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Marital Status</Label>
+                <Select
+                  value={formData.maritalStatus || undefined}
+                  onValueChange={(val) => setFormData({ ...formData, maritalStatus: val })}
+                >
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="single">Single</SelectItem>
+                    <SelectItem value="married">Married</SelectItem>
+                    <SelectItem value="divorced">Divorced</SelectItem>
+                    <SelectItem value="widowed">Widowed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Nationality</Label>
+                <Input
+                  value={formData.nationality || ""}
+                  onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                  placeholder="e.g. Indian"
+                  className="h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Religion</Label>
+                <Select value={formData.religion || undefined} onValueChange={(v) => setFormData({ ...formData, religion: v })}>
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500">
+                    <SelectValue placeholder="Select religion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Parsi", "Jewish", "Other"].map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -476,6 +576,101 @@ export function TeacherDialog({
                   placeholder="Pick date of joining"
                   className="w-full h-9 text-xs rounded-xl bg-muted "
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Department</Label>
+                <Input
+                  value={formData.department || ""}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  placeholder="e.g. Science, Administration"
+                  className="h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Designation</Label>
+                <Input
+                  value={formData.designation || ""}
+                  onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                  placeholder="e.g. Senior Faculty Member"
+                  className="h-9 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Employment Type</Label>
+                <Select
+                  value={formData.employmentType || "full-time"}
+                  onValueChange={(val) => setFormData({ ...formData, employmentType: val })}
+                >
+                  <SelectTrigger className="h-9 text-xs rounded-xl bg-muted ">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full-time">Full-Time</SelectItem>
+                    <SelectItem value="part-time">Part-Time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="intern">Intern</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* ────────────────────────────────────────────────────────── */}
+          {/* SECTION 3b: Statutory Information                          */}
+          {/* ────────────────────────────────────────────────────────── */}
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
+              <CheckCircle2 className="size-4 text-emerald-600" />
+              Statutory Information
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">PAN Number</Label>
+                <Input
+                  value={formData.panNumber || ""}
+                  onChange={(e) => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })}
+                  placeholder="ABCDE1234F"
+                  maxLength={10}
+                  className="h-9 text-xs rounded-xl bg-muted font-mono focus-visible:ring-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Aadhaar Number</Label>
+                <Input
+                  value={formData.aadhaarNumber || ""}
+                  onChange={(e) => setFormData({ ...formData, aadhaarNumber: e.target.value.replace(/[^0-9]/g, "").slice(0, 12) })}
+                  placeholder="12-digit number"
+                  inputMode="numeric"
+                  className="h-9 text-xs rounded-xl bg-muted font-mono focus-visible:ring-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Statutory Registrations</Label>
+                <div className="flex items-center gap-4 h-9">
+                  {([
+                    ["pfEnabled", "PF"],
+                    ["esiEnabled", "ESI"],
+                    ["ptEnabled", "PT"],
+                  ] as const).map(([key, label]) => (
+                    <label key={key} className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={!!formData[key]}
+                        onChange={(e) => setFormData({ ...formData, [key]: e.target.checked })}
+                        className="size-3.5 rounded accent-emerald-600 cursor-pointer"
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

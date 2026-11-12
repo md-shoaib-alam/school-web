@@ -227,8 +227,14 @@ export const useAppStore = create<AppState>((set, get) => ({
         tenantSlug: userData.tenantSlug,
         tenantName: userData.tenantName,
         tenantLogo: userData.tenantLogo,
+        phone: userData.phone,
+        address: userData.address,
         customRole: userData.customRole || null,
         platformRole: userData.platformRole || null,
+        teacherProfile: userData.teacherProfile || null,
+        staffProfile: userData.staffProfile || null,
+        studentProfile: userData.studentProfile || null,
+        currentSession: userData.currentSession || null,
       };
       set({ currentUser: updatedUser });
       updateAccountUser(updatedUser.id, updatedUser);
@@ -250,7 +256,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         } catch { /* ignore */ }
       }
     } catch (error: any) {
-      if (error?.status === 404 || error?.status === 401 || error?.message === 'Session expired') {
+      // 'Session expired' is no longer a reason to sign out here: every place
+      // that throws it has already ended the session, and running logout() again
+      // would drop the account the handover just activated.
+      if (error?.status === 404 || error?.status === 401) {
         window.location.href = get().logout() ?? '/';
       }
     } finally {

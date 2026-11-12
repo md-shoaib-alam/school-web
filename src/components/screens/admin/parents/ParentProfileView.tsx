@@ -216,7 +216,7 @@ export function ParentProfileView({
             </div>
 
             {/* Horizontal info row */}
-            <div className="flex flex-wrap items-start gap-x-6 gap-y-3 pt-1 mt-1 border-t ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 pt-4 mt-3 border-t ">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-muted"><User className="size-3.5 text-emerald-600 dark:text-emerald-400" /></div>
                 <div>

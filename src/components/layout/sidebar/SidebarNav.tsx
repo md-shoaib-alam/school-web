@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { NavItem } from "../nav-config";
-import { groupNavItems } from "../nav-sections";
+import { filterNavGroups, groupNavItems } from "../nav-sections";
 import { useAppStore } from "@/store/use-app-store";
 import {
   ARRIVE,
@@ -25,6 +25,8 @@ import { usePillSlider } from "@/lib/pill-slider";
 
 interface SidebarNavProps {
   items: NavItem[];
+  /** The rail's search box. Empty lists every row; anything else narrows to the matches. */
+  query?: string;
   resolvedScreen: string;
   sidebarOpen: boolean;
   isSuperAdmin: boolean;
@@ -55,6 +57,7 @@ const treeHeight = (rows: number) => TRUNK_TOP + (rows - 1) * (ROW + GAP) + ROW 
 
 export function SidebarNav({
   items,
+  query,
   resolvedScreen,
   sidebarOpen,
   isSuperAdmin,
@@ -71,7 +74,11 @@ export function SidebarNav({
   const expanded = useRef(expandedKeys);
   const place = usePillSlider(nav);
   const role = useAppStore((state) => state.currentUser?.role);
-  const groups = useMemo(() => groupNavItems(role, items), [role, items]);
+  const q = (query ?? "").trim().toLowerCase();
+  const groups = useMemo(
+    () => filterNavGroups(groupNavItems(role, items), q),
+    [role, items, q],
+  );
 
   // The active screen's pill travels to its new home; a group that just opened staggers in.
   useLayoutEffect(() => {
@@ -100,7 +107,7 @@ export function SidebarNav({
         ),
       );
     }
-  }, [isModernUI, resolvedScreen, sidebarOpen, expandedKeys, items]);
+  }, [isModernUI, resolvedScreen, sidebarOpen, expandedKeys, items, q]);
 
   // The sidebar eases its own width open and shut; the pills track that frame by frame.
   useLayoutEffect(() => {
@@ -201,7 +208,8 @@ export function SidebarNav({
         )}
         {group.items.map((item) => {
           const hasChildren = item.children && item.children.length > 0;
-          const isExpanded = expandedKeys.includes(item.key);
+          // A search that reached a row through its children must show them, whatever was open.
+          const isExpanded = q ? true : expandedKeys.includes(item.key);
           const isChildActive = !!item.children?.some((child) => child.key === resolvedScreen);
           const isActive = resolvedScreen === item.key || isChildActive;
           /** The row whose branch is lit: drawn last, so its trunk covers the grey it shares. */
@@ -330,6 +338,11 @@ export function SidebarNav({
         })}
         </div>
         ))}
+        {q && sidebarOpen && groups.length === 0 && (
+          <p className="px-3 py-6 text-xs text-muted-foreground">
+            Nothing in the menu matches &ldquo;{query}&rdquo;.
+          </p>
+        )}
       </div>
     </nav>
     </TooltipProvider>

@@ -238,7 +238,7 @@ export function StudentPersonalInfoCard({
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">Student Photo</Label>
               <div className="flex items-center gap-3">
-                <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
+                <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
                   {name ? name.slice(0, 2).toUpperCase() : "ST"}
                 </div>
                 <Button

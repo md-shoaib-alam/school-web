@@ -26,7 +26,7 @@ export function TodayAttendanceCard({ records }: TodayAttendanceCardProps) {
   const statusInfo = formatStatus(todayData.status);
 
   return (
-    <Card className="rounded-xl border  bg-white/70 backdrop-blur-md shadow-xs hover: dark:hover: transition-all">
+    <Card className="rounded-xl border  bg-card shadow-xs transition-all">
       <CardContent className="p-2.5 sm:p-3.5 flex flex-row items-center justify-between gap-2.5 sm:gap-4">
         <div className="text-left min-w-0 flex-1">
           <h3 className="text-xs sm:text-base font-bold text-foreground tracking-tight truncate">

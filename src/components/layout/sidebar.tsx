@@ -4,10 +4,12 @@ import { useAppStore } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { roleColors, roleLabels, type NavItem } from "./nav-config";
+import { firstNavMatch } from "./nav-sections";
 import { useState, useEffect } from "react";
 
 // Sub-components
 import { SidebarHeader } from "./sidebar/SidebarHeader";
+import { SidebarSearch } from "./sidebar/SidebarSearch";
 import { SidebarNav } from "./sidebar/SidebarNav";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 
@@ -35,6 +37,9 @@ export function Sidebar({
     logout,
   } = useAppStore();
   const { replace } = useRouter();
+
+  // What the rail's search holds; the list filters on it, and Enter goes to the first match.
+  const [query, setQuery] = useState("");
 
   // State for expanded accordions
   const [expandedKeys, setExpandedKeys] = useState<string[]>(() => {
@@ -96,8 +101,21 @@ export function Sidebar({
         onToggle={toggleSidebar}
       />
 
+      <SidebarSearch
+        value={query}
+        onChange={setQuery}
+        sidebarOpen={sidebarOpen}
+        onSubmit={() => {
+          const key = firstNavMatch(currentUser.role, items, query);
+          if (!key) return;
+          navigateTo(key);
+          setQuery("");
+        }}
+      />
+
       <SidebarNav 
         items={items}
+        query={query}
         resolvedScreen={resolvedScreen}
         sidebarOpen={sidebarOpen}
         isSuperAdmin={isSuperAdmin}

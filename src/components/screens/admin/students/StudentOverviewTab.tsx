@@ -10,6 +10,7 @@ import {
 } from "./student-overview-model";
 import { StudentPersonalInfoCard } from "./StudentPersonalInfoCard";
 import { StudentAcademicInfoCard } from "./StudentAcademicInfoCard";
+import { StudentStatutoryCard } from "./StudentStatutoryCard";
 import { StudentParentContactCard } from "./StudentParentContactCard";
 import { StudentSiblingsCard } from "./StudentSiblingsCard";
 import { StudentTransportCard } from "./StudentTransportCard";
@@ -20,18 +21,18 @@ export function StudentOverviewTab({
   transportRoute,
   canEdit,
   onSelectStudent,
+  editingSection = null,
+  setEditingSection = () => {},
   formatDate,
   calculateAge,
 }: StudentOverviewTabProps) {
   const queryClient = useQueryClient();
 
-  // Track which section is in edit mode: null | 'personal' | 'academic' | 'parent' | 'transport'
-  const [editingSection, setEditingSection] = useState<string | null>(null);
-
   // Track collapsed state for sections
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     personal: false,
     academic: false,
+    statutory: false,
     parent: false,
     transport: false,
   });
@@ -40,8 +41,12 @@ export function StudentOverviewTab({
     setCollapsed((prev) => ({ ...prev, [sec]: !prev[sec] }));
   };
 
+  /** A section shows its form when it is the active one, or when every section is open. */
+  const isSectionEditing = (sec: string) => editingSection === sec || editingSection === "all";
+
   /** Another section holds the form: this one sits behind it, dimmed. */
-  const dimmed = (sec: string) => editingSection !== null && editingSection !== sec;
+  const dimmed = (sec: string) =>
+    editingSection !== null && editingSection !== "all" && editingSection !== sec;
 
   const sourceStudent = studentDetails || currentStudent;
 
@@ -51,6 +56,12 @@ export function StudentOverviewTab({
     gender: sourceStudent?.gender || "male",
     dateOfBirth: sourceStudent?.dateOfBirth ? sourceStudent.dateOfBirth.split("T")[0] : "",
     bloodGroup: sourceStudent?.bloodGroup || "Not Added",
+    nationality: sourceStudent?.nationality || "",
+    religion: sourceStudent?.religion || "",
+    maritalStatus: sourceStudent?.maritalStatus || "",
+    category: sourceStudent?.category || "",
+    alternatePhone: sourceStudent?.alternatePhone || "",
+    aadhaarNumber: sourceStudent?.aadhaarNumber || "",
     phone: sourceStudent?.phone || "",
     email: sourceStudent?.email || "",
     classId: sourceStudent?.classId || "",
@@ -87,34 +98,48 @@ export function StudentOverviewTab({
   });
   const routes = Array.isArray(routesData) ? routesData : [];
 
+  const buildForm = (s: any) => ({
+    name: s?.name || "",
+    gender: s?.gender || "male",
+    dateOfBirth: s?.dateOfBirth ? s.dateOfBirth.split("T")[0] : "",
+    bloodGroup: s?.bloodGroup || "Not Added",
+    nationality: s?.nationality || "",
+    religion: s?.religion || "",
+    maritalStatus: s?.maritalStatus || "",
+    category: s?.category || "",
+    alternatePhone: s?.alternatePhone || "",
+    aadhaarNumber: s?.aadhaarNumber || "",
+    phone: s?.phone || "",
+    email: s?.email || "",
+    classId: s?.classId || "",
+    className: s?.className || "",
+    rollNumber: s?.rollNumber || "",
+    username: s?.username || "",
+    admissionDate: s?.admissionDate ? s.admissionDate.split("T")[0] : (s?.createdAt ? s.createdAt.split("T")[0] : ""),
+    academicStatus: s?.status || "enrolled",
+    house: s?.house || "Not Assigned",
+    parentName: s?.parentName || "",
+    parentRelationship: "Parent",
+    parentEmail: s?.parentEmail || "",
+    parentPhone: s?.parentPhone || "",
+    address: s?.address || "",
+    transportEnabled: !!s?.transport,
+    routeId: s?.transport?.routeId || "",
+    pickupPoint: s?.transport?.pickupPoint || "",
+    newPickupPointFee: 0,
+  });
+
   const startEditSection = (section: string) => {
-    const s = studentDetails || currentStudent;
-    setFormData({
-      name: s?.name || "",
-      gender: s?.gender || "male",
-      dateOfBirth: s?.dateOfBirth ? s.dateOfBirth.split("T")[0] : "",
-      bloodGroup: s?.bloodGroup || "Not Added",
-      phone: s?.phone || "",
-      email: s?.email || "",
-      classId: s?.classId || "",
-      className: s?.className || "",
-      rollNumber: s?.rollNumber || "",
-      username: s?.username || "",
-      admissionDate: s?.admissionDate ? s.admissionDate.split("T")[0] : (s?.createdAt ? s.createdAt.split("T")[0] : ""),
-      academicStatus: s?.status || "enrolled",
-      house: s?.house || "Not Assigned",
-      parentName: s?.parentName || "",
-      parentRelationship: "Parent",
-      parentEmail: s?.parentEmail || "",
-      parentPhone: s?.parentPhone || "",
-      address: s?.address || "",
-      transportEnabled: !!s?.transport,
-      routeId: s?.transport?.routeId || "",
-      pickupPoint: s?.transport?.pickupPoint || "",
-      newPickupPointFee: 0,
-    });
+    setFormData(buildForm(studentDetails || currentStudent));
     setEditingSection(section);
   };
+
+  // The header "Edit Profile" button flips every section open at once; re-sync the
+  // form from saved data so the bulk edit starts from truth, not a stale draft.
+  useEffect(() => {
+    if (editingSection === "all") setFormData(buildForm(studentDetails || currentStudent));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingSection]);
 
   const [saving, setSaving] = useState(false);
 
@@ -132,6 +157,13 @@ export function StudentOverviewTab({
         classId: formData.classId,
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
+        bloodGroup: formData.bloodGroup === "Not Added" ? "" : formData.bloodGroup,
+        nationality: formData.nationality,
+        religion: formData.religion,
+        maritalStatus: formData.maritalStatus,
+        category: formData.category,
+        alternatePhone: formData.alternatePhone,
+        aadhaarNumber: formData.aadhaarNumber,
         status: formData.academicStatus,
         parentName: formData.parentName,
         parentPhone: formData.parentPhone,
@@ -173,6 +205,12 @@ export function StudentOverviewTab({
     setFormData((prev) => ({
       ...prev,
       name: s?.name || "",
+      nationality: s?.nationality || "",
+      religion: s?.religion || "",
+      maritalStatus: s?.maritalStatus || "",
+      category: s?.category || "",
+      alternatePhone: s?.alternatePhone || "",
+      aadhaarNumber: s?.aadhaarNumber || "",
       gender: s?.gender || "male",
       dateOfBirth: s?.dateOfBirth ? s.dateOfBirth.split("T")[0] : "",
       phone: s?.phone || "",
@@ -200,7 +238,7 @@ export function StudentOverviewTab({
     <div className="space-y-4">
       {/* CARD 1: Personal Information */}
       <StudentPersonalInfoCard
-        editing={editingSection === "personal"}
+        editing={isSectionEditing("personal")}
         collapsed={collapsed.personal}
         saving={saving}
         canEdit={canEdit}
@@ -229,7 +267,7 @@ export function StudentOverviewTab({
 
       {/* CARD 2: Academic Information */}
       <StudentAcademicInfoCard
-        editing={editingSection === "academic"}
+        editing={isSectionEditing("academic")}
         collapsed={collapsed.academic}
         saving={saving}
         canEdit={canEdit}
@@ -252,9 +290,35 @@ export function StudentOverviewTab({
         formatDate={formatDate}
       />
 
+      {/* CARD 2b: Background & Statutory Details */}
+      <StudentStatutoryCard
+        editing={isSectionEditing("statutory")}
+        collapsed={collapsed.statutory}
+        saving={saving}
+        canEdit={canEdit}
+        dimmed={dimmed("statutory")}
+        currentStudent={currentStudent}
+        nationality={formData.nationality}
+        religion={formData.religion}
+        maritalStatus={formData.maritalStatus}
+        category={formData.category}
+        alternatePhone={formData.alternatePhone}
+        aadhaarNumber={formData.aadhaarNumber}
+        onNationalityChange={(value) => setFormData({ ...formData, nationality: value })}
+        onReligionChange={(value) => setFormData({ ...formData, religion: value })}
+        onMaritalStatusChange={(value) => setFormData({ ...formData, maritalStatus: value })}
+        onCategoryChange={(value) => setFormData({ ...formData, category: value })}
+        onAlternatePhoneChange={(value) => setFormData({ ...formData, alternatePhone: value })}
+        onAadhaarChange={(value) => setFormData({ ...formData, aadhaarNumber: value })}
+        onEditSection={startEditSection}
+        onToggleCollapse={toggleCollapse}
+        onCancel={cancelSection}
+        onSave={handleSave}
+      />
+
       {/* CARD 3: Parent & Contact Details */}
       <StudentParentContactCard
-        editing={editingSection === "parent"}
+        editing={isSectionEditing("parent")}
         collapsed={collapsed.parent}
         saving={saving}
         canEdit={canEdit}
@@ -288,7 +352,7 @@ export function StudentOverviewTab({
 
       {/* CARD 5: Transport Details */}
       <StudentTransportCard
-        editing={editingSection === "transport"}
+        editing={isSectionEditing("transport")}
         collapsed={collapsed.transport}
         saving={saving}
         canEdit={canEdit}

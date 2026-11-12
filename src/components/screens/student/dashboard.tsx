@@ -7,19 +7,7 @@ import { useStudentDashboard } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { useRouter, useParams } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
 import {
   GraduationCap,
   TrendingUp,
@@ -32,11 +20,10 @@ import {
   ChevronRight,
   UserCheck,
   CheckCircle2,
-  AlertCircle,
-  Trophy,
 } from "lucide-react";
 import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
+import { formatTime } from "./timetable/types";
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return "";
@@ -61,8 +48,6 @@ const getSlotStatus = (startTime: string, endTime: string) => {
 };
 
 export function StudentDashboard() {
-  const { push } = useRouter();
-  const { slug } = useParams();
   const { currentUser, currentTenantName, currentTenantLogo } = useAppStore();
   const { data, isPending, fetchStatus, isError, error } = useStudentDashboard(
     currentUser?.email,
@@ -123,24 +108,16 @@ export function StudentDashboard() {
     (n) => n.targetRole === "all" || n.targetRole === "student",
   );
 
-  const getGreeting = () => {
-    const h = today.getHours();
-    if (h < 12) return "Good morning";
-    if (h < 17) return "Good afternoon";
-    return "Good evening";
-  };
-
   if (isActuallyLoading) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white shadow-md">
-        <div className="absolute top-0 right-0 size-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="p-6 lg:p-8 relative z-10">
+      <Card className="rounded-3xl border  shadow-xs overflow-hidden bg-card">
+        <CardContent className="p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="size-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-inner">
+              <div className="size-14 sm:size-16 rounded-2xl bg-muted border  flex items-center justify-center overflow-hidden shrink-0">
                 <img
                   src={currentTenantLogo || "/test.webp"}
                   alt={currentTenantName || ""}
@@ -149,19 +126,19 @@ export function StudentDashboard() {
                 />
               </div>
               <div className="text-left">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight">
+                <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-tight">
                   {studentInfo?.name || currentUser?.name || "Student"}
                 </h2>
-                <p className="text-violet-100/80 mt-0.5 text-xs sm:text-sm font-medium">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                   {studentInfo
                     ? `${studentInfo.className} • Roll ${studentInfo.rollNumber}`
-                    : `Welcome to ${currentTenantName || "the school"}`}
+                    : currentTenantName || "Student"}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 shrink-0 self-start sm:self-auto text-white" suppressHydrationWarning>
-              <Calendar className="size-4" />
-              <span className="text-sm font-medium">
+            <div className="flex items-center gap-2 self-start sm:self-auto w-fit shrink-0 rounded-2xl border  bg-muted px-4 py-2 text-foreground shadow-xs">
+              <Calendar className="size-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-xs sm:text-sm font-medium" suppressHydrationWarning>
                 {today.toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
@@ -171,8 +148,8 @@ export function StudentDashboard() {
               </span>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Result Published Notification */}
       <ResultPublishedBanner />
@@ -185,7 +162,6 @@ export function StudentDashboard() {
           icon={<UserCheck className="size-5" />}
           trend={attendanceRate >= 85 ? "Good" : "Needs Improvement"}
           trendUp={attendanceRate >= 85}
-          color="violet"
         />
         <StatCard
           title="Average Grade"
@@ -199,23 +175,20 @@ export function StudentDashboard() {
                 : "Needs Work"
           }
           trendUp={avgGrade >= 60}
-          color="emerald"
         />
         <StatCard
           title="Homework"
           value={String(pendingAssignments || 0)}
           icon={<ClipboardList className="size-5" />}
-          trend="Pending"
-          trendUp={false}
-          color="amber"
+          trend={pendingAssignments > 0 ? "Pending" : "All Done"}
+          trendUp={pendingAssignments === 0}
         />
         <StatCard
-          title="Events"
-          value={String(pendingAssignments || 0)}
+          title="Classes Today"
+          value={String(todayTimetable.length)}
           icon={<Calendar className="size-5" />}
-          trend="Upcoming"
-          trendUp={true}
-          color="blue"
+          trend={todayTimetable.length > 0 ? "Scheduled" : "No Classes"}
+          trendUp={todayTimetable.length > 0}
         />
       </div>
 
@@ -226,10 +199,10 @@ export function StudentDashboard() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Clock className="size-4 text-violet-500" />
+                <Clock className="size-4 text-emerald-600 dark:text-emerald-400" />
                 Today&apos;s Schedule
               </CardTitle>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="outline" className="text-xs shadow-none">
                 {todayName.charAt(0).toUpperCase() + todayName.slice(1)}
               </Badge>
             </div>
@@ -239,7 +212,6 @@ export function StudentDashboard() {
               <div className="text-center py-8 text-muted-foreground">
                 <BookOpen className="size-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No classes scheduled for today</p>
-                <p className="text-xs mt-1">Enjoy your day off! 🎉</p>
               </div>
             ) : (
               <ScrollArea className="max-h-[320px]">
@@ -250,23 +222,23 @@ export function StudentDashboard() {
                       <div
                         key={slot.id}
                         className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isCurrent
-                          ? "bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800"
+                          ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800"
                           : isPast
                             ? "bg-muted opacity-60"
-                            : "bg-muted hover:bg-violet-50/50 dark:hover:bg-violet-900/20"
+                            : "bg-muted hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20"
                           }`}
                         suppressHydrationWarning
                       >
                         <div className="flex-shrink-0 w-20 text-center">
                           <p className="text-sm font-semibold text-foreground">
-                            {slot.startTime}
+                            {formatTime(slot.startTime)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {slot.endTime}
+                            {formatTime(slot.endTime)}
                           </p>
                         </div>
                         <div
-                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-violet-400" : "bg-muted dark:bg-zinc-700"}`}
+                          className={`w-0.5 h-10 rounded-full ${isCurrent ? "bg-emerald-500" : "bg-border"}`}
                         />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm text-foreground truncate">
@@ -277,12 +249,12 @@ export function StudentDashboard() {
                           </p>
                         </div>
                         {isCurrent && (
-                          <Badge className="bg-violet-500 text-white text-[10px] px-2">
+                          <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] font-bold h-4 px-1.5 shadow-xs animate-pulse">
                             Live
                           </Badge>
                         )}
                         {isPast && (
-                          <CheckCircle2 className="size-4 text-green-400" />
+                          <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
                         )}
                       </div>
                     );
@@ -297,7 +269,7 @@ export function StudentDashboard() {
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Star className="size-4 text-violet-500" />
+              <Star className="size-4 text-emerald-600 dark:text-emerald-400" />
               Recent Grades
             </CardTitle>
           </CardHeader>
@@ -326,13 +298,14 @@ export function StudentDashboard() {
                       </div>
                       <div className="flex items-center gap-2 ml-2">
                         <Badge
-                          variant="secondary"
-                          className={`text-xs font-semibold ${pct >= 80
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                            : pct >= 60
-                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                            }`}
+                          variant="outline"
+                          className={`text-xs font-semibold shadow-none ${
+                            pct >= 80
+                              ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
+                              : pct >= 60
+                                ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                                : "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                          }`}
                         >
                           {g.grade || "N/A"}
                         </Badge>
@@ -353,7 +326,7 @@ export function StudentDashboard() {
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="size-4 text-violet-500" />
+            <Bell className="size-4 text-emerald-600 dark:text-emerald-400" />
             Announcements & Notices
           </CardTitle>
         </CardHeader>
@@ -372,24 +345,22 @@ export function StudentDashboard() {
                     ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30"
                     : notice.priority === "important"
                       ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30"
-                      : " bg-muted"
+                      : "bg-muted"
                     }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge
-                          variant="secondary"
-                          className={`text-[10px] ${notice.priority === "urgent"
-                            ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                            : notice.priority === "important"
-                              ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                              : "bg-muted text-foreground"
-                            }`}
-                        >
-                          {notice.priority}
-                        </Badge>
-                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`mb-1 text-[10px] shadow-none ${notice.priority === "urgent"
+                          ? "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+                          : notice.priority === "important"
+                            ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                            : "bg-background text-muted-foreground"
+                          }`}
+                      >
+                        {notice.priority}
+                      </Badge>
                       <h4 className="font-semibold text-sm text-foreground">
                         {notice.title}
                       </h4>
@@ -420,44 +391,34 @@ function StatCard({
   icon,
   trend,
   trendUp,
-  color,
 }: {
   title: string;
   value: string;
   icon: React.ReactNode;
   trend: string;
   trendUp: boolean;
-  color: string;
 }) {
-  const colorMap: Record<string, string> = {
-    violet: "bg-violet-600 dark:bg-violet-500",
-    emerald: "bg-emerald-600 dark:bg-emerald-500",
-    amber: "bg-amber-600 dark:bg-amber-500",
-    blue: "bg-blue-600 dark:bg-blue-500",
-  };
-  const iconBg = colorMap[color] || "bg-zinc-600";
-
   return (
     <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between">
-          <div className={`p-2 rounded-lg text-white ${iconBg}`}>{icon}</div>
+      <CardContent className="p-5">
+        <div className="flex items-center gap-3">
+          <div className="size-11 shrink-0 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            {icon}
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">{title}</p>
+            <p className="text-2xl font-bold text-foreground">{value}</p>
+          </div>
         </div>
-        <div className="mt-3">
-          <p className="text-2xl font-bold text-foreground">
-            {value}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {title}
-          </p>
-        </div>
-        <div className="mt-2 flex items-center gap-1">
-          <span
-            className={`text-[10px] font-medium ${trendUp ? "text-green-600" : "text-amber-600"}`}
-          >
-            {trend}
-          </span>
-        </div>
+        <p
+          className={`mt-3 text-[11px] font-medium ${
+            trendUp
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-amber-600 dark:text-amber-400"
+          }`}
+        >
+          {trend}
+        </p>
       </CardContent>
     </Card>
   );

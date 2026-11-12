@@ -16,18 +16,18 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <Card className="rounded-xl shadow-sm overflow-hidden border-none bg-white/50 backdrop-blur-sm">
+    <Card className="rounded-xl shadow-sm overflow-hidden border  bg-card">
       <CardHeader className="p-3 sm:p-4 pb-2">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="size-8 sm:size-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center border border-amber-500/20">
-              <Calendar className="size-4 sm:size-5 text-amber-600" />
+            <div className="size-8 sm:size-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center border border-emerald-500/20">
+              <Calendar className="size-4 sm:size-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
               <CardTitle className="text-sm font-semibold text-foreground">
                 Calendar
               </CardTitle>
-              <CardDescription className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+              <CardDescription className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                 {currentPeriod || "Current"}
               </CardDescription>
             </div>
@@ -37,7 +37,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
             <button
               type="button"
               onClick={onPrev}
-              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-foreground shadow-sm" : "opacity-30 cursor-not-allowed text-muted-foreground"}`}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-accent text-foreground shadow-sm" : "opacity-30 cursor-not-allowed text-muted-foreground"}`}
               title={isPremium ? "Previous" : "Premium Only"}
             >
               <ChevronLeft className="size-3.5 sm:size-4" />
@@ -49,7 +49,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
             <button
               type="button"
               onClick={onNext}
-              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-white dark:hover:bg-zinc-700 text-foreground shadow-sm" : "opacity-30 cursor-not-allowed text-muted-foreground"}`}
+              className={`p-1 sm:p-1.5 rounded-lg transition-all ${isPremium ? "hover:bg-accent text-foreground shadow-sm" : "opacity-30 cursor-not-allowed text-muted-foreground"}`}
               title={isPremium ? "Next" : "Premium Only"}
             >
               <ChevronRight className="size-3.5 sm:size-4" />

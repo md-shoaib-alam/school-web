@@ -54,7 +54,7 @@ export function TeacherClassesCard({
             <Input
               value={formData.newClassInput}
               onChange={(e) => setFormData({ ...formData, newClassInput: e.target.value })}
-              placeholder="Add class (e.g. Grade 1-B)"
+              placeholder="Add class (e.g. Class 1-B)"
               className="h-9 text-xs rounded-xl bg-muted "
               onKeyDown={(e) => {
                 if (e.key === "Enter" && formData.newClassInput.trim()) {

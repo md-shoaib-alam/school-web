@@ -129,17 +129,18 @@ export function AccountSwitchOverlay({ ready }: { ready: boolean }) {
 
   const fade = { transitionDuration: reduced ? '0ms' : `${SWEEP}ms` };
 
-  // The identity lives in the shell's own header row, in both copies, so there is exactly one
-  // rule under it and nothing is painted over the drawn sheet from outside its geometry.
+  // The identity lives in the shell's own header row and only in the solid copy: while the sheet
+  // is being drawn, the header is placeholders and blue lines like everything else, and the real
+  // name arrives with the sweep instead of sitting on top of the drawing as a finished bar.
   const identity = (
     <>
-      <Avatar className="size-9 shrink-0">
-        <AvatarFallback className={cn('text-[11px] font-bold text-white', roleColors[signal.role])}>
+      <Avatar className="size-8 shrink-0">
+        <AvatarFallback className={cn('text-[10px] font-semibold text-white', roleColors[signal.role])}>
           {initialsOf(signal.name)}
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-foreground">Switching to {signal.name}</p>
+        <p className="truncate text-sm font-medium text-foreground">Switching to {signal.name}</p>
         <p className="truncate text-xs text-muted-foreground">
           {roleLabels[signal.role]}
           {signal.tenantName ? ` · ${signal.tenantName}` : ''}
@@ -169,7 +170,7 @@ export function AccountSwitchOverlay({ ready }: { ready: boolean }) {
         className="blueprint-grid blueprint-draw absolute inset-0 transition-opacity ease-spring"
         style={{ opacity: sweeping ? 0 : 1, ...fade, '--print-ms': `${BUILD}ms` } as CSSProperties}
       >
-        <FullPageSkeleton blueprint header={identity} />
+        <FullPageSkeleton blueprint />
         {/* The print head. Everything below it is masked off until it passes, so the sidebar, the
             stat cards and the table are all drawn by the same travelling line. */}
         {!built && !reduced && <span className="account-switch-head" />}

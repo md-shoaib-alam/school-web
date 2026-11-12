@@ -14,6 +14,71 @@ export interface PlatformRoleInfo {
   permissions: Record<string, string[]>;
 }
 
+export interface TeacherProfileInfo {
+  id: string;
+  employeeId?: string | null;
+  qualification?: string | null;
+  experience?: string | null;
+  joiningDate?: string | null;
+  department?: string | null;
+  designation?: string | null;
+  employmentType?: string | null;
+  status?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  bloodGroup?: string | null;
+  maritalStatus?: string | null;
+  nationality?: string | null;
+  religion?: string | null;
+  alternatePhone?: string | null;
+  panNumber?: string | null;
+  aadhaarNumber?: string | null;
+  pfEnabled?: boolean;
+  esiEnabled?: boolean;
+  ptEnabled?: boolean;
+}
+
+export interface StaffProfileInfo {
+  id: string;
+  employeeId?: string | null;
+  joiningDate?: string | null;
+  department?: string | null;
+  designation?: string | null;
+  employmentType?: string | null;
+  status?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  bloodGroup?: string | null;
+  maritalStatus?: string | null;
+  nationality?: string | null;
+  religion?: string | null;
+  alternatePhone?: string | null;
+  panNumber?: string | null;
+  aadhaarNumber?: string | null;
+  pfEnabled?: boolean;
+  esiEnabled?: boolean;
+  ptEnabled?: boolean;
+}
+
+export interface StudentProfileInfo {
+  id: string;
+  rollNumber?: string | null;
+  classId?: string | null;
+  className?: string | null;
+  academicYear?: string | null;
+  admissionDate?: string | null;
+  status?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  bloodGroup?: string | null;
+  maritalStatus?: string | null;
+  nationality?: string | null;
+  religion?: string | null;
+  category?: string | null;
+  alternatePhone?: string | null;
+  aadhaarNumber?: string | null;
+}
+
 export interface AppUser {
   id: string;
   name: string;
@@ -29,6 +94,10 @@ export interface AppUser {
 
   customRole?: CustomRoleInfo | null;
   platformRole?: PlatformRoleInfo | null;
+  teacherProfile?: TeacherProfileInfo | null;
+  staffProfile?: StaffProfileInfo | null;
+  studentProfile?: StudentProfileInfo | null;
+  currentSession?: string | null;
 }
 
 export interface SessionTokens {

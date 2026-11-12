@@ -42,6 +42,20 @@ const emptyFormData = {
   subjects: "Mathematics",
   joiningDate: "",
   status: "active",
+  employeeId: "",
+  department: "",
+  designation: "",
+  employmentType: "full-time",
+  bloodGroup: "",
+  maritalStatus: "",
+  nationality: "",
+  religion: "",
+  panNumber: "",
+  aadhaarNumber: "",
+  pfEnabled: false,
+  esiEnabled: false,
+  ptEnabled: false,
+  avatar: "",
 };
 
 function validateTeacherForm(formData: typeof emptyFormData): boolean {
@@ -226,6 +240,23 @@ export function AdminTeachers() {
           joiningDate: teacher.joiningDate || "",
           status: teacher.status || "active",
           password: "",
+          employeeId: teacher.employeeId || "",
+          department: teacher.department || "",
+          designation: teacher.designation || "",
+          employmentType: teacher.employmentType || "full-time",
+          gender: teacher.gender || "male",
+          dateOfBirth: teacher.dateOfBirth || "",
+          bloodGroup: teacher.bloodGroup || "",
+          maritalStatus: teacher.maritalStatus || "",
+          nationality: teacher.nationality || "",
+          religion: teacher.religion || "",
+          alternatePhone: teacher.alternatePhone || "",
+          panNumber: teacher.panNumber || "",
+          aadhaarNumber: teacher.aadhaarNumber || "",
+          pfEnabled: !!teacher.pfEnabled,
+          esiEnabled: !!teacher.esiEnabled,
+          ptEnabled: !!teacher.ptEnabled,
+          avatar: teacher.avatar || "",
         },
       },
     });
@@ -406,6 +437,7 @@ export function AdminTeachers() {
           teacher={viewingTeacher}
           onBack={handleCloseView}
           canEdit={canEdit}
+          currentSession={teachersData?.currentSession || null}
           onEdit={(teacher) => {
             handleCloseView();
             handleOpenEdit(teacher);

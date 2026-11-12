@@ -102,7 +102,7 @@ export function BulkPromotionDialog({
                   )
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade})
+                        {c.name}-{c.section}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -123,7 +123,7 @@ export function BulkPromotionDialog({
                   )
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade})
+                        {c.name}-{c.section}
                       </SelectItem>
                     ))}
                 </SelectContent>

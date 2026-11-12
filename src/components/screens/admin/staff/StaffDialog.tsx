@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Loader2,
   X,
@@ -25,8 +26,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  Camera,
   Upload,
+  Camera,
   RotateCcw,
   Plus,
   Shield,
@@ -35,6 +36,7 @@ import {
   Eye,
   EyeOff,
   Briefcase,
+  ShieldCheck,
   Info,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -63,6 +65,7 @@ export function StaffDialog({
 }: StaffDialogProps) {
   const isCreate = !member;
   const [showPassword, setShowPassword] = useState(false);
+  const photoRef = useRef<HTMLInputElement>(null);
 
   // Track initial snapshot for reset
   const [initialSnapshot, setInitialSnapshot] = useState<StaffFormData>(formData);
@@ -73,6 +76,22 @@ export function StaffDialog({
       setShowPassword(false);
     }
   }, [open, member]);
+
+  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Photo must be under 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData({ ...formData, avatar: reader.result as string });
+      toast.success("Photo attached — save to apply");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleReset = () => {
     if (isCreate) {
@@ -149,6 +168,47 @@ export function StaffDialog({
             className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
             data-lenis-prevent
           >
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 0: Profile Photo                                  */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                  <Camera className="size-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Staff Photo</p>
+                  <p className="text-[11px] text-muted-foreground">Upload a clear photo of the staff member (Optional)</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="size-14 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
+                  {formData.avatar ? (
+                    <img src={formData.avatar} alt="" className="size-full object-cover" />
+                  ) : formData.name ? (
+                    formData.name.slice(0, 2).toUpperCase()
+                  ) : (
+                    <User className="size-6 text-emerald-600/70" />
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <input ref={photoRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
+                    onClick={() => photoRef.current?.click()}
+                  >
+                    <Upload className="size-3.5 text-emerald-600" />
+                    Upload Photo
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 2MB</p>
+                </div>
+              </div>
+            </div>
+
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 1: Personal Information                           */}
             {/* ────────────────────────────────────────────────────────── */}
@@ -246,59 +306,25 @@ export function StaffDialog({
               </div>
             </div>
 
-            {/* Row 2: Phone Number & Staff Photo */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-              {/* Phone Number */}
-              <div className="space-y-1.5">
-                <Label htmlFor="st_phone" className="text-xs font-semibold text-foreground">
-                  Phone Number
-                </Label>
-                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-3 text-xs text-muted-foreground bg-muted border-r  font-medium select-none">
-                    +91
-                  </span>
-                  <input
-                    id="st_phone"
-                    name="phone"
-                    autoComplete="tel"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter phone number"
-                    className="w-full h-10 px-3 text-xs bg-transparent focus:outline-none text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-
-              {/* Staff Photo (Matches Add Student UI) */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">
-                  Staff Photo <span className="text-muted-foreground font-normal">(Optional)</span>
-                </Label>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-muted border  flex items-center justify-center text-muted-foreground shrink-0">
-                    {formData.name ? (
-                      <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                        {formData.name.slice(0, 2).toUpperCase()}
-                      </span>
-                    ) : (
-                      <User className="size-5" />
-                    )}
-                  </div>
-                  <div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-10 px-3 text-xs rounded-xl  font-semibold gap-1.5 hover:bg-accent text-foreground"
-                      onClick={() => toast.info("Photo upload is enabled and will be saved with staff record")}
-                    >
-                      <Upload className="size-3.5 text-emerald-600" />
-                      Upload Photo
-                    </Button>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">JPG, PNG (Max 2MB)</p>
-                  </div>
-                </div>
+            {/* Row 2: Phone Number */}
+            <div className="space-y-1.5">
+              <Label htmlFor="st_phone" className="text-xs font-semibold text-foreground">
+                Phone Number
+              </Label>
+              <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500 max-w-sm">
+                <span className="inline-flex items-center px-3 text-xs text-muted-foreground bg-muted border-r  font-medium select-none">
+                  +91
+                </span>
+                <input
+                  id="st_phone"
+                  name="phone"
+                  autoComplete="tel"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="Enter phone number"
+                  className="w-full h-10 px-3 text-xs bg-transparent focus:outline-none text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
+                />
               </div>
             </div>
 
@@ -323,10 +349,152 @@ export function StaffDialog({
                 />
               </div>
             </div>
+
+            {/* Row 4: Personal details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Date of Birth</Label>
+                <DatePicker
+                  date={formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) ? new Date(formData.dateOfBirth) : undefined}
+                  onChange={(d) => setFormData({ ...formData, dateOfBirth: d ? d.toISOString().split("T")[0] : "" })}
+                  placeholder="Pick date of birth"
+                  className="w-full h-10 text-xs rounded-xl bg-muted"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Gender</Label>
+                <Select value={formData.gender || undefined} onValueChange={(v) => setFormData({ ...formData, gender: v })}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted"><SelectValue placeholder="Select gender" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Blood Group</Label>
+                <Select value={formData.bloodGroup || undefined} onValueChange={(v) => setFormData({ ...formData, bloodGroup: v })}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted"><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => (<SelectItem key={g} value={g}>{g}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Marital Status</Label>
+                <Select value={formData.maritalStatus || undefined} onValueChange={(v) => setFormData({ ...formData, maritalStatus: v })}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted"><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="single">Single</SelectItem>
+                    <SelectItem value="married">Married</SelectItem>
+                    <SelectItem value="divorced">Divorced</SelectItem>
+                    <SelectItem value="widowed">Widowed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Nationality</Label>
+                <Input value={formData.nationality} onChange={(e) => setFormData({ ...formData, nationality: e.target.value })} placeholder="e.g. Indian" className="h-10 text-xs rounded-xl bg-muted" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Religion</Label>
+                <Select value={formData.religion || undefined} onValueChange={(v) => setFormData({ ...formData, religion: v })}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted"><SelectValue placeholder="Select religion" /></SelectTrigger>
+                  <SelectContent>
+                    {["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Parsi", "Jewish", "Other"].map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                <Label className="text-xs font-semibold text-foreground">Alternate Phone <span className="text-muted-foreground font-normal">(Optional)</span></Label>
+                <Input type="tel" value={formData.alternatePhone} onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })} placeholder="Optional alternate number" className="h-10 text-xs rounded-xl bg-muted" />
+              </div>
+            </div>
           </div>
 
           {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 2: Account Settings                                */}
+          {/* SECTION 2: Professional Information                        */}
+          {/* ────────────────────────────────────────────────────────── */}
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
+              <Briefcase className="size-4 text-emerald-600" />
+              Professional Information
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Employee ID</Label>
+                <Input value={formData.employeeId} onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })} placeholder="Auto-generate if empty" className="h-10 text-xs rounded-xl bg-muted font-mono" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Department</Label>
+                <Input value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} placeholder="e.g. Administration" className="h-10 text-xs rounded-xl bg-muted" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Designation</Label>
+                <Input value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} placeholder="e.g. Office Administrator" className="h-10 text-xs rounded-xl bg-muted" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Employment Type</Label>
+                <Select value={formData.employmentType || "full-time"} onValueChange={(v) => setFormData({ ...formData, employmentType: v })}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted"><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full-time">Full-Time</SelectItem>
+                    <SelectItem value="part-time">Part-Time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="intern">Intern</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Date of Joining</Label>
+                <DatePicker
+                  date={formData.joiningDate && !isNaN(new Date(formData.joiningDate).getTime()) ? new Date(formData.joiningDate) : undefined}
+                  onChange={(d) => setFormData({ ...formData, joiningDate: d ? d.toISOString().split("T")[0] : "" })}
+                  placeholder="Pick date of joining"
+                  className="w-full h-10 text-xs rounded-xl bg-muted"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ────────────────────────────────────────────────────────── */}
+          {/* SECTION 3: Statutory Information                           */}
+          {/* ────────────────────────────────────────────────────────── */}
+          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
+              <ShieldCheck className="size-4 text-emerald-600" />
+              Statutory Information
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">PAN Number</Label>
+                <Input value={formData.panNumber} onChange={(e) => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })} placeholder="ABCDE1234F" maxLength={10} className="h-10 text-xs rounded-xl bg-muted font-mono" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Aadhaar Number</Label>
+                <Input value={formData.aadhaarNumber} onChange={(e) => setFormData({ ...formData, aadhaarNumber: e.target.value.replace(/[^0-9]/g, "").slice(0, 12) })} placeholder="12-digit number" inputMode="numeric" className="h-10 text-xs rounded-xl bg-muted font-mono" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Statutory Registrations</Label>
+                <div className="flex items-center gap-4 h-10">
+                  {([["pfEnabled", "PF"], ["esiEnabled", "ESI"], ["ptEnabled", "PT"]] as const).map(([key, label]) => (
+                    <label key={key} className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground cursor-pointer">
+                      <input type="checkbox" checked={!!formData[key]} onChange={(e) => setFormData({ ...formData, [key]: e.target.checked })} className="size-3.5 rounded accent-emerald-600 cursor-pointer" />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ────────────────────────────────────────────────────────── */}
+          {/* SECTION 4: Account Settings                                */}
           {/* ────────────────────────────────────────────────────────── */}
           <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">

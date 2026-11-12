@@ -17,6 +17,9 @@
  * is the state the account-switch overlay sweeps away. Keeping it one component is what stops the
  * two from drifting apart.
  */
+/** One rule language for the whole sheet: dashed brand while drawn, the shell's grey once solid. */
+const edge = (blueprint: boolean) => (blueprint ? "border-dashed border-brand/70" : "border-border");
+
 export function FullPageSkeleton({
   blueprint = false,
   header,
@@ -26,15 +29,15 @@ export function FullPageSkeleton({
   header?: React.ReactNode;
 }) {
   return (
-    <div className="h-dvh w-screen flex flex-col overflow-hidden bg-zinc-200/60 dark:bg-black p-1.5 sm:p-2 lg:p-2.5">
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl lg:rounded-3xl border border-border/80 shadow-xs bg-sidebar">
+    <div className="h-dvh w-screen flex flex-col overflow-hidden bg-background p-1.5 sm:p-2 lg:p-2.5">
+      <div className={`flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl lg:rounded-3xl border shadow-xs bg-background ${blueprint ? "border-dashed border-brand/70" : "border-border/80"}`}>
         <div className="flex-1 flex min-h-0 overflow-hidden">
           {/* The sidebar stands beside the header, as it does in the real shell. */}
           <SidebarSkeleton blueprint={blueprint} />
 
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
             {/* One rule under the header: dashed brand while drawn, the shell's grey once solid. */}
-            <header className={`h-14 sm:h-16 flex items-center gap-3 px-4 lg:px-6 border-b shrink-0 bg-sidebar ${blueprint ? "border-dashed border-brand/70" : "border-border"}`}>
+            <header className={`h-14 sm:h-16 flex items-center gap-3 px-4 lg:px-6 border-b shrink-0 bg-background ${edge(blueprint)}`}>
               {header ?? (
                 <>
                   <ShimmerBox blueprint={blueprint} className="size-8 rounded-lg" />
@@ -63,13 +66,22 @@ export function ScreenSkeleton({ blueprint = false }: { blueprint?: boolean }) {
   return <ContentSkeleton blueprint={blueprint} />;
 }
 
-/** Sidebar column: brand block, the list of tabs, and the footer cards. */
+/** Sidebar column: brand block, the search field, the list of tabs, and the footer cards. */
 function SidebarSkeleton({ blueprint }: { blueprint: boolean }) {
   return (
-    <aside className={`hidden lg:flex w-72 shrink-0 flex-col border-r overflow-hidden bg-background ${blueprint ? "border-dashed border-brand/70" : "border-border"}`}>
-      <div className={`h-16 px-5 flex items-center gap-3 border-b shrink-0 ${blueprint ? "border-dashed border-brand/70" : "border-border"}`}>
+    <aside className={`hidden lg:flex w-72 shrink-0 flex-col border-r overflow-hidden bg-background ${edge(blueprint)}`}>
+      <div className={`h-16 px-5 flex items-center gap-3 border-b shrink-0 ${edge(blueprint)}`}>
         <ShimmerBox blueprint={blueprint} className="size-10 rounded-xl" />
         <ShimmerBox blueprint={blueprint} className="h-4 w-28 rounded" />
+      </div>
+
+      {/* The rail's filter, mirroring SidebarSearch: icon, query run and the ⌘K hint. */}
+      <div className="px-3 pt-2 pb-1">
+        <div className={`h-10 rounded-xl border flex items-center gap-2.5 px-3 ${edge(blueprint)}`}>
+          <ShimmerBox blueprint={blueprint} className="size-4 rounded-full" />
+          <ShimmerBox blueprint={blueprint} className="h-3.5 w-16 rounded" />
+          <ShimmerBox blueprint={blueprint} className="ml-auto h-4 w-7 rounded-md" />
+        </div>
       </div>
 
       <div className="flex-1 p-3 space-y-1 overflow-hidden">
@@ -85,7 +97,7 @@ function SidebarSkeleton({ blueprint }: { blueprint: boolean }) {
         ))}
       </div>
 
-      <div className={`p-3 border-t shrink-0 space-y-3 ${blueprint ? "border-dashed border-brand/70" : "border-border"}`}>
+      <div className={`p-3 border-t shrink-0 space-y-3 ${edge(blueprint)}`}>
         <ShimmerBox blueprint={blueprint} className="h-[76px] rounded-2xl" />
         <div className="flex items-center gap-3 p-1.5">
           <ShimmerBox blueprint={blueprint} className="size-9 rounded-full" />
@@ -144,9 +156,9 @@ function ContentSkeleton({ blueprint }: { blueprint: boolean }) {
       </div>
 
       {/* Table block */}
-      <div className="rounded-2xl border border-border overflow-hidden">
+      <div className={`rounded-2xl border overflow-hidden ${edge(blueprint)}`}>
         {/* Table header */}
-        <div className="flex items-center gap-4 px-5 py-3 border-b border-border bg-muted/30">
+        <div className={`flex items-center gap-4 px-5 py-3 border-b ${edge(blueprint)} ${blueprint ? "" : "bg-muted/30"}`}>
           {[10, 36, 20, 20, 16].map((w, i) => (
             <ShimmerBox
               key={i}
@@ -161,7 +173,7 @@ function ContentSkeleton({ blueprint }: { blueprint: boolean }) {
         {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 px-5 py-3.5 border-b border-border last:border-none"
+            className={`flex items-center gap-4 px-5 py-3.5 border-b last:border-none ${edge(blueprint)}`}
           >
             <ShimmerBox blueprint={blueprint} className="h-4 w-8 rounded" />
             <div className="flex items-center gap-3 flex-1">

@@ -21,6 +21,8 @@ import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
 import { TeacherProfile } from "./profile/TeacherProfile";
+import { StaffProfile } from "./profile/StaffProfile";
+import { StudentProfile } from "./profile/StudentProfile";
 import { TeacherProfileSkeleton } from "./profile/TeacherProfileSkeleton";
 
 export function UserProfileScreen() {
@@ -34,6 +36,16 @@ export function UserProfileScreen() {
   const [editAddress, setEditAddress] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [editTeacher, setEditTeacher] = useState({
+    dateOfBirth: "",
+    gender: "",
+    bloodGroup: "",
+    maritalStatus: "",
+    nationality: "",
+    religion: "",
+    panNumber: "",
+    aadhaarNumber: "",
+  });
 
   if (!currentUser) return <TeacherProfileSkeleton />;
 
@@ -65,6 +77,17 @@ export function UserProfileScreen() {
     setEditPhone(currentUser?.phone || "");
     setEditAddress(currentUser?.address || "");
     setEditAvatar(currentUser?.avatar || "");
+    const tp = currentUser?.teacherProfile || currentUser?.staffProfile || currentUser?.studentProfile;
+    setEditTeacher({
+      dateOfBirth: tp?.dateOfBirth || "",
+      gender: tp?.gender || "",
+      bloodGroup: tp?.bloodGroup || "",
+      maritalStatus: tp?.maritalStatus || "",
+      nationality: tp?.nationality || "",
+      religion: tp?.religion || "",
+      panNumber: "panNumber" in (tp ?? {}) ? (tp as any).panNumber || "" : "",
+      aadhaarNumber: tp?.aadhaarNumber || "",
+    });
     setIsEditOpen(true);
   };
 
@@ -77,15 +100,15 @@ export function UserProfileScreen() {
 
     setSavingProfile(true);
     try {
+      const isTeacher = currentUser?.role === "teacher" || currentUser?.role === "staff" || currentUser?.role === "student";
       const res = await apiFetch("/api/auth/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editName.trim(),
-          phone: editPhone,
-          address: editAddress,
-          avatar: editAvatar,
-        }),
+        body: JSON.stringify(
+          isTeacher
+            ? { name: editName.trim(), address: editAddress, avatar: editAvatar, ...editTeacher }
+            : { name: editName.trim(), phone: editPhone, address: editAddress, avatar: editAvatar }
+        ),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
@@ -151,6 +174,78 @@ export function UserProfileScreen() {
           onFileChange={handleFileChange}
           onSave={handleSaveProfile}
           saving={savingProfile}
+          role="teacher"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
+        />
+      </div>
+    );
+  }
+
+  if (currentUser.role === "staff") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <StaffProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+          role="staff"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
+        />
+      </div>
+    );
+  }
+
+  if (currentUser.role === "student") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <StudentProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+          role="student"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
         />
       </div>
     );

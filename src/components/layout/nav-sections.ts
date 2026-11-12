@@ -1,5 +1,6 @@
 import type { NavItem } from "./nav-config";
 import type { UserRole } from "@/store/use-app-store";
+import { actionKeywords } from "./dashboard-keywords";
 
 /**
  * How the sidebar groups each role's tabs. Keys are listed in the order they should appear;
@@ -60,7 +61,7 @@ const SECTIONS: Partial<Record<UserRole, { label: string; keys: string[] }[]>> =
   ],
   student: [
     { label: "Overview", keys: ["dashboard"] },
-    { label: "My Classes", keys: ["my-classes", "grades-group", "assessments", "homework"] },
+    { label: "My Subjects", keys: ["my-classes", "grades-group", "assessments", "homework"] },
     { label: "Attendance", keys: ["my-attendance", "leaves"] },
     { label: "Schedule", keys: ["timetable", "calendar"] },
     { label: "Fees & Support", keys: ["fees", "notices", "tickets"] },
@@ -98,4 +99,51 @@ export function groupNavItems(
 
   // No map for this role: one unnamed block, so the sidebar still lists everything.
   return groups.length ? groups : [{ label: "", items }];
+}
+
+/**
+ * Whether a row answers to the words typed in the rail's search. A row matches its own name or any
+ * of the synonyms the dashboards already use, so "faculty" finds Teachers.
+ */
+export function matchesNav(label: string, key: string, q: string): boolean {
+  return (
+    label.toLowerCase().includes(q) ||
+    (actionKeywords[key] ?? []).some((word) => word.toLowerCase().includes(q))
+  );
+}
+
+/** The sections that still hold a match. A parent stays on the strength of its children alone. */
+export function filterNavGroups(
+  groups: { label: string; items: NavItem[] }[],
+  q: string,
+): { label: string; items: NavItem[] }[] {
+  if (!q) return groups;
+  return groups
+    .map((group) => ({
+      ...group,
+      items: group.items.flatMap((item) => {
+        if (matchesNav(item.label, item.key, q)) return [item];
+        const kids = (item.children ?? []).filter((child) => matchesNav(child.label, child.key, q));
+        return kids.length ? [{ ...item, children: kids }] : [];
+      }),
+    }))
+    .filter((group) => group.items.length > 0);
+}
+
+/** Where Enter in the search goes: the first row that matches, or its first matching child. */
+export function firstNavMatch(
+  role: UserRole | undefined,
+  items: NavItem[],
+  query: string,
+): string | null {
+  const q = query.trim().toLowerCase();
+  if (!q) return null;
+  for (const group of filterNavGroups(groupNavItems(role, items), q)) {
+    for (const item of group.items) {
+      const kids = (item.children ?? []).filter((child) => matchesNav(child.label, child.key, q));
+      if (kids.length) return kids[0].key;
+      if (matchesNav(item.label, item.key, q)) return item.key;
+    }
+  }
+  return null;
 }

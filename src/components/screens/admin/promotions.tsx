@@ -605,7 +605,7 @@ export function AdminPromotions({ initialTab: propTab }: { initialTab?: "individ
                   <SelectItem value="all">All Classes</SelectItem>
                   {classes.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.name}-{c.section} (Grade {c.grade})
+                      {c.name}-{c.section}
                   </SelectItem>
                 ))}
               </SelectContent>

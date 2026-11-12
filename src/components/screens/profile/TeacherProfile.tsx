@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   User,
   Calendar,
@@ -20,13 +20,15 @@ import {
   Download,
   Upload,
   Briefcase,
-  ExternalLink,
+  Clock,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { AppUser } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
 interface TeacherProfileProps {
   user: AppUser;
@@ -34,6 +36,42 @@ interface TeacherProfileProps {
   onEditClick: () => void;
   tenantName: string | null;
 }
+
+interface TeacherDoc {
+  id: string;
+  name: string;
+  category: string;
+  fileUrl: string;
+  size: number;
+  status: string;
+  verifiedAt: string | null;
+  createdAt: string;
+}
+
+const DOC_CATEGORIES = [
+  { value: "identity", label: "Identity Proof" },
+  { value: "degree", label: "Degree Certificate" },
+  { value: "appointment", label: "Appointment Letter" },
+  { value: "experience", label: "Experience Certificate" },
+  { value: "other", label: "Other" },
+];
+
+function formatLongDate(value?: string | null) {
+  if (!value || isNaN(new Date(value).getTime())) return "—";
+  return new Date(value).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function formatSize(bytes: number) {
+  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  return Math.max(1, Math.round(bytes / 1024)) + " KB";
+}
+
+const EMPLOYMENT_LABELS: Record<string, string> = {
+  "full-time": "Full-Time",
+  "part-time": "Part-Time",
+  contract: "Contract",
+  intern: "Intern",
+};
 
 export function TeacherProfile({
   user,
@@ -43,20 +81,104 @@ export function TeacherProfile({
 }: TeacherProfileProps) {
   const [activeTab, setActiveTab] = useState<"personal" | "documents" | "employment">("personal");
 
-  // Derive display values or fallback to standard demo record values matching the reference
-  const empId = (user as any).employeeId || (user as any).teacherId || `EMP2026${user.id?.slice(-4).padStart(4, "0") || "0115"}`;
-  const department = user.customRole?.name || (user as any).department || "Administration";
-  const dateOfBirth = (user as any).dateOfBirth || (user as any).dob || "7 March 1988";
-  const gender = (user as any).gender || "Male";
-  const bloodGroup = (user as any).bloodGroup || "—";
-  const maritalStatus = (user as any).maritalStatus || "—";
-  const nationality = (user as any).nationality || "Indian";
-  const religion = (user as any).religion || "—";
-  const phone = user.phone || "+916207142699";
-  const email = user.email || "anil.agarwal.115@demo.inkwelly.com";
-  const panNumber = (user as any).panNumber || (user as any).pan || "—";
-  const aadhaarNumber = (user as any).aadhaarNumber || (user as any).aadhaar || "—";
-  const sessionYear = "2026-27";
+  const tp = user.teacherProfile;
+  const empId = tp?.employeeId || "—";
+  const department = tp?.department || "—";
+  const dateOfBirth = formatLongDate(tp?.dateOfBirth);
+  const gender = tp?.gender || "—";
+  const bloodGroup = tp?.bloodGroup || "—";
+  const maritalStatus = tp?.maritalStatus || "—";
+  const nationality = tp?.nationality || "—";
+  const religion = tp?.religion || "—";
+  const phone = user.phone || "—";
+  const email = user.email;
+  const panNumber = tp?.panNumber || "—";
+  const aadhaarNumber = tp?.aadhaarNumber || "—";
+  const sessionYear = user.currentSession || "—";
+  const status = tp?.status || "active";
+  const roleLabel = user.customRole?.name || "Teacher";
+
+  const [docs, setDocs] = useState<TeacherDoc[]>([]);
+  const [docsLoading, setDocsLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [docCategory, setDocCategory] = useState("other");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const loadDocs = async () => {
+    setDocsLoading(true);
+    try {
+      const res = await apiFetch("/api/auth/profile/documents");
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) setDocs(data.documents || []);
+    } catch {
+      toast.error("Failed to load documents");
+    } finally {
+      setDocsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "documents") loadDocs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Document must be under 5MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      setUploading(true);
+      try {
+        const res = await apiFetch("/api/auth/profile/documents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: file.name,
+            category: docCategory,
+            fileName: file.name,
+            dataUrl: reader.result,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          toast.error(data.error || "Failed to upload document");
+          return;
+        }
+        toast.success("Document uploaded for verification");
+        await loadDocs();
+      } catch {
+        toast.error("Failed to upload document");
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDeleteDoc = async (id: string) => {
+    try {
+      const res = await apiFetch("/api/auth/profile/documents?id=" + id, { method: "DELETE" });
+      if (!res.ok) {
+        toast.error("Failed to remove document");
+        return;
+      }
+      toast.success("Document removed");
+      await loadDocs();
+    } catch {
+      toast.error("Failed to remove document");
+    }
+  };
+
+  const statusBadge = status === "inactive"
+    ? { cls: "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border-red-200/70 dark:border-red-800/60", label: "Inactive" }
+    : status === "on_leave"
+      ? { cls: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/70 dark:border-amber-800/60", label: "On Leave" }
+      : { cls: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-800/60", label: "Active" };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-10">
@@ -89,47 +211,26 @@ export function TeacherProfile({
 
       {/* ─── Navigation Tabs Bar ─── */}
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveTab("personal")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer",
-            activeTab === "personal"
-              ? "bg-card text-foreground shadow-xs border border-border"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-          )}
-        >
-          <User className="size-4" />
-          <span>Personal</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("documents")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer",
-            activeTab === "documents"
-              ? "bg-card text-foreground shadow-xs border border-border"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-          )}
-        >
-          <FileText className="size-4" />
-          <span>Documents</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("employment")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer",
-            activeTab === "employment"
-              ? "bg-card text-foreground shadow-xs border border-border"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-          )}
-        >
-          <Building2 className="size-4" />
-          <span>Employment</span>
-        </button>
+        {([
+          { id: "personal", label: "Personal", icon: User },
+          { id: "documents", label: "Documents", icon: FileText },
+          { id: "employment", label: "Employment", icon: Building2 },
+        ] as const).map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer",
+              activeTab === tab.id
+                ? "bg-card text-foreground shadow-xs border border-border"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+            )}
+          >
+            <tab.icon className="size-4" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* ─── Tab Content: Personal ─── */}
@@ -174,12 +275,12 @@ export function TeacherProfile({
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-400 border border-teal-200/70 dark:border-teal-800/60">
-                  <Building2 className="size-3" />
-                  {department}
+                  <ShieldCheck className="size-3" />
+                  {roleLabel}
                 </span>
 
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/60">
-                  Active
+                <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border", statusBadge.cls)}>
+                  {statusBadge.label}
                 </span>
               </div>
 
@@ -202,95 +303,28 @@ export function TeacherProfile({
 
             <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 gap-y-7">
-                {/* DATE OF BIRTH */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <Calendar className="size-4" />
+                {([
+                  { icon: Calendar, label: "DATE OF BIRTH", value: dateOfBirth },
+                  { icon: User, label: "GENDER", value: gender, capitalize: true },
+                  { icon: Droplets, label: "BLOOD GROUP", value: bloodGroup },
+                  { icon: Users, label: "MARITAL STATUS", value: maritalStatus, capitalize: true },
+                  { icon: Globe, label: "NATIONALITY", value: nationality },
+                  { icon: Star, label: "RELIGION", value: religion },
+                ] as const).map((field) => (
+                  <div key={field.label} className="flex items-start gap-3">
+                    <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
+                      <field.icon className="size-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
+                        {field.label}
+                      </span>
+                      <span className={cn("text-sm font-semibold text-foreground mt-0.5 block", "capitalize" in field && field.capitalize && "capitalize")}>
+                        {field.value}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      DATE OF BIRTH
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
-                      {dateOfBirth}
-                    </span>
-                  </div>
-                </div>
-
-                {/* GENDER */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <User className="size-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      GENDER
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block capitalize">
-                      {gender}
-                    </span>
-                  </div>
-                </div>
-
-                {/* BLOOD GROUP */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <Droplets className="size-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      BLOOD GROUP
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
-                      {bloodGroup}
-                    </span>
-                  </div>
-                </div>
-
-                {/* MARITAL STATUS */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <Users className="size-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      MARITAL STATUS
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
-                      {maritalStatus}
-                    </span>
-                  </div>
-                </div>
-
-                {/* NATIONALITY */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <Globe className="size-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      NATIONALITY
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
-                      {nationality}
-                    </span>
-                  </div>
-                </div>
-
-                {/* RELIGION */}
-                <div className="flex items-start gap-3">
-                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
-                    <Star className="size-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
-                      RELIGION
-                    </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
-                      {religion}
-                    </span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -308,7 +342,6 @@ export function TeacherProfile({
 
             <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* EMAIL */}
                 <div className="flex items-start gap-3">
                   <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/60 dark:border-teal-800/50 flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="size-4" />
@@ -318,7 +351,7 @@ export function TeacherProfile({
                       EMAIL
                     </span>
                     <a
-                      href={`mailto:${email}`}
+                      href={"mailto:" + email}
                       className="text-sm font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
                     >
                       {email}
@@ -326,7 +359,6 @@ export function TeacherProfile({
                   </div>
                 </div>
 
-                {/* MOBILE */}
                 <div className="flex items-start gap-3">
                   <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/60 dark:border-teal-800/50 flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="size-4" />
@@ -336,7 +368,7 @@ export function TeacherProfile({
                       MOBILE
                     </span>
                     <a
-                      href={`tel:${phone}`}
+                      href={"tel:" + phone}
                       className="text-sm font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
                     >
                       {phone}
@@ -359,27 +391,29 @@ export function TeacherProfile({
             </div>
 
             <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-5">
-              {/* Badges row */}
               <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted/80 text-muted-foreground border border-border">
-                  <XCircle className="size-3.5 text-muted-foreground" />
-                  PF Disabled
-                </span>
-
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted/80 text-muted-foreground border border-border">
-                  <XCircle className="size-3.5 text-muted-foreground" />
-                  ESI Disabled
-                </span>
-
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted/80 text-muted-foreground border border-border">
-                  <XCircle className="size-3.5 text-muted-foreground" />
-                  PT Disabled
-                </span>
+                {([
+                  { label: "PF", enabled: tp?.pfEnabled },
+                  { label: "ESI", enabled: tp?.esiEnabled },
+                  { label: "PT", enabled: tp?.ptEnabled },
+                ] as const).map((item) => (
+                  <span
+                    key={item.label}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border",
+                      item.enabled
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-800/60"
+                        : "bg-muted/80 text-muted-foreground border-border"
+                    )}
+                  >
+                    {item.enabled ? <CheckCircle2 className="size-3.5" /> : <XCircle className="size-3.5" />}
+                    {item.label} {item.enabled ? "Enabled" : "Disabled"}
+                  </span>
+                ))}
               </div>
 
               <div className="border-t border-border/60" />
 
-              {/* PAN & AADHAAR */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
                   <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5 text-muted-foreground">
@@ -389,7 +423,7 @@ export function TeacherProfile({
                     <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
                       PAN NUMBER
                     </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
+                    <span className="text-sm font-semibold text-foreground mt-0.5 block font-mono">
                       {panNumber}
                     </span>
                   </div>
@@ -403,7 +437,7 @@ export function TeacherProfile({
                     <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase block">
                       AADHAAR NUMBER
                     </span>
-                    <span className="text-sm font-semibold text-foreground mt-0.5 block">
+                    <span className="text-sm font-semibold text-foreground mt-0.5 block font-mono">
                       {aadhaarNumber}
                     </span>
                   </div>
@@ -418,59 +452,112 @@ export function TeacherProfile({
       {activeTab === "documents" && (
         <div className="space-y-4 animate-in fade-in duration-200">
           <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs">
-            <div className="flex items-center justify-between pb-4 border-b border-border/70 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/70 mb-4">
               <div>
-                <h3 className="text-base font-bold text-foreground">Verified Documents</h3>
+                <h3 className="text-base font-bold text-foreground">My Documents</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Official certificates and identification documents on record.
+                  Certificates and identification on record. Uploads go to the admin for verification.
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-xl text-xs font-semibold"
-                onClick={() => toast.info("Document upload request submitted to admin")}
-              >
-                <Upload className="size-3.5" />
-                Upload New
-              </Button>
+              <div className="flex items-center gap-2">
+                <select
+                  value={docCategory}
+                  onChange={(e) => setDocCategory(e.target.value)}
+                  className="h-9 rounded-xl border border-border bg-muted px-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                  aria-label="Document category"
+                >
+                  {DOC_CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.txt"
+                  onChange={handleUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-xl text-xs font-semibold"
+                  disabled={uploading}
+                  onClick={() => fileRef.current?.click()}
+                >
+                  {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+                  {uploading ? "Uploading..." : "Upload New"}
+                </Button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { name: "Government Identity Proof (Aadhaar / Passport)", size: "1.8 MB", date: "Verified on 12 Aug 2024", verified: true },
-                { name: "Educational Degree Certificates (M.Sc, B.Ed)", size: "3.4 MB", date: "Verified on 12 Aug 2024", verified: true },
-                { name: "Teacher Appointment Letter", size: "1.2 MB", date: "Issued on 10 Aug 2024", verified: true },
-                { name: "Prior Experience & Relieving Certificates", size: "2.1 MB", date: "Verified on 12 Aug 2024", verified: true },
-              ].map((doc, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-border bg-muted/40 hover:bg-muted/70 transition-colors flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="size-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50">
-                      <FileText className="size-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{doc.name}</p>
-                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                        <span>{doc.size}</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                          <CheckCircle2 className="size-3" />
-                          {doc.date}
-                        </span>
+            {docsLoading ? (
+              <div className="py-14 flex items-center justify-center gap-2 text-muted-foreground text-sm">
+                <Loader2 className="size-4 animate-spin" />
+                Loading documents...
+              </div>
+            ) : docs.length === 0 ? (
+              <div className="py-14 text-center">
+                <FileText className="size-9 mx-auto mb-2 text-muted-foreground/40" />
+                <p className="text-sm font-semibold text-foreground">No documents on record yet</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Upload your degree certificates, ID proof and appointment letter for verification.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {docs.map((doc) => (
+                  <div key={doc.id} className="p-4 rounded-xl border border-border bg-muted/40 hover:bg-muted/70 transition-colors flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="size-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50">
+                        <FileText className="size-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{doc.name}</p>
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                          <span>{formatSize(doc.size)}</span>
+                          <span>•</span>
+                          {doc.status === "verified" ? (
+                            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                              <CheckCircle2 className="size-3" />
+                              Verified{doc.verifiedAt ? " on " + new Date(doc.verifiedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : ""}
+                            </span>
+                          ) : doc.status === "rejected" ? (
+                            <span className="flex items-center gap-1 text-red-600 dark:text-red-400 font-medium">
+                              <XCircle className="size-3" />
+                              Rejected — re-upload a clearer copy
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                              <Clock className="size-3" />
+                              Pending verification
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <a
+                        href={doc.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center size-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                        title="Open document"
+                      >
+                        <Download className="size-4" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteDoc(doc.id)}
+                        className="inline-flex items-center justify-center size-8 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                        title="Remove document"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 rounded-lg shrink-0 text-muted-foreground hover:text-foreground"
-                    onClick={() => toast.success("Downloading document preview...")}
-                  >
-                    <Download className="size-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -489,7 +576,7 @@ export function TeacherProfile({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Designation</span>
-                <p className="text-sm font-semibold text-foreground">{user.customRole?.name || "Senior Faculty Member"}</p>
+                <p className="text-sm font-semibold text-foreground">{tp?.designation || "—"}</p>
               </div>
 
               <div className="space-y-1">
@@ -499,12 +586,12 @@ export function TeacherProfile({
 
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Employment Type</span>
-                <p className="text-sm font-semibold text-foreground">Full-Time / Permanent</p>
+                <p className="text-sm font-semibold text-foreground">{EMPLOYMENT_LABELS[tp?.employmentType || ""] || tp?.employmentType || "—"}</p>
               </div>
 
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Joining Date</span>
-                <p className="text-sm font-semibold text-foreground">12 August 2024</p>
+                <p className="text-sm font-semibold text-foreground">{formatLongDate(tp?.joiningDate)}</p>
               </div>
 
               <div className="space-y-1">
@@ -514,10 +601,25 @@ export function TeacherProfile({
 
               <div className="space-y-1">
                 <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Service Status</span>
-                <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Active / Good Standing
+                <p className={cn("text-sm font-semibold flex items-center gap-1.5", status === "inactive" ? "text-red-600 dark:text-red-400" : status === "on_leave" ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")}>
+                  <span className={cn("size-2 rounded-full", status === "inactive" ? "bg-red-500" : status === "on_leave" ? "bg-amber-500" : "bg-emerald-500 animate-pulse")} />
+                  {statusBadge.label}
                 </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Qualification</span>
+                <p className="text-sm font-semibold text-foreground">{tp?.qualification || "—"}</p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Experience</span>
+                <p className="text-sm font-semibold text-foreground">{tp?.experience || "—"}</p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Employee ID</span>
+                <p className="text-sm font-semibold text-foreground font-mono">{empId}</p>
               </div>
             </div>
           </div>
@@ -526,4 +628,3 @@ export function TeacherProfile({
     </div>
   );
 }
-

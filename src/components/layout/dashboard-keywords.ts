@@ -62,7 +62,7 @@ export const actionKeywords: Record<string, string[]> = {
   "reports": ["analytics", "data export", "charts", "statistics"],
 
   // --- Teacher Specific ---
-  "my-classes": ["class", "section", "grade", "classroom", "division"],
+  "my-classes": ["class", "section", "grade", "classroom", "division", "subject", "syllabus", "course"],
   "my-subjects": ["subject", "course", "curriculum", "syllabus", "book"],
   "take-attendance": ["attendance", "present", "absent", "roll call"],
   "assessments": ["test", "exam", "quiz", "grade"],

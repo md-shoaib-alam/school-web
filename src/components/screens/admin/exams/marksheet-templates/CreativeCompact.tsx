@@ -64,7 +64,7 @@ export const CreativeCompact: React.FC<MarksheetTemplateProps> = ({
           <div className="flex items-center gap-3 bg-muted border  p-3 rounded-xl">
             <div className="size-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">🏫</div>
             <div className="min-w-0">
-              <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block">Grade Form</span>
+              <span className="text-muted-foreground font-bold uppercase text-[7.5px] tracking-wider block">Class / Section</span>
               <span className="font-extrabold text-foreground truncate block">{classNameStr} - {classSection}</span>
             </div>
           </div>

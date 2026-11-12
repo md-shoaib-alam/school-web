@@ -123,8 +123,12 @@ export function AccountMenu({ currentUser, initials, onNavigate, onPasswordChang
     if (!setActiveAccount(account.user.id)) return;
     // Tells the page we are about to land on to animate over its own boot.
     beginAccountSwitch(account.user);
-    // A full reload is what keeps the previous account's cached queries from being read as this one's.
-    window.location.href = dashboardHref(account.user);
+    // A full reload is what keeps the previous account's cached queries from being read as this
+    // one's. Two accounts of the same school land on the same path, where assigning href can be
+    // treated as a no-op, so ask for the reload outright in that case.
+    const href = dashboardHref(account.user);
+    if (href === window.location.pathname) window.location.reload();
+    else window.location.assign(href);
   };
 
   const askSignOut = () => {

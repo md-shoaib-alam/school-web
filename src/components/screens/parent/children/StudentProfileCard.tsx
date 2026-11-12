@@ -50,7 +50,7 @@ export function StudentProfileCard({ student }: StudentProfileCardProps) {
             <div className="flex items-center justify-between py-1 border-b ">
               <div className="flex items-center gap-2">
                 <GraduationCap className="size-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Class / Grade</span>
+                <span className="text-xs text-muted-foreground font-medium">Class</span>
               </div>
               <span className="text-xs font-bold text-foreground">{student.className}</span>
             </div>
