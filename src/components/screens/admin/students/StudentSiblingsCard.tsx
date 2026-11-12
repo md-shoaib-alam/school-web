@@ -5,11 +5,16 @@ import { Users, ChevronRight } from "lucide-react";
 interface StudentSiblingsCardProps {
   siblings: any[];
   onSelectStudent?: (studentId: string) => void;
+  dimmed?: boolean;
 }
 
-export function StudentSiblingsCard({ siblings, onSelectStudent }: StudentSiblingsCardProps) {
+export function StudentSiblingsCard({ siblings, onSelectStudent, dimmed }: StudentSiblingsCardProps) {
   return (
-    <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+    <div
+      className={`rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-[opacity,filter] duration-300 ${
+        dimmed ? "opacity-60 blur-[1.5px]" : ""
+      }`}
+    >
       {/* ────────────────────────────────────────────────────────── */}
       {/* CARD 4: Siblings (View Only - No Edit Button)             */}
       {/* ────────────────────────────────────────────────────────── */}

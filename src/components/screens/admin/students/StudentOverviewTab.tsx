@@ -13,7 +13,6 @@ import { StudentAcademicInfoCard } from "./StudentAcademicInfoCard";
 import { StudentParentContactCard } from "./StudentParentContactCard";
 import { StudentSiblingsCard } from "./StudentSiblingsCard";
 import { StudentTransportCard } from "./StudentTransportCard";
-import { StudentOverviewSaveBar } from "./StudentOverviewSaveBar";
 
 export function StudentOverviewTab({
   currentStudent,
@@ -40,6 +39,9 @@ export function StudentOverviewTab({
   const toggleCollapse = (sec: string) => {
     setCollapsed((prev) => ({ ...prev, [sec]: !prev[sec] }));
   };
+
+  /** Another section holds the form: this one sits behind it, dimmed. */
+  const dimmed = (sec: string) => editingSection !== null && editingSection !== sec;
 
   const sourceStudent = studentDetails || currentStudent;
 
@@ -202,6 +204,7 @@ export function StudentOverviewTab({
         collapsed={collapsed.personal}
         saving={saving}
         canEdit={canEdit}
+        dimmed={dimmed("personal")}
         currentStudent={currentStudent}
         name={formData.name}
         gender={formData.gender}
@@ -230,6 +233,7 @@ export function StudentOverviewTab({
         collapsed={collapsed.academic}
         saving={saving}
         canEdit={canEdit}
+        dimmed={dimmed("academic")}
         currentStudent={currentStudent}
         classId={formData.classId}
         rollNumber={formData.rollNumber}
@@ -254,6 +258,7 @@ export function StudentOverviewTab({
         collapsed={collapsed.parent}
         saving={saving}
         canEdit={canEdit}
+        dimmed={dimmed("parent")}
         currentStudent={currentStudent}
         parentName={formData.parentName}
         parentRelationship={formData.parentRelationship}
@@ -277,6 +282,7 @@ export function StudentOverviewTab({
         <StudentSiblingsCard
           siblings={studentDetails.siblings}
           onSelectStudent={onSelectStudent}
+          dimmed={editingSection !== null}
         />
       )}
 
@@ -286,6 +292,7 @@ export function StudentOverviewTab({
         collapsed={collapsed.transport}
         saving={saving}
         canEdit={canEdit}
+        dimmed={dimmed("transport")}
         transport={studentDetails?.transport}
         transportRoute={transportRoute}
         routes={routes}
@@ -306,15 +313,6 @@ export function StudentOverviewTab({
         }}
       />
 
-      {/* Global Bottom Save Action Bar if any section is in edit mode */}
-      {editingSection && (
-        <StudentOverviewSaveBar
-          editingSection={editingSection}
-          saving={saving}
-          onCancel={cancelSection}
-          onSave={handleSave}
-        />
-      )}
     </div>
   );
 }
