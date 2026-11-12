@@ -86,7 +86,7 @@ const initialState: State = {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_SELECTED_CLASS': return { ...state, selectedClass: action.payload };
-    case 'SET_VIEW_MODE': return { ...state, viewMode: action.payload };
+    case 'SET_VIEW_MODE': return { ...state, viewMode: action.payload, selectedDay: action.payload === 'day' ? '' : state.selectedDay };
     case 'SET_SELECTED_DAY': return { ...state, selectedDay: action.payload };
     case 'SET_CREATE_DIALOG_OPEN': return { ...state, createDialogOpen: action.payload };
     case 'SET_DAY_SLOTS':
@@ -336,7 +336,13 @@ export function AdminTimetable() {
     return data;
   }, [slots]);
 
-  const effectiveDay = workingDays.includes(selectedDay) ? selectedDay : workingDays[currentDayIndex] || workingDays[0];
+  const effectiveDay = useMemo(() => {
+    if (selectedDay) {
+      const match = workingDays.find((d) => d.toLowerCase() === selectedDay.toLowerCase());
+      if (match) return match;
+    }
+    return workingDays[currentDayIndex] || workingDays[0] || "monday";
+  }, [selectedDay, workingDays, currentDayIndex]);
   const selectedDaySlots = useMemo(() => {
     return timeSlots.map(({ start, end }) => { const key = `${start}-${end}`; return gridData.get(effectiveDay)?.get(key) || []; });
   }, [effectiveDay, timeSlots, gridData]);
@@ -355,11 +361,15 @@ export function AdminTimetable() {
         onManageClick={handleOpenManage}
       />
 
-      <Card className="border  bg-card rounded-2xl overflow-hidden">
-        <CardContent className="p-0 overflow-x-auto w-full">
-          {isLoadingTimetable || isLoadingClasses ? (
+      {isLoadingTimetable || isLoadingClasses ? (
+        <Card className="border bg-card rounded-2xl overflow-hidden">
+          <CardContent className="p-0 overflow-x-auto w-full">
             <TimetableSkeleton viewMode={viewMode} />
-          ) : slots.length === 0 ? (
+          </CardContent>
+        </Card>
+      ) : slots.length === 0 ? (
+        <Card className="border bg-card rounded-2xl overflow-hidden">
+          <CardContent className="p-0 overflow-x-auto w-full">
             <EmptyTimetableState 
               selectedClass={selectedClass}
               classes={classes}
@@ -367,15 +377,19 @@ export function AdminTimetable() {
               onManageClick={handleOpenManage}
               canCreate={canCreate}
             />
-          ) : viewMode === "grid" ? (
+          </CardContent>
+        </Card>
+      ) : viewMode === "grid" ? (
+        <Card className="border bg-card rounded-2xl overflow-hidden">
+          <CardContent className="p-0 overflow-x-auto w-full">
             <GridView timeSlots={timeSlots} gridData={gridData} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
-          ) : viewMode === "list" ? (
-            <ListView slotsByDay={slotsByDay} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
-          ) : (
-            <DayView selectedDay={effectiveDay} selectedDaySlots={selectedDaySlots} timeSlots={timeSlots} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onSelectDay={(v) => dispatch({ type: 'SET_SELECTED_DAY', payload: v })} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : viewMode === "list" ? (
+        <ListView slotsByDay={slotsByDay} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
+      ) : (
+        <DayView selectedDay={effectiveDay} selectedDaySlots={selectedDaySlots} timeSlots={timeSlots} uniqueSubjects={uniqueSubjects} workingDays={workingDays} currentDayIndex={currentDayIndex} onSelectDay={(v) => dispatch({ type: 'SET_SELECTED_DAY', payload: v })} onDeleteSlot={(id) => deleteMutation.mutate(id)} onEditSlot={handleEditSlot} canEdit={canEdit} canDelete={canDelete} />
+      )}
 
       <WorkingDaysDialog open={daysConfigOpen} onOpenChange={(v) => dispatch({ type: 'SET_DAYS_CONFIG_OPEN', payload: { open: v } })} draft={daysConfigDraft} setDraft={(v) => dispatch({ type: 'SET_DAYS_CONFIG_DRAFT', payload: v })} onSave={handleWorkingDaysSave} saving={daysConfigSaving} />
       <EditSlotDialog open={editDialogOpen} onOpenChange={(v) => dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: v })} form={editForm} setForm={(v) => dispatch({ type: 'SET_EDIT_FORM', payload: v })} onSave={handleEditSave} saving={editSaving} availableSubjects={filteredSubjects} availableTeachers={availableTeachers} workingDays={workingDays} isBreak={!!(editingSlot as any)?.label} />

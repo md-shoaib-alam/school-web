@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { ClassSelect } from "@/components/ui/class-select";
-import { Calendar, LayoutGrid, List, CalendarDays, Plus, Settings } from "lucide-react";
+import { Calendar, Plus, Settings } from "lucide-react";
 import type { ViewMode } from "./types";
+import { TimetableToggle } from "@/components/shared/timetable-toggle";
 
 interface TimetableHeaderProps {
   currentClass: any;
@@ -17,6 +18,16 @@ interface TimetableHeaderProps {
   onManageClick: () => void;
 }
 
+function ViewSwitcher({
+  viewMode,
+  setViewMode,
+}: {
+  viewMode: ViewMode;
+  setViewMode: (m: ViewMode) => void;
+}) {
+  return <TimetableToggle mode={viewMode} onChange={setViewMode} />;
+}
+
 export function TimetableHeader({
   currentClass,
   viewMode,
@@ -28,44 +39,12 @@ export function TimetableHeader({
   onSettingsClick,
   onManageClick,
 }: TimetableHeaderProps) {
-  const viewSwitcher = (
-    <div className="inline-flex items-center rounded-lg border  bg-card p-0.5 shadow-xs shrink-0">
-      <Button
-        size="sm"
-        variant={viewMode === "grid" ? "default" : "ghost"}
-        onClick={() => setViewMode("grid")}
-        className="h-8 px-2 sm:px-2.5 text-xs"
-      >
-        <LayoutGrid className="size-4 sm:mr-1.5" />
-        <span className="hidden sm:inline">Grid</span>
-      </Button>
-      <Button
-        size="sm"
-        variant={viewMode === "list" ? "default" : "ghost"}
-        onClick={() => setViewMode("list")}
-        className="h-8 px-2 sm:px-2.5 text-xs"
-      >
-        <List className="size-4 sm:mr-1.5" />
-        <span className="hidden sm:inline">List</span>
-      </Button>
-      <Button
-        size="sm"
-        variant={viewMode === "day" ? "default" : "ghost"}
-        onClick={() => setViewMode("day")}
-        className="h-8 px-2 sm:px-2.5 text-xs"
-      >
-        <CalendarDays className="size-4 sm:mr-1.5" />
-        <span className="hidden sm:inline">Day</span>
-      </Button>
-    </div>
-  );
-
   return (
     <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 items-start lg:items-center justify-between">
       {/* Top row on mobile: Title on left, View Switcher on right */}
       <div className="flex items-center justify-between gap-3 w-full lg:w-auto">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <div className="size-9 sm:size-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="size-9 sm:size-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
             <Calendar className="size-4.5 sm:size-5" />
           </div>
           <div className="min-w-0">
@@ -80,7 +59,7 @@ export function TimetableHeader({
 
         {/* View Switcher on mobile (< lg) */}
         <div className="lg:hidden shrink-0">
-          {viewSwitcher}
+          <ViewSwitcher viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>
 
@@ -88,7 +67,7 @@ export function TimetableHeader({
       <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
         {/* View Switcher on desktop (>= lg) */}
         <div className="hidden lg:block shrink-0">
-          {viewSwitcher}
+          <ViewSwitcher viewMode={viewMode} setViewMode={setViewMode} />
         </div>
 
         <ClassSelect
@@ -115,7 +94,7 @@ export function TimetableHeader({
           <Button
             size="sm"
             onClick={onManageClick}
-            className="h-9 px-3 bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition-all duration-200 shrink-0"
+            className="h-9 px-3 bg-blue-600 text-white hover:bg-blue-700 shadow-xs transition-all duration-200 shrink-0"
           >
             <Plus className="size-4 mr-1.5" />
             <span>Manage</span>

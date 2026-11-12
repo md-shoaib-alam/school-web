@@ -43,7 +43,7 @@ const JS_DAY_TO_KEY: Record<number, string> = {
 
 export function formatTime(time: string): string {
   const [h, m] = time.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
+  const ampm = h >= 12 ? "pm" : "am";
   const hour = h % 12 || 12;
   return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
 }

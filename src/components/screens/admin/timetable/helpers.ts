@@ -1,3 +1,4 @@
+import { Coffee, Utensils } from "lucide-react";
 import { SUBJECT_COLORS, SUBJECT_DOT_COLORS } from "./constants";
 
 function getSubjectColorIndex(
@@ -20,7 +21,8 @@ export function getCurrentDayIndex(days: string[]): number {
     6: "saturday",
   };
   const todayKey = dayMap[jsDay];
-  return days.indexOf(todayKey);
+  const idx = days.findIndex((d) => d.toLowerCase() === todayKey);
+  return idx >= 0 ? idx : 0;
 }
 
 export function isCurrentPeriod(start: string, end: string): boolean {
@@ -37,7 +39,7 @@ export function formatTime(time: string): string {
   const [h, m] = time.split(":");
   const hour = parseInt(h ?? "0", 10);
   const min = m ?? "00";
-  const ampm = hour >= 12 ? "PM" : "AM";
+  const ampm = hour >= 12 ? "pm" : "am";
   const displayHour = hour % 12 === 0 ? 12 : hour % 12;
   return `${displayHour}:${min} ${ampm}`;
 }
@@ -56,4 +58,36 @@ export function getSubjectDotClass(
 ): string {
   const idx = getSubjectColorIndex(uniqueSubjects, subject);
   return SUBJECT_DOT_COLORS[idx % SUBJECT_DOT_COLORS.length];
+}
+
+export function isBreakSlot(slot: {
+  label?: string;
+  subjectName?: string;
+  subjectId?: string;
+  teacherId?: string;
+}): boolean {
+  if (slot.label && slot.label.trim().length > 0) return true;
+  if (!slot.subjectId && !slot.teacherId && !slot.subjectName) return true;
+  const name = (slot.subjectName || "").toLowerCase();
+  const label = (slot.label || "").toLowerCase();
+  return (
+    name.includes("break") ||
+    name.includes("lunch") ||
+    name.includes("recess") ||
+    name.includes("snack") ||
+    name.includes("interval") ||
+    label.includes("break") ||
+    label.includes("lunch") ||
+    label.includes("recess") ||
+    label.includes("snack") ||
+    label.includes("interval")
+  );
+}
+
+export function getBreakIcon(slot: { label?: string; subjectName?: string }) {
+  const text = `${slot.label || ""} ${slot.subjectName || ""}`.toLowerCase();
+  if (text.includes("tea") || text.includes("coffee")) {
+    return Coffee;
+  }
+  return Utensils;
 }
