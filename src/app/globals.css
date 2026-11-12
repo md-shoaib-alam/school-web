@@ -275,6 +275,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 }
 
@@ -454,6 +455,77 @@ button:disabled,
 @keyframes skeleton-sweep {
   100% {
     transform: translateX(100%);
+  }
+}
+
+/* Account switch overlay: the blueprint language the shell skeleton is drawn in before it sweeps in. */
+.blueprint-box {
+  /* The brand line on every drawn box, not just the outer frame: the sidebar is as dark as the
+     line needs to read against, and a grey dashed edge disappears into it. */
+  border: 1px dashed color-mix(in oklab, var(--brand) 55%, transparent);
+}
+
+.blueprint-grid {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+.account-switch-scan {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.14), transparent);
+  animation: account-switch-scan 700ms ease-out both;
+}
+
+/* The print pass, drawn as one travelling edge. --draw is the height reached so far: the mask
+   reveals the blueprint down to it and the head bar sits on it, so the two cannot drift apart.
+   A mask rather than a covering sheet, because the shell's own panels are coloured (the sidebar
+   and header sit on --sidebar) and a flat cover would paint over them in the page background. */
+@property --draw {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+
+.blueprint-draw {
+  -webkit-mask-image: linear-gradient(to bottom, #000 var(--draw), transparent calc(var(--draw) + 4%));
+  mask-image: linear-gradient(to bottom, #000 var(--draw), transparent calc(var(--draw) + 4%));
+  animation: blueprint-draw var(--print-ms, 2000ms) ease-out forwards;
+}
+
+@keyframes blueprint-draw {
+  from { --draw: 0%; }
+  to { --draw: 100%; }
+}
+
+/* The head bar riding the mask edge. It sits 2px above --draw so the mask, which is opaque up to
+   that line, never fades the bar itself. */
+.account-switch-head {
+  position: absolute;
+  top: calc(var(--draw) - 2px);
+  left: 0;
+  right: 0;
+  height: 2px;
+  /* Solid across the whole width: a centre-weighted gradient faded out over the sidebar, which is
+     the one column the reader watches being drawn. */
+  background: color-mix(in oklab, var(--brand) 85%, transparent);
+}
+
+.dark .account-switch-scan {
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.16), transparent);
+}
+
+@keyframes account-switch-scan {
+  from {
+    transform: translateX(-110%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(500%);
+    opacity: 0;
   }
 }
 

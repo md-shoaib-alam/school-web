@@ -32,6 +32,7 @@ export function HoverList({
         "relative",
         // Only positioned rows can sit above the pill; Radix's sub-triggers are not by default.
         "[&_[role=menuitem]]:relative [&_[role=menuitem]]:cursor-pointer",
+        "[&_[role=option]]:relative [&_[role=option]]:cursor-pointer",
         "[&_[data-highlighted]:not([data-variant=destructive])]:bg-transparent!",
         className,
       )}
@@ -43,7 +44,7 @@ export function HoverList({
         ref={pill}
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute left-0 top-0 z-0 bg-accent opacity-0",
+          "pointer-events-none absolute left-0 top-0 z-0 bg-accent opacity-0 will-change-transform",
           pillClassName,
         )}
       />
