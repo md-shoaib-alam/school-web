@@ -275,12 +275,6 @@ export const TOGGLE_USER_STATUS = `
   }
 `
 
-export const REQUEST_PASSWORD_RESET = `
-  mutation RequestPasswordReset($email: String!) {
-    requestPasswordReset(email: $email)
-  }
-`
-
 export const CREATE_USER = `
   mutation CreateUser($data: CreateUserInput!) {
     createUser(data: $data) { id name email role isActive }
