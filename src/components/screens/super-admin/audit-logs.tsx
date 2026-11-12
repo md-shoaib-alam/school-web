@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { ScrollText } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { useAuditLogs, useTenants } from "@/lib/graphql/hooks";
 
-// Sub-components
-import { LogStats } from "./audit-logs/LogStats";
-import { LogTable } from "./audit-logs/LogTable";
+import { LogExplorer } from "./audit-logs/LogExplorer";
+import { parse, rowOf, rowPasses } from "./audit-logs/explorer-query";
+
+/** How often the live pill asks for new events, and how many a page holds. */
+const POLL_MS = 30_000;
+const LIMIT = 25;
 
 export function SuperAdminAuditLogs() {
   const searchParams = useSearchParams();
@@ -16,12 +21,13 @@ export function SuperAdminAuditLogs() {
   const rawPage = pageParam ? Number(pageParam) : 1;
   const initialPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
-  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [tenantFilter, setTenantFilter] = useState<string>("all");
   const [page, setPage] = useState(initialPage);
-  const limit = 10;
+  // The stream only runs while the reader is looking at the newest events, so leaving page 1 stops it.
+  const [live, setLive] = useState(initialPage === 1);
 
   const updateUrlParams = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -30,82 +36,65 @@ export function SuperAdminAuditLogs() {
     router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
   };
 
-  // Fetch simple list of tenants for selection
   const { data: tenantsData } = useTenants({ limit: 100 });
 
-  // Fetch via GraphQL
-  const {
-    data,
-    isLoading: loading,
-  } = useAuditLogs({
-    action: actionFilter !== "all" ? actionFilter : undefined,
-    role: roleFilter !== "all" ? roleFilter : undefined,
-    tenantId: tenantFilter !== "all" ? tenantFilter : undefined,
-    page,
-    limit,
-  });
+  const { data, isLoading: loading } = useAuditLogs(
+    {
+      action: actionFilter !== "all" ? actionFilter : undefined,
+      role: roleFilter !== "all" ? roleFilter : undefined,
+      tenantId: tenantFilter !== "all" ? tenantFilter : undefined,
+      page,
+      limit: LIMIT,
+    },
+    { refetchInterval: live && page === 1 ? POLL_MS : undefined },
+  );
 
-  const filteredLogs = useMemo(() => {
-    const list = data?.logs;
-    if (!Array.isArray(list)) return [];
-    
-    return list.filter((log) => {
-      if (!search) return true;
-      const q = search.toLowerCase();
-      return (
-        log.action.toLowerCase().includes(q) ||
-        log.resource.toLowerCase().includes(q) ||
-        log.details?.toLowerCase().includes(q) ||
-        log.tenant?.name?.toLowerCase().includes(q)
-      );
-    });
-  }, [data, search]);
+  const rows = useMemo(() => (data?.logs ?? []).map(rowOf), [data]);
+  const terms = useMemo(() => parse(query), [query]);
+  const filtered = useMemo(() => rows.filter((row) => rowPasses(terms, row)), [rows, terms]);
 
   const totalLogs = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
 
-  const handleActionFilterChange = (val: string) => {
-    setActionFilter(val);
-    setPage(1);
-    updateUrlParams(1);
-  };
-
-  const handleRoleFilterChange = (val: string) => {
-    setRoleFilter(val);
-    setPage(1);
-    updateUrlParams(1);
-  };
-
-  const handleTenantFilterChange = (val: string) => {
-    setTenantFilter(val);
+  const changeFilter = (setter: (value: string) => void) => (value: string) => {
+    setter(value);
     setPage(1);
     updateUrlParams(1);
   };
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 pb-12">
+      <PageHeader
+        icon={<ScrollText />}
+        title="Audit Logs"
+        description="Every change made across the platform, newest first. Type to filter the events on this page."
+      />
 
-      <LogTable 
+      <LogExplorer
         loading={loading}
-        logs={filteredLogs}
-        totalLogs={totalLogs}
+        rows={filtered}
+        pageRows={rows.length}
+        total={totalLogs}
         page={page}
         totalPages={totalPages}
-        limit={limit}
-        onPageChange={(p) => {
-          setPage(p);
-          updateUrlParams(p);
+        limit={LIMIT}
+        onPageChange={(next) => {
+          setPage(next);
+          if (next !== 1) setLive(false);
+          updateUrlParams(next);
         }}
-        search={search}
-        onSearchChange={setSearch}
-        actionFilter={actionFilter}
-        onActionFilterChange={handleActionFilterChange}
+        query={query}
+        onQueryChange={setQuery}
+        live={live}
+        onLiveChange={setLive}
         roleFilter={roleFilter}
-        onRoleFilterChange={handleRoleFilterChange}
+        onRoleFilterChange={changeFilter(setRoleFilter)}
         tenantFilter={tenantFilter}
-        onTenantFilterChange={handleTenantFilterChange}
-        tenants={tenantsData?.tenants || []}
-        actionTypes={data?.actionTypes || []}
+        onTenantFilterChange={changeFilter(setTenantFilter)}
+        actionFilter={actionFilter}
+        onActionFilterChange={changeFilter(setActionFilter)}
+        tenants={tenantsData?.tenants ?? []}
+        actionTypes={data?.actionTypes ?? []}
       />
     </div>
   );

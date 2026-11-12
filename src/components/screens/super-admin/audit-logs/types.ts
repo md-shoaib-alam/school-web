@@ -17,20 +17,21 @@ export interface AuditLog {
   } | null;
 }
 
+export type LogCategory =
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "LOGIN"
+  | "EXPORT"
+  | "SUSPEND"
+  | "VIEW";
+
 export interface ActionTypeCount {
   action: string;
   count: number;
 }
 
-export interface AuditLogsResponse {
-  logs: AuditLog[];
-  total: number;
-  page: number;
-  totalPages: number;
-  actionTypes: ActionTypeCount[];
-}
-
-export function getActionCategory(action: string): string {
+export function getActionCategory(action: string): LogCategory {
   if (action.startsWith("CREATE")) return "CREATE";
   if (action.startsWith("UPDATE")) return "UPDATE";
   if (action.startsWith("DELETE")) return "DELETE";
@@ -52,45 +53,44 @@ export const categoryColors: Record<string, string> = {
   UPDATE: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-700",
   DELETE: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700",
   LOGIN: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-700",
-  VIEW: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700",
+  VIEW: "bg-muted text-foreground ",
   EXPORT: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700",
   SUSPEND: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 border-orange-200",
 };
 
-export const categoryIcons: Record<string, string> = {
-  CREATE: "🟢",
-  UPDATE: "🔵",
-  DELETE: "🔴",
-  LOGIN: "🟣",
-  VIEW: "⚪",
-  EXPORT: "🟡",
-  SUSPEND: "🟠",
+export const CATEGORIES: LogCategory[] = [
+  "DELETE",
+  "CREATE",
+  "UPDATE",
+  "LOGIN",
+  "EXPORT",
+  "SUSPEND",
+  "VIEW",
+];
+
+/** The solid colour each category takes in the legend's dots and the breakdown's bars. */
+export const categoryAccent: Record<LogCategory, string> = {
+  CREATE: "bg-emerald-500",
+  UPDATE: "bg-blue-500",
+  DELETE: "bg-red-500",
+  LOGIN: "bg-purple-500",
+  EXPORT: "bg-amber-500",
+  SUSPEND: "bg-orange-500",
+  VIEW: "bg-sky-500",
 };
 
-export function truncateJson(jsonStr: string, maxLen: number = 60): string {
-  try {
-    const parsed = JSON.parse(jsonStr);
-    const formatted = JSON.stringify(parsed);
-    if (formatted.length <= maxLen) return formatted;
-    return formatted.slice(0, maxLen) + "...";
-  } catch {
-    if (jsonStr.length <= maxLen) return jsonStr;
-    return jsonStr.slice(0, maxLen) + "...";
-  }
-}
+/** `action:login` and the legend's chip label. */
+export const categoryLabel: Record<LogCategory, string> = {
+  CREATE: "Create",
+  UPDATE: "Update",
+  DELETE: "Delete",
+  LOGIN: "Login",
+  EXPORT: "Export",
+  SUSPEND: "Suspend",
+  VIEW: "View",
+};
 
-export function formatTimestamp(dateStr: string): string {
-  if (!dateStr) return "–";
-  const num = Number(dateStr);
-  const date = !isNaN(num) && dateStr.length > 10 ? new Date(num) : new Date(dateStr);
-
-  if (isNaN(date.getTime())) return dateStr;
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+/** "CREATE_STUDENT" reads as "create student" in the message column. */
+export function humanizeAction(action: string): string {
+  return action.replace(/_/g, " ").toLowerCase();
 }
