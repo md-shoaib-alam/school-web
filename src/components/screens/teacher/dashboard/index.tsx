@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { useTeacherDashboard } from "@/lib/graphql/hooks";
 import { toast } from "sonner";
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import {
   Bell,
   Calendar,
@@ -210,7 +210,7 @@ export function TeacherDashboard() {
   }
 
   if (isActuallyLoading) {
-    return <FullPageSkeleton />;
+    return <ScreenSkeleton />;
   }
 
   const classes = data?.classes ?? [];

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import { AdmitCardUpgradeCard } from './subscription/AdmitCardUpgradeCard';
 import {
   FileText, Printer, Loader2, School, Download, Crown, Award, Sparkles,
@@ -457,7 +457,7 @@ export function AdminAdmitCards() {
   const totalExams = currentCycle?.exams.length || 0;
 
   if (isDetailLoading) {
-    return <FullPageSkeleton />;
+    return <ScreenSkeleton />;
   }
 
   if (tenant && tenant.plan.toLowerCase() === 'basic') {

@@ -6,9 +6,9 @@ import { useAppStore } from "@/store/use-app-store";
 import { useTenantResolution } from "@/lib/graphql/hooks/platform.hooks";
 import dynamic from "next/dynamic";
 
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 
-const LoadingScreen = () => <FullPageSkeleton />;
+const LoadingScreen = () => <ScreenSkeleton />;
 
 const AdminDashboard = dynamic(() => import("@/components/screens/admin/dashboard").then((m) => m.AdminDashboard), { loading: LoadingScreen });
 const SuperAdminDashboard = dynamic(() => import("@/components/screens/super-admin/dashboard").then((m) => m.SuperAdminDashboard), { loading: LoadingScreen });

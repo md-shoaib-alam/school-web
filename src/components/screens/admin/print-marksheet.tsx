@@ -15,13 +15,13 @@ import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { Badge } from '@/components/ui/badge';
 import { getGroupedExams } from './exams/utils';
 import { ExamRecord } from './exams/types';
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 import { PremiumUpgradeCard } from './subscription/PremiumUpgradeCard';
 
-const LoadingScreen = () => <FullPageSkeleton />;
+const LoadingScreen = () => <ScreenSkeleton />;
 
 export function AdminPrintMarksheetContent() {
   const { push } = useRouter();

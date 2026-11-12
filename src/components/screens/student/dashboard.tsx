@@ -35,7 +35,7 @@ import {
   AlertCircle,
   Trophy,
 } from "lucide-react";
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import { ResultPublishedBanner } from "@/components/shared/result-published-banner";
 
 const formatDate = (dateStr: string) => {
@@ -465,5 +465,5 @@ function StatCard({
 
 /* ─── Skeleton ─── */
 function DashboardSkeleton() {
-  return <FullPageSkeleton />;
+  return <ScreenSkeleton />;
 }

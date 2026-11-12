@@ -6,9 +6,9 @@ import { useAppStore } from '@/store/use-app-store';
 import { hasPermission } from '@/lib/permissions';
 import { navItems } from '@/components/layout/nav-config';
 import dynamic from 'next/dynamic';
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 
-const LoadingScreen = () => <FullPageSkeleton />;
+const LoadingScreen = () => <ScreenSkeleton />;
 
 const ParentHomework = dynamic(() => import('@/components/screens/parent/homework').then(m => m.ParentHomework), { loading: LoadingScreen });
 const UserProfileScreen = dynamic(() => import('@/components/screens/profile').then(m => m.UserProfileScreen), { loading: LoadingScreen });
