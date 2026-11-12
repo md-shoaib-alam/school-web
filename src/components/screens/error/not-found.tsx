@@ -25,8 +25,8 @@ export function NotFoundScreen() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-between py-12 px-6 bg-[#FDF3D8] dark:bg-[#141310] transition-colors duration-300">
-      
+    <div className="min-h-screen w-full flex flex-col items-center justify-between py-12 px-6 bg-background transition-colors duration-300">
+
       {/* Top Section: Recreated Premium Logo */}
       <div className="w-full flex justify-center animate-[fade-down_0.8s_ease-out_forwards]">
         <div className="relative w-64 h-20 transition-transform duration-300 hover:scale-102">
@@ -43,25 +43,27 @@ export function NotFoundScreen() {
 
       {/* Middle Section: SVG Illustration */}
       <div className="flex-1 flex items-center justify-center my-8 w-full max-w-4xl animate-[scale-in_0.8s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
-        <div className="relative w-full aspect-[300/108] max-h-[55vh]">
-          <Image
-            src="/404 page.svg"
-            alt="404 - Page Not Found"
-            fill
-            sizes="(max-width: 1024px) 100vw, 896px"
-            className="object-contain"
-            priority
-          />
+        <div className="w-full max-w-3xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg">
+          <div className="relative w-full aspect-[300/108] max-h-[45vh] mx-auto">
+            <Image
+              src="/404 page.svg"
+              alt="404 - Page Not Found"
+              fill
+              sizes="(max-width: 1024px) 100vw, 896px"
+              className="object-contain"
+              priority
+            />
+          </div>
         </div>
       </div>
 
       {/* Bottom Section: Action Buttons */}
-      <div className="w-full flex flex-col items-center gap-6 animate-[fade-up_0.8s_ease-out_0.2s_forwards] opacity-0">
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="w-full flex flex-col items-center gap-5 animate-[fade-up_0.8s_ease-out_0.2s_forwards] opacity-0">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             type="button"
             onClick={goHome}
-            className="bg-[#FAA21B] hover:bg-[#E08D10] text-[#412137] dark:text-[#25101E] font-bold text-sm sm:text-base py-3 px-10 rounded-full shadow-[0_4px_14px_rgba(250,162,27,0.35)] hover:shadow-[0_6px_20px_rgba(250,162,27,0.5)] transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+            className="h-10 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-xs transition-all duration-300 ease-spring hover:-translate-y-px active:scale-[0.97] active:translate-y-0 cursor-pointer"
           >
             Back to Home
           </button>
@@ -70,16 +72,16 @@ export function NotFoundScreen() {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-foreground font-semibold text-sm py-3 px-8 rounded-full border  transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+              className="h-10 px-6 rounded-xl bg-card hover:bg-accent text-foreground font-semibold text-sm border border-border shadow-xs transition-all duration-300 ease-spring hover:-translate-y-px active:scale-[0.97] active:translate-y-0 cursor-pointer flex items-center gap-2"
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-3.5" />
               Sign Out
             </button>
           )}
         </div>
 
         {/* Subtle Supporting Footer Text */}
-        <p className="text-xs font-medium text-[#BD695B] dark:text-[#A8584B] tracking-wide">
+        <p className="text-xs font-medium text-muted-foreground">
           School Aura OS &middot; If you think this is an error, please contact your administrator.
         </p>
       </div>
