@@ -89,7 +89,7 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
     : defaultSchools;
 
   return (
-    <Card className="border  bg-card rounded-2xl shadow-sm py-4 px-5 gap-3">
+    <Card className="border  bg-card rounded-2xl shadow-sm py-4 px-5 gap-3 h-full">
       <CardHeader className="p-0 pb-1 flex flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
@@ -112,7 +112,7 @@ export function TopPerformance({ loading, data, onNavigate }: TopPerformanceProp
         </Button>
       </CardHeader>
 
-      <CardContent className="p-0 pt-1">
+      <CardContent className="p-0 pt-1 flex-1">
         {loading ? (
           <div className="rounded-xl border  overflow-hidden">
             <Table>

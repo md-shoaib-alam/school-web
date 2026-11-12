@@ -33,22 +33,22 @@ const colorCycles = [
 
 export function TeacherSubjects({ subjects, onNavigate }: TeacherSubjectsProps) {
   return (
-    <div className="rounded-2xl sm:rounded-3xl border  bg-card p-4 sm:p-5 shadow-xs flex flex-col h-full">
+    <div className="rounded-xl border bg-card p-4 sm:p-5 shadow-xs flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b ">
+      <div className="flex items-center justify-between pb-3 border-b">
         <div className="flex items-center gap-2">
           <BookOpen className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400" />
-          <h2 className="text-sm sm:text-base font-bold text-foreground">
+          <h2 className="text-base font-semibold text-foreground">
             My Subjects
           </h2>
-          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100/80 dark:border-blue-900/40">
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100/80 dark:border-blue-900/40">
             {subjects.length} subjects
           </span>
         </div>
 
         <button
           onClick={() => onNavigate?.('my-subjects')}
-          className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 cursor-pointer transition-colors"
+          className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 cursor-pointer transition-colors"
         >
           View All →
         </button>
@@ -71,10 +71,10 @@ export function TeacherSubjects({ subjects, onNavigate }: TeacherSubjectsProps) 
                   <BookOpen className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">
+                  <p className="text-sm font-semibold text-foreground truncate">
                     {subject.name}
                   </p>
-                  <p className="text-[11px] text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {subject.className} {subject.code ? `• ${subject.code}` : ''}
                   </p>
                 </div>
@@ -88,10 +88,10 @@ export function TeacherSubjects({ subjects, onNavigate }: TeacherSubjectsProps) 
         {subjects.length === 0 && (
           <div className="text-center py-6">
             <BookOpen className="size-8 text-muted-foreground mx-auto mb-1.5" />
-            <p className="text-xs sm:text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-foreground">
               No subjects assigned
             </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Contact your administrator to assign subjects
             </p>
           </div>

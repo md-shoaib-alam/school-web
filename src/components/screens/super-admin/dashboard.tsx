@@ -66,7 +66,7 @@ export function SuperAdminDashboard() {
       />
 
       {/* Bottom Grid: Recent Schools (7 cols) & Platform Insights (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         <div className="lg:col-span-7">
           <TopPerformance loading={loading} data={data} onNavigate={handleNavigate} />
         </div>

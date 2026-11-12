@@ -122,7 +122,7 @@ export function FeePieDistribution({ isLoading, data, recharts }: FeePieDistribu
                         </div>
                         <div className="flex items-baseline gap-1.5 shrink-0 ml-2">
                           <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">₹{entry.value.toLocaleString()}</span>
-                          <span className="text-[10px] text-muted-foreground font-medium">({percentage}%)</span>
+                          <span className="text-xs text-muted-foreground font-medium">({percentage}%)</span>
                         </div>
                       </div>
                     );

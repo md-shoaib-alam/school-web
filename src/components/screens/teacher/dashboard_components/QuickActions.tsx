@@ -53,11 +53,11 @@ const actions = [
 
 export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
   return (
-    <div className="rounded-2xl sm:rounded-3xl border  bg-card p-4 sm:p-5 shadow-xs flex flex-col h-full">
+    <div className="rounded-xl border bg-card p-4 sm:p-5 shadow-xs flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 pb-3 border-b ">
+      <div className="flex items-center gap-2 pb-3 border-b">
         <Zap className="size-4 sm:size-4.5 text-blue-600 dark:text-blue-400 fill-blue-600/20" />
-        <h2 className="text-sm sm:text-base font-bold text-foreground">
+        <h2 className="text-base font-semibold text-foreground">
           Quick Actions
         </h2>
       </div>
@@ -76,7 +76,7 @@ export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
                 onNavigate(act.screen);
               }
             }}
-            className={`rounded-xl sm:rounded-2xl p-2.5 sm:p-3 border flex items-center justify-between transition-all group cursor-pointer shadow-2xs hover:shadow-xs ${act.cardBg}`}
+            className={`rounded-xl p-2.5 sm:p-3 border flex items-center justify-between transition-all group cursor-pointer shadow-2xs hover:shadow-xs ${act.cardBg}`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div
@@ -85,10 +85,10 @@ export function QuickActions({ onNavigate, onOpenQRScan }: QuickActionsProps) {
                 {act.icon}
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] sm:text-xs font-bold text-foreground truncate">
+                <p className="text-xs sm:text-sm font-medium text-foreground truncate">
                   {act.label}
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {act.subtitle}
                 </p>
               </div>

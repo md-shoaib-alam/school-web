@@ -119,17 +119,17 @@ export function ClassDistribution({ isLoading, data, recharts, maleStudents = 0,
 
                 <div className="mt-2 pt-2 border-t border-border/40 flex items-center justify-around w-full">
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Students</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Students</span>
                     <span className="text-sm sm:text-base font-bold mt-1 text-cyan-600 dark:text-cyan-400">{totalStudents}</span>
                   </div>
                   <div className="h-8 w-px bg-border/60" />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Male</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Male</span>
                     <span className="text-sm sm:text-base font-bold mt-1 text-blue-600 dark:text-blue-400">{maleStudents}</span>
                   </div>
                   <div className="h-8 w-px bg-border/60" />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Female</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Female</span>
                     <span className="text-sm sm:text-base font-bold mt-1 text-pink-600 dark:text-pink-400">{femaleStudents}</span>
                   </div>
                 </div>
