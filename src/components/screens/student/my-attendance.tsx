@@ -103,6 +103,15 @@ export function StudentAttendance() {
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
+      <div>
+        <h2 className="text-2xl font-semibold text-foreground">
+          My Attendance
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Track your daily attendance and view monthly progress.
+        </p>
+      </div>
+
       <div className="space-y-6 mt-2 animate-in fade-in duration-300" suppressHydrationWarning>
         <AttendanceStats 
           percentage={stats.percentage}

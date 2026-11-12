@@ -24,8 +24,8 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
   const circlePath = "M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831";
 
   return (
-    <Card className="rounded-2xl border  bg-card p-4 sm:p-5 space-y-3">
-      <h3 className="text-sm sm:text-base font-bold text-foreground">
+    <Card className="rounded-xl border bg-card p-4 space-y-3">
+      <h3 className="text-base font-semibold text-foreground">
         Current Month Breakdown
       </h3>
 
@@ -91,17 +91,17 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-base sm:text-lg font-extrabold text-foreground">
+            <span className="text-xl sm:text-2xl font-bold text-foreground">
               {metrics.recordedDays}
             </span>
-            <span className="text-[9px] font-medium text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground mt-0.5">
               Days Logged
             </span>
           </div>
         </div>
 
         {/* Breakdown Rows */}
-        <div className="w-full sm:flex-1 space-y-1.5 text-xs">
+        <div className="w-full sm:flex-1 space-y-2 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-emerald-500" />

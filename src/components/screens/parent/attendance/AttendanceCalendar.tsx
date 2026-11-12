@@ -24,16 +24,16 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               <Calendar className="size-4 sm:size-5 text-amber-600" />
             </div>
             <div>
-              <CardTitle className="text-xs sm:text-sm font-bold text-foreground">
+              <CardTitle className="text-sm font-semibold text-foreground">
                 Calendar
               </CardTitle>
-              <CardDescription className="text-[9px] sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+              <CardDescription className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                 {currentPeriod || "Current"}
               </CardDescription>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 bg-muted p-0.5 sm:p-1 rounded-xl border ">
+          <div className="flex items-center gap-1 bg-muted p-0.5 sm:p-1 rounded-xl border">
             <button
               type="button"
               onClick={onPrev}
@@ -42,7 +42,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
             >
               <ChevronLeft className="size-3.5 sm:size-4" />
             </button>
-            <div className="px-1 sm:px-2 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter sm:tracking-widest text-muted-foreground flex items-center gap-0.5">
+            <div className="px-1.5 sm:px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-0.5">
               {!isPremium && <Lock className="size-2" />}
               <span>History</span>
             </div>
@@ -60,7 +60,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
       <CardContent className="p-2 sm:p-4">
         <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-1.5">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase py-1">
+            <div key={day} className="text-center text-xs font-medium text-muted-foreground uppercase py-1">
               {day}
             </div>
           ))}
@@ -77,7 +77,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
               }`}
             >
               {day.date && (
-                <span className="text-[10px] sm:text-xs font-bold">
+                <span className="text-xs font-medium">
                   {day.date}
                 </span>
               )}
@@ -85,7 +85,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 pt-3 border-t ">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 pt-3 border-t">
           {[
             { label: "Present", color: "bg-emerald-500" },
             { label: "Absent", color: "bg-red-500" },
@@ -93,7 +93,7 @@ export function AttendanceCalendar({ data, isPremium, onPrev, onNext, currentPer
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-1 text-[8px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-tighter sm:tracking-wide"
+              className="flex items-center gap-1 text-xs font-medium text-muted-foreground uppercase tracking-wide"
             >
               <div className={`size-2 rounded-full ${item.color}`} />
               {item.label}

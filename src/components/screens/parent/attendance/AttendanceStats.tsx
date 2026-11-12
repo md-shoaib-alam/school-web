@@ -33,17 +33,17 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-left leading-none">
-              <span className={`text-2xl font-black tracking-tight ${percentage >= 80 ? "text-emerald-600 dark:text-emerald-400" : percentage >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+              <span className={`text-2xl font-bold tracking-tight ${percentage >= 80 ? "text-emerald-600 dark:text-emerald-400" : percentage >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
                 {percentage}%
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mt-1.5">Attendance</span>
+              <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider mt-1.5">Attendance</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Present days card */}
-      <Card className="col-span-1 rounded-3xl border border-emerald-100/80 dark:border-emerald-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-emerald-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
+      <Card className="col-span-1 rounded-xl border border-emerald-100/80 dark:border-emerald-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-emerald-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
         <CardContent className="p-4 md:p-6 flex flex-col justify-between h-full w-full">
           <div className="flex items-center">
             <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
@@ -51,8 +51,8 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
             </div>
           </div>
           <div className="mt-3 md:mt-4 text-left leading-none">
-            <span className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider font-semibold block">Present Days</span>
-            <span className="text-2xl md:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight block mt-1.5 md:mt-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block">Present Days</span>
+            <span className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight block mt-1.5 md:mt-2">
               {present}
             </span>
           </div>
@@ -60,7 +60,7 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
       </Card>
 
       {/* Absent days card */}
-      <Card className="col-span-1 rounded-3xl border border-red-100/80 dark:border-red-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-red-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
+      <Card className="col-span-1 rounded-xl border border-red-100/80 dark:border-red-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-red-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
         <CardContent className="p-4 md:p-6 flex flex-col justify-between h-full w-full">
           <div className="flex items-center">
             <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-red-500/5 text-red-600 dark:text-red-400 group-hover:scale-105 transition-transform">
@@ -68,8 +68,8 @@ export function AttendanceStats({ percentage, present, absent }: AttendanceStats
             </div>
           </div>
           <div className="mt-3 md:mt-4 text-left leading-none">
-            <span className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wider font-semibold block">Absent Days</span>
-            <span className="text-2xl md:text-3xl font-black text-red-650 dark:text-red-400 tracking-tight block mt-1.5 md:mt-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block">Absent Days</span>
+            <span className="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400 tracking-tight block mt-1.5 md:mt-2">
               {absent}
             </span>
           </div>

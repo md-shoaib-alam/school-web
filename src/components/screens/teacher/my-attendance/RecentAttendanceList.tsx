@@ -27,10 +27,10 @@ export function RecentAttendanceList({
   className,
 }: RecentAttendanceListProps) {
   return (
-    <Card className={cn('lg:col-span-3 rounded-2xl border  bg-card p-5 flex flex-col justify-between', className)}>
+    <Card className={cn('lg:col-span-3 rounded-xl border bg-card p-4 sm:p-5 flex flex-col justify-between', className)}>
       <div>
-        <div className="flex items-center justify-between pb-3 border-b ">
-          <h3 className="text-base font-bold text-foreground">
+        <div className="flex items-center justify-between pb-3 border-b">
+          <h3 className="text-base font-semibold text-foreground">
             Recent Attendance
           </h3>
           <Button
@@ -38,10 +38,10 @@ export function RecentAttendanceList({
             size="sm"
             onClick={onOpenViewAll}
             disabled={recentRecords.length === 0}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 p-0 h-auto cursor-pointer gap-1 disabled:opacity-40"
+            className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 p-0 h-auto cursor-pointer gap-1 disabled:opacity-40"
           >
             <span>View All</span>
-            <ArrowRight className="size-3" />
+            <ArrowRight className="size-3.5" />
           </Button>
         </div>
 
@@ -49,7 +49,7 @@ export function RecentAttendanceList({
         {recentRecords.length === 0 ? (
           <div className="py-12 text-center space-y-2">
             <CalendarDays className="size-8 text-muted-foreground mx-auto" />
-            <p className="text-xs font-medium text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               No attendance logged yet for {MONTH_NAMES[currentRealMonth]} {currentRealYear}.
             </p>
           </div>
@@ -66,13 +66,13 @@ export function RecentAttendanceList({
               return (
                 <div
                   key={item.date}
-                  className="py-3 flex items-center justify-between gap-2.5 hover:bg-muted rounded-xl px-1.5 transition-colors cursor-pointer"
+                  className="py-3 flex items-center justify-between gap-2.5 hover:bg-muted rounded-lg px-2 transition-colors cursor-pointer"
                   onClick={() => onSelectDate(item.date)}
                 >
                   {/* Date Block */}
                   <div
                     className={cn(
-                      'size-10 rounded-xl flex flex-col items-center justify-center shrink-0 border text-center',
+                      'size-10 rounded-lg flex flex-col items-center justify-center shrink-0 border text-center',
                       isAbsent
                         ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200/60 dark:border-rose-900/40 text-rose-600'
                         : isLeave
@@ -80,8 +80,8 @@ export function RecentAttendanceList({
                         : 'bg-blue-50 dark:bg-blue-950/40 border-blue-200/60 dark:border-blue-900/40 text-blue-600'
                     )}
                   >
-                    <span className="text-xs font-bold leading-none">{dayNum}</span>
-                    <span className="text-[9px] font-medium uppercase tracking-tight">{mShort}</span>
+                    <span className="text-xs font-semibold leading-none">{dayNum}</span>
+                    <span className="text-[10px] font-medium uppercase tracking-tight">{mShort}</span>
                   </div>
 
                   {/* Middle Info */}
@@ -93,11 +93,11 @@ export function RecentAttendanceList({
                           isAbsent ? 'bg-rose-500' : isLeave ? 'bg-amber-500' : 'bg-emerald-500'
                         )}
                       />
-                      <span className="text-xs font-semibold text-foreground capitalize truncate">
+                      <span className="text-xs font-medium text-foreground capitalize truncate">
                         {item.status}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground truncate">
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">
                       {isAbsent
                         ? '--'
                         : item.checkIn
@@ -110,7 +110,7 @@ export function RecentAttendanceList({
                   <div className="shrink-0 flex items-center gap-1">
                     <Badge
                       className={cn(
-                        'text-[10px] px-2 py-0.5 font-semibold capitalize',
+                        'text-xs px-2 py-0.5 font-medium capitalize',
                         isAbsent
                           ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400'
                           : isLeave
@@ -120,7 +120,7 @@ export function RecentAttendanceList({
                     >
                       {isAbsent ? 'Absent' : isLeave ? 'Leave' : 'On Time'}
                     </Badge>
-                    <ChevronRight className="size-3 text-muted-foreground" />
+                    <ChevronRight className="size-3.5 text-muted-foreground" />
                   </div>
                 </div>
               );

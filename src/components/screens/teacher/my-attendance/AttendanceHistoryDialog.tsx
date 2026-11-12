@@ -33,13 +33,13 @@ export function AttendanceHistoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <CalendarRange className="size-5 text-blue-600" />
             <span>
               Full Attendance History - {MONTH_NAMES[currentRealMonth]} {currentRealYear}
             </span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-muted-foreground">
             Complete real attendance logs for the current month.
           </DialogDescription>
         </DialogHeader>
@@ -72,7 +72,7 @@ export function AttendanceHistoryDialog({
                   </div>
                   <Badge
                     className={cn(
-                      'text-[10px] capitalize font-semibold',
+                      'text-xs capitalize font-medium',
                       r.status === 'present' && 'bg-emerald-50 text-emerald-700 border-emerald-200',
                       r.status === 'absent' && 'bg-rose-50 text-rose-700 border-rose-200',
                       r.status === 'leave' && 'bg-amber-50 text-amber-700 border-amber-200',

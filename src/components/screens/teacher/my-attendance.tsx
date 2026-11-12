@@ -50,9 +50,14 @@ export function TeacherMyAttendance() {
   return (
     <div className="space-y-5">
       {/* ── 1. Page Title ── */}
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
-        My <span className="text-blue-600 dark:text-blue-400">Attendance</span>
-      </h2>
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          My Attendance
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Track your daily attendance, check-in records, and monthly overview.
+        </p>
+      </div>
 
       {/* ── 2. Mobile Only: Today / Calendar / History Switcher ── */}
       <Tabs
