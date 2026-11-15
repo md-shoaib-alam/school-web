@@ -35,7 +35,7 @@ export function ActiveEventsCard({
   openDeleteConfirm,
 }: ActiveEventsCardProps) {
   return (
-    <div className="bg-card border  shadow-sm rounded-2xl p-5 sm:p-6 flex flex-col overflow-hidden">
+    <div className="bg-card border shadow-sm rounded-xl p-5 sm:p-6 flex flex-col overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-base font-semibold text-foreground tracking-tight">
@@ -53,7 +53,7 @@ export function ActiveEventsCard({
           )}
         </div>
         
-        <div className="px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 text-[11px] font-bold tracking-tight border border-blue-100/50 dark:border-blue-900/20 shadow-sm shadow-blue-500/5 shrink-0">
+        <div className="px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 text-xs font-medium tracking-tight border border-blue-100/50 dark:border-blue-900/20 shadow-sm shadow-blue-500/5 shrink-0">
           {formattedDatePill}
         </div>
       </div>
@@ -61,10 +61,10 @@ export function ActiveEventsCard({
       <div className="flex-1 overflow-y-auto no-scrollbar min-h-[120px] max-h-[260px] flex flex-col">
         {loading ? (
           <div className="space-y-3">
-            <Skeleton className="h-14 w-full rounded-xl bg-muted border " />
+            <Skeleton className="h-14 w-full rounded-xl bg-muted border" />
           </div>
         ) : activeEventsList.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-6 border  bg-muted rounded-xl text-center">
+          <div className="flex-1 flex flex-col items-center justify-center py-6 border bg-muted rounded-xl text-center">
             <CalendarCheck2 className="size-8 text-muted-foreground mb-2 stroke-[1.5]" />
             <p className="text-xs font-medium text-muted-foreground">
               No events scheduled for this day
@@ -83,20 +83,20 @@ export function ActiveEventsCard({
                     onDetailClick(ev);
                   }
                 }}
-                className="w-full text-left group relative p-3.5 bg-muted hover:bg-accent border  hover: hover:shadow-[0_4px_12px_rgba(0,0,0,0.02)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)] rounded-2xl transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+                className="w-full text-left group relative p-3.5 bg-muted hover:bg-accent border hover: hover:shadow-[0_4px_12px_rgba(0,0,0,0.02)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)] rounded-xl transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
               >
                 <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full transition-transform duration-300 group-hover:scale-y-125" style={{ backgroundColor: ev.color || EVENT_TYPE_COLORS[ev.type] || "#3b82f6" }} />
                 
                 <div className="flex items-start justify-between pl-3.5">
                   <div className="space-y-2 min-w-0 flex-1">
-                    <h4 className="text-[14px] font-semibold text-foreground leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate pr-2">
+                    <h4 className="text-sm font-semibold text-foreground leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 truncate pr-2">
                       {ev.title}
                     </h4>
-                    <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-medium text-muted-foreground">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black tracking-wider border uppercase shadow-sm bg-card/80" style={getTypeBadgeStyle(ev.type, ev.color)}>
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs font-medium text-muted-foreground">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium tracking-wider border uppercase shadow-sm bg-card/80" style={getTypeBadgeStyle(ev.type, ev.color)}>
                         {EVENT_TYPE_LABELS[ev.type] || ev.type}
                       </span>
-                      <span className="flex items-center gap-1 text-muted-foreground font-semibold">
+                      <span className="flex items-center gap-1 text-muted-foreground font-medium">
                         <Clock className="size-3 shrink-0 opacity-70" />
                         {ev.allDay ? "All Day" : "Scheduled"}
                       </span>

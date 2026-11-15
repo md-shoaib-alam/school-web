@@ -17,7 +17,6 @@ import {
   Shield,
   User,
   School,
-  Copy,
   Check,
   Printer,
   ChevronLeft,
@@ -32,7 +31,7 @@ import {
   Key,
 } from "lucide-react";
 import { toast } from "sonner";
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { StaffMember } from "./types";
 import { getInitials } from "./utils";
 
@@ -53,7 +52,6 @@ export function StaffDetailDialog({
   onEdit,
   isLoading = false,
 }: StaffDetailDialogProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "attendance" | "documents" | "notes">("overview");
 
   if (!member && !isLoading) return null;
@@ -68,13 +66,6 @@ export function StaffDetailDialog({
     isActive: true,
     customRole: null,
     createdAt: new Date().toISOString(),
-  };
-
-  const handleCopy = (text: string, fieldName: string) => {
-    copyToClipboard(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success(`${fieldName} copied to clipboard`);
   };
 
   const handlePrint = () => {
@@ -209,17 +200,7 @@ export function StaffDetailDialog({
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-muted-foreground font-medium">
                   <span>Staff ID:</span>
                   <span className="font-semibold text-foreground">{displayStaffId}</span>
-                  <button
-                    onClick={() => handleCopy(displayStaffId, "Staff ID")}
-                    className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
-                    aria-label="Copy Staff ID"
-                  >
-                    {copiedField === "Staff ID" ? (
-                      <Check className="size-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="size-3.5" />
-                    )}
-                  </button>
+                  <CopyButton value={displayStaffId} toastSubject="Staff ID" size="sm" />
                 </div>
               </div>
             </div>
@@ -315,17 +296,7 @@ export function StaffDetailDialog({
                         <span className="font-semibold text-foreground text-right truncate max-w-[180px] sm:max-w-xs">
                           {currentMember.email}
                         </span>
-                        <button
-                          onClick={() => handleCopy(currentMember.email, "Email")}
-                          className="p-1 text-muted-foreground hover:text-emerald-600 transition-colors rounded"
-                          aria-label="Copy Email"
-                        >
-                          {copiedField === "Email" ? (
-                            <Check className="size-3.5 text-emerald-600" />
-                          ) : (
-                            <Copy className="size-3.5" />
-                          )}
-                        </button>
+                        <CopyButton value={currentMember.email} toastSubject="Email" size="sm" />
                       </div>
                     </div>
 

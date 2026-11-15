@@ -17,23 +17,36 @@ import {
   School,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRequestPasswordReset } from '@/lib/graphql/hooks';
+import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function ResetPasswordClient() {
   const [email, setEmail] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-  const resetMutation = useRequestPasswordReset();
-  const isLoading = resetMutation.isPending;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    const identifier = email.trim();
+    if (!identifier) return;
+    setIsLoading(true);
     try {
-      await resetMutation.mutateAsync(email);
+      // Public REST route: the /graphql gate rejects every anonymous request,
+      // so a signed-out user can never get an answer through GraphQL.
+      const res = await apiFetch('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: identifier }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(body?.error || `Could not check that account (HTTP ${res.status}).`);
+        return;
+      }
       setIsSuccess(true);
-    } catch (err: any) {
-      toast.error('The email address you entered is not registered in our system.');
+    } catch {
+      toast.error('Could not reach the server. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,10 +58,11 @@ export default function ResetPasswordClient() {
       <div className="size-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4 shadow-sm">
         <CheckCircle2 className="size-8 text-emerald-500" />
       </div>
-      <h2 className="text-xl font-bold text-foreground tracking-tight">Email Sent!</h2>
+      <h2 className="text-xl font-bold text-foreground tracking-tight">Account Found</h2>
       <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-[260px]">
-        A secure reset link has been sent to{' '}
-        <span className="font-semibold text-foreground">{email}</span>
+        Automatic reset links aren&apos;t wired up yet, so nothing was mailed to{' '}
+        <span className="font-semibold text-foreground">{email}</span>. Ask your school
+        administrator to set a new password for you.
       </p>
       <Button asChild className="w-full h-10 mt-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 cursor-pointer">
         <Link href="/"><ArrowLeft className="size-4" />Return to Login</Link>
@@ -58,7 +72,7 @@ export default function ResetPasswordClient() {
         onClick={() => setIsSuccess(false)}
         className="mt-3 text-xs text-muted-foreground hover:text-blue-600 font-medium transition-colors cursor-pointer"
       >
-        Didn't receive the email? Try again
+        Didn&apos;t recognise this account? Try again
       </button>
     </div>
   );
@@ -77,7 +91,8 @@ export default function ResetPasswordClient() {
       <div className="text-center mb-5">
         <h2 className="text-xl xl:text-2xl font-bold text-foreground tracking-tight">Forgot Password?</h2>
         <p className="mt-2 text-xs text-muted-foreground leading-relaxed max-w-[240px] mx-auto">
-          Enter your email address and we'll send you instructions to reset your password.
+          Enter the email address you use to sign in, and we&apos;ll tell you how to
+          reset it.
         </p>
       </div>
 
@@ -108,7 +123,7 @@ export default function ResetPasswordClient() {
           className="w-full h-10 xl:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold text-sm shadow-md shadow-blue-500/25 gap-2 transition-all cursor-pointer disabled:opacity-60"
         >
           {isLoading ? (
-            <><Loader2 className="size-4 animate-spin" /><span>Sending link…</span></>
+            <><Loader2 className="size-4 animate-spin" /><span>Checking…</span></>
           ) : (
             <span>Send Reset Link</span>
           )}

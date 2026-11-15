@@ -15,13 +15,13 @@ import { MarksheetPreviewPage } from './exams/MarksheetPreviewPage';
 import { Badge } from '@/components/ui/badge';
 import { getGroupedExams } from './exams/utils';
 import { ExamRecord } from './exams/types';
-import { FullPageSkeleton } from "@/components/ui/full-page-skeleton";
+import { ScreenSkeleton } from "@/components/ui/full-page-skeleton";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 import { useTenantMetadata } from "@/lib/graphql/hooks/platform.hooks";
 import { PremiumUpgradeCard } from './subscription/PremiumUpgradeCard';
 
-const LoadingScreen = () => <FullPageSkeleton />;
+const LoadingScreen = () => <ScreenSkeleton />;
 
 export function AdminPrintMarksheetContent() {
   const { push } = useRouter();
@@ -37,7 +37,7 @@ export function AdminPrintMarksheetContent() {
   // Academic Years
   const { academicYears } = useAcademicYears();
   const currentAcademicYear = useMemo(() => {
-    return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024-2025';
+    return academicYears.find((ay: any) => ay.isCurrent)?.name || '2024 - 2025';
   }, [academicYears]);
 
   // Settings for inline vs tab preview

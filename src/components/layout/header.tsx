@@ -176,7 +176,7 @@ export function Header({ items, resolvedScreen, layoutPref = "comprehensive", on
         <ThemeToggle />
 
         {/* Subtle Divider */}
-        <div className="h-5 w-px bg-muted mx-0.5 sm:mx-1 hidden sm:block" />
+        <div className="h-6 w-px bg-zinc-300 dark:bg-zinc-700 mx-0.5 sm:mx-1 hidden sm:block" />
 
         {/* User profile dropdown */}
         {(effectiveIsMinimal || isModernUI) && (

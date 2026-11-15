@@ -168,6 +168,7 @@ export interface TeachersResponse {
   total: number
   page: number
   totalPages: number
+  currentSession?: string | null
 }
 
 export interface StudentsResponse {
@@ -210,4 +211,5 @@ export interface StaffResponse {
   total: number
   page: number
   totalPages: number
+  currentSession?: string | null
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useCallback, useMemo, useEffect } from "react";
+import { useReducer, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   useGraphQLMutation,
   useAssignRoleToUser,
@@ -32,6 +32,7 @@ import { useModulePermissions } from "@/hooks/use-permissions";
 import { Pagination } from "@/components/shared/pagination";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { LayoutGroup, LazyMotion, domMax, m } from "framer-motion";
 
 // Sub-components
 import { StaffTable } from "./staff/StaffTable";
@@ -43,6 +44,13 @@ import { StaffProfileView } from "./staff/StaffProfileView";
 
 // Types
 import { StaffMember, StaffFormData, emptyFormData } from "./staff/types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 // --- GraphQL Operations ---
 
@@ -127,13 +135,31 @@ function reducer(state: State, action: Action): State {
         ...state,
         editingMember: action.payload,
         formData: {
+          ...emptyFormData,
           name: action.payload.name,
           email: action.payload.email,
-          password: "",
           phone: action.payload.phone || "",
           address: action.payload.address || "",
           customRoleId: action.payload.customRole?.id || "",
           isActive: action.payload.isActive,
+          employeeId: action.payload.employeeId || "",
+          department: action.payload.department || "",
+          designation: action.payload.designation || "",
+          employmentType: action.payload.employmentType || "full-time",
+          joiningDate: action.payload.joiningDate || "",
+          dateOfBirth: action.payload.dateOfBirth || "",
+          gender: action.payload.gender || "",
+          bloodGroup: action.payload.bloodGroup || "",
+          maritalStatus: action.payload.maritalStatus || "",
+          nationality: action.payload.nationality || "",
+          religion: action.payload.religion || "",
+          alternatePhone: action.payload.alternatePhone || "",
+          panNumber: action.payload.panNumber || "",
+          aadhaarNumber: action.payload.aadhaarNumber || "",
+          pfEnabled: !!action.payload.pfEnabled,
+          esiEnabled: !!action.payload.esiEnabled,
+          ptEnabled: !!action.payload.ptEnabled,
+          avatar: action.payload.avatar || "",
         },
         dialogOpen: true,
       };
@@ -228,14 +254,17 @@ export function AdminStaff() {
 
     dispatch({ type: 'SET_SUBMITTING', payload: true });
     try {
+      const payload: any = { ...formData, customRoleId: formData.customRoleId || null };
+      const headers = { "Content-Type": "application/json" };
+
       if (editingMember) {
         // OPTIMISTIC UPDATE: Update the UI instantly
-        const updatedStaff = { 
-          ...editingMember, 
+        const updatedStaff = {
+          ...editingMember,
           ...formData,
           customRole: roles.find(r => r.id === formData.customRoleId) || editingMember.customRole
         };
-        
+
         const queryKey = ["staff", currentTenantId, "staff", search || undefined, currentPage, 12];
         queryClient.setQueryData(queryKey, (old: any) => {
           if (!old || !old.staff) return old;
@@ -245,46 +274,26 @@ export function AdminStaff() {
           };
         });
 
-        // Update user
-        await updateUser({
-          id: editingMember.id,
-          data: {
-            name: formData.name,
-            phone: formData.phone,
-            address: formData.address,
-            isActive: formData.isActive,
-          },
+        const res = await apiFetch("/api/staff", {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ id: editingMember.id, ...payload }),
         });
-        
-        // Assign/Update role
-        await assignRole({
-          userId: editingMember.id,
-          roleId: formData.customRoleId === "none" ? "" : formData.customRoleId,
-          tenantId: currentTenantId!,
-        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || "Failed to update staff");
+        }
 
         toast.success("Staff member updated");
       } else {
-        // Create user
-        const res = await createUser({
-          data: {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            role: "staff",
-            phone: formData.phone,
-            address: formData.address,
-            isActive: formData.isActive,
-            tenantId: currentTenantId!,
-          },
+        const res = await apiFetch("/api/staff", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
         });
-
-        if (res?.createUser?.id && formData.customRoleId && formData.customRoleId !== "none") {
-          await assignRole({
-            userId: res.createUser.id,
-            roleId: formData.customRoleId,
-            tenantId: currentTenantId!,
-          });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || "Failed to create staff");
         }
         toast.success("New staff member created");
       }
@@ -321,6 +330,14 @@ export function AdminStaff() {
 
   const totalItems = staffResponse?.total || 0;
   const totalPages = staffResponse?.totalPages || 1;
+
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    if (!loadingStaff && staff.length > 0) painted.current = true;
+  }, [loadingStaff, staff]);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -399,6 +416,7 @@ export function AdminStaff() {
           roles={roles}
           onBack={handleCloseView}
           canEdit={canEdit}
+          currentSession={staffResponse?.currentSession || null}
           onEditModal={(m) => {
             handleCloseView();
             handleOpenEdit(m);
@@ -454,32 +472,47 @@ export function AdminStaff() {
           </div>
 
           {/* Content */}
-          <div className={cn(viewMode === 'table' ? "bg-card rounded-xl border  overflow-hidden" : "")}>
+          <div>
               {loadingStaff ? (
                 <StaffSkeleton />
-              ) : viewMode === 'table' ? (
-                <StaffTable
-                  staff={staff}
-                  onEdit={handleOpenEdit}
-                  onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
-                  onView={handleOpenView}
-                  canEdit={canEdit}
-                  canDelete={canDelete}
-                />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                  {staff.map((member) => (
-                    <StaffCard
-                      key={member.id}
-                      member={member}
+                <LayoutGroup id="staff">
+                  {viewMode === 'table' ? (
+                    <StaffTable
+                      staff={staff}
+                      enter={enter}
                       onEdit={handleOpenEdit}
                       onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
                       onView={handleOpenView}
                       canEdit={canEdit}
                       canDelete={canDelete}
                     />
-                  ))}
-                </div>
+                  ) : (
+                    <LazyMotion features={domMax}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                        {staff.map((member, index) => (
+                          <m.div
+                            key={member.id}
+                            id={`staff-item-${member.id}`}
+                            layoutId={`staff-${member.id}`}
+                            initial={enter ? { y: 6 } : undefined}
+                            animate={{ y: 0 }}
+                            transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                          >
+                            <StaffCard
+                              member={member}
+                              onEdit={handleOpenEdit}
+                              onDelete={(m) => dispatch({ type: 'OPEN_DELETE', payload: m })}
+                              onView={handleOpenView}
+                              canEdit={canEdit}
+                              canDelete={canDelete}
+                            />
+                          </m.div>
+                        ))}
+                      </div>
+                    </LazyMotion>
+                  )}
+                </LayoutGroup>
               )}
           </div>
 

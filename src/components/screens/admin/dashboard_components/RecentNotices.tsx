@@ -53,9 +53,9 @@ export function RecentNotices({ isLoading, data }: RecentNoticesProps) {
                       <p className="text-sm font-medium truncate">{notice.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{notice.content}</p>
                     </div>
-                    <Badge className={`text-[10px] shrink-0 ${priorityColors[notice.priority] || priorityColors.normal}`}>{notice.priority}</Badge>
+                    <Badge className={`text-xs shrink-0 ${priorityColors[notice.priority] || priorityColors.normal}`}>{notice.priority}</Badge>
                   </div>
-                  <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                     <span>{notice.authorName}</span>
                     <span>•</span>
                     <span suppressHydrationWarning>{formatNoticeDate(notice.createdAt)}</span>

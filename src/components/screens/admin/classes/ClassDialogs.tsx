@@ -114,13 +114,13 @@ function ClassForm({ value, onChange, enableGradeSelection = false, teachers = [
       </div>
       {enableGradeSelection && (
         <div className="grid gap-2">
-          <Label>Grade</Label>
+          <Label>Class Level</Label>
           <Select
             value={value.grade}
             onValueChange={(v) => onChange({ ...value, grade: v })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select grade" />
+              <SelectValue placeholder="Select class level" />
             </SelectTrigger>
             <SelectContent>
               {["Pre-Nursery", "Nursery", "LKG", "UKG"].map((grade) => (
@@ -130,7 +130,7 @@ function ClassForm({ value, onChange, enableGradeSelection = false, teachers = [
               ))}
               {Array.from({ length: 12 }, (_, i) => (
                 <SelectItem key={i + 1} value={String(i + 1)}>
-                  Grade {i + 1}
+                  Class {i + 1}
                 </SelectItem>
               ))}
             </SelectContent>

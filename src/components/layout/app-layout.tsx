@@ -369,67 +369,64 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <NotificationProvider>
-      <div className={cn(
-        "h-dvh flex flex-col overflow-hidden bg-background transition-opacity duration-200",
-        !isMounted ? "opacity-0" : "opacity-100"
-      )}>
-        <PlatformNoticeBar />
-        <div className="flex-1 flex min-h-0 overflow-hidden">
-          <LoadingProgress />
-        {/* Mobile overlay */}
-
-        {sidebarOpen && (
-          <button
-            type="button"
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden border-none p-0"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setSidebarOpen(false);
-              }
-            }}
-          />
+      <div
+        className={cn(
+          "h-dvh w-screen flex flex-col overflow-hidden bg-zinc-200/60 dark:bg-black p-1.5 sm:p-2 lg:p-2.5 transition-opacity duration-200",
+          !isMounted ? "opacity-0" : "opacity-100"
         )}
+      >
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl lg:rounded-3xl border border-border/80 shadow-xs bg-sidebar relative">
+          <PlatformNoticeBar />
+          <div className="flex-1 flex min-h-0 overflow-hidden">
+            <LoadingProgress />
+            {/* Mobile overlay */}
 
-        {/* Sidebar */}
-        <Sidebar
-          items={items}
-          resolvedScreen={resolvedScreen}
-          navigateTo={navigateTo}
-          setIsChangePasswordOpen={setIsChangePasswordOpen}
-          layoutPref={layoutPref}
-        />
+            {/* Mobile overlay with smooth fade */}
+            <div
+              className={cn(
+                "fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ease-spring",
+                sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+              )}
+              onClick={() => setSidebarOpen(false)}
+              aria-hidden={!sidebarOpen}
+            />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Top Header */}
-          <Header
-            items={items}
-            resolvedScreen={resolvedScreen}
-            layoutPref={layoutPref}
-            onPasswordChange={() => setIsChangePasswordOpen(true)}
-          />
+            {/* Sidebar */}
+            <Sidebar
+              items={items}
+              resolvedScreen={resolvedScreen}
+              navigateTo={navigateTo}
+              setIsChangePasswordOpen={setIsChangePasswordOpen}
+              layoutPref={layoutPref}
+            />
 
-          {/* Page Content */}
-          <main data-lenis-scroll-container className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
-            {isExpired && !isExemptFromLock ? (
-              <SubscriptionExpiredScreen 
-                tenantName={resolvedTenant?.name || currentTenantName || "School"} 
-                tenantSlug={resolvedTenant?.slug || currentTenantSlug || ""}
-                role={currentUser.role}
-                endDate={resolvedTenant?.endDate}
-                status={resolvedTenant?.status}
-                plan={resolvedTenant?.plan}
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
+              {/* Top Header */}
+              <Header
+                items={items}
+                resolvedScreen={resolvedScreen}
+                layoutPref={layoutPref}
+                onPasswordChange={() => setIsChangePasswordOpen(true)}
               />
-            ) : (
-              children
-            )}
-          </main>
-        </div>
 
+              {/* Page Content */}
+              <main data-lenis-scroll-container className="flex-1 overflow-y-auto p-4 lg:p-6 overscroll-contain">
+                {isExpired && !isExemptFromLock ? (
+                  <SubscriptionExpiredScreen 
+                    tenantName={resolvedTenant?.name || currentTenantName || "School"} 
+                    tenantSlug={resolvedTenant?.slug || currentTenantSlug || ""}
+                    role={currentUser.role}
+                    endDate={resolvedTenant?.endDate}
+                    status={resolvedTenant?.status}
+                    plan={resolvedTenant?.plan}
+                  />
+                ) : (
+                  children
+                )}
+              </main>
+            </div>
+          </div>
         </div>
         <ChangePasswordModal
           open={isChangePasswordOpen}

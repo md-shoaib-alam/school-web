@@ -4,12 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Pencil, Trash2, Phone, Mail, Copy, Check } from "lucide-react";
+import { Pencil, Trash2, Phone, Mail } from "lucide-react";
 import { StaffMember } from "./types";
 import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
-import { useState } from "react";
 import { cn } from "@/lib/utils"
-import { copyToClipboard } from "@/lib/clipboard";
+import { CopyButton } from "@/components/ui/copy-button";
 
 interface StaffCardProps {
   member: StaffMember;
@@ -21,14 +20,6 @@ interface StaffCardProps {
 }
 
 export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete }: StaffCardProps) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    copyToClipboard(member.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const roleColor = member.customRole?.color || "#6366f1";
 
   return (
@@ -95,15 +86,13 @@ export function StaffCard({ member, onEdit, onDelete, onView, canEdit, canDelete
               <Mail className="size-3.5 text-muted-foreground shrink-0" />
               <span className="truncate">{member.email}</span>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="size-6 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-accent shrink-0 rounded-md"
-              onClick={(e) => { e.stopPropagation(); handleCopy(); }}
-              title="Copy email"
-            >
-              {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3 text-muted-foreground" />}
-            </Button>
+            <CopyButton
+              value={member.email}
+              toastSubject="Email"
+              size="sm"
+              onClick={(e) => e.stopPropagation()}
+              className="opacity-0 group-hover:opacity-100"
+            />
           </div>
           
           <div className="flex items-center gap-2 text-xs ">

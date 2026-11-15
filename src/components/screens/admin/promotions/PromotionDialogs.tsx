@@ -136,7 +136,7 @@ export function NewPromotionDialog({
                     .sort((a, b) => getNumericGrade(a.grade) - getNumericGrade(b.grade))
                     .map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.name}-{c.section} (Grade {c.grade})
+                        {c.name}-{c.section}
                       </SelectItem>
                     ))}
                 </SelectContent>

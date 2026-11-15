@@ -22,11 +22,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { avatarColors } from "../teachers/types";
+import { LazyMotion, domMax, m } from "framer-motion";
 import type { ParentInfo } from "./types";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface ParentsTableViewProps {
   parents: ParentInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   onEdit: (p: ParentInfo) => void;
   onDelete: (id: string) => void;
   onLinkOpen: (p: ParentInfo) => void;
@@ -35,6 +44,7 @@ interface ParentsTableViewProps {
 
 export function ParentsTableView({
   parents,
+  enter,
   onEdit,
   onDelete,
   onLinkOpen,
@@ -45,7 +55,7 @@ export function ParentsTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+            <thead className="[&_tr]:border-b text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-3 sm:px-6 py-4">Parent</th>
                 <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">Children</th>
@@ -54,19 +64,24 @@ export function ParentsTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {parents.map((parent, index) => {
-                const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                const color = avatarColors[index % avatarColors.length];
-                return (
-                  <tr 
+              <LazyMotion features={domMax}>
+                {parents.map((parent, index) => {
+                  const initials = parent.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                  return (
+                  <m.tr 
                     key={parent.id} 
+                    id={`parent-item-${parent.id}`}
+                    layoutId={`parent-${parent.id}`}
+                    initial={enter ? { y: 6 } : undefined}
+                    animate={{ y: 0 }}
+                    transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
                     className="hover:bg-muted transition-colors cursor-pointer"
                     onClick={() => onView(parent)}
                   >
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8 shrink-0">
-                          <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                          <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
@@ -206,9 +221,10 @@ export function ParentsTableView({
                         </div>
                       </div>
                     </td>
-                  </tr>
+                  </m.tr>
                 );
-              })}
+                })}
+              </LazyMotion>
             </tbody>
           </table>
         </div>

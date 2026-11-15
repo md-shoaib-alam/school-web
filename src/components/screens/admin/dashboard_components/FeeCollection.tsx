@@ -102,20 +102,20 @@ export function FeeCollection({ isLoading, data, recharts }: FeeCollectionProps)
 
                 <div className="mt-2 pt-2 border-t border-border/40 flex items-center justify-around w-full">
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Collected</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Collected</span>
                     <span className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-1">₹{totalCollected.toLocaleString()}</span>
                   </div>
                   <div className="h-8 w-px bg-border/60" />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Current Month</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Current Month</span>
                     <span className="text-sm sm:text-base font-bold text-foreground mt-1">₹{currentMonthRev.toLocaleString()}</span>
                   </div>
                   <div className="h-8 w-px bg-border/60" />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Peak Month</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Peak Month</span>
                     <span className="text-sm sm:text-base font-bold text-foreground mt-1">
                       ₹{Number(maxMonthData.amount || 0).toLocaleString()}{" "}
-                      <span className="text-[10px] font-normal text-muted-foreground">({maxMonthData.month})</span>
+                      <span className="text-xs font-normal text-muted-foreground">({maxMonthData.month})</span>
                     </span>
                   </div>
                 </div>

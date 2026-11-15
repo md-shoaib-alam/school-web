@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useClassesInfinite } from "@/lib/graphql/hooks/academic.hooks";
 import { useAppStore } from "@/store/use-app-store";
+import { HoverList } from "@/components/shared/hover-list";
 
 interface ClassSelectProps {
   value: string;
@@ -88,59 +89,63 @@ export function ClassSelect({
         onTouchMove={(e) => e.stopPropagation()}
       >
         <ScrollArea className="h-64 p-1">
-          {showAllOption && (
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                onValueChange("all");
-                setOpen(false);
-              }}
-              onClick={() => {
-                onValueChange("all");
-                setOpen(false);
-              }}
-              className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-lg transition-colors cursor-pointer group"
-            >
-              <span className="font-semibold text-foreground">All Classes</span>
-              {value === "all" && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
-            </button>
-          )}
+          <HoverList pillClassName="rounded-lg">
+            {showAllOption && (
+              <button
+                type="button"
+                role="option"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  onValueChange("all");
+                  setOpen(false);
+                }}
+                onClick={() => {
+                  onValueChange("all");
+                  setOpen(false);
+                }}
+                className="relative z-10 flex items-center justify-between w-full text-left px-3 py-2 text-sm rounded-lg transition-transform duration-200 ease-spring active:scale-[0.98] cursor-pointer group"
+              >
+                <span className="font-semibold text-foreground">All Classes</span>
+                {value === "all" && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
+              </button>
+            )}
 
-          {classes.length === 0 ? (
-            <div className="p-3 text-xs text-muted-foreground text-center">No classes found.</div>
-          ) : (
-            <>
-              {classes.map((c, index) => (
-                <button
-                  key={`${c.id}-${index}`}
-                  ref={index === classes.length - 1 ? lastElementRef : null}
-                  type="button"
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    onValueChange(c.id);
-                    setOpen(false);
-                  }}
-                  onClick={() => {
-                    onValueChange(c.id);
-                    setOpen(false);
-                  }}
-                  className="flex items-center justify-between w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-lg transition-colors cursor-pointer group"
-                >
-                  <span className="font-semibold text-foreground truncate">
-                    {c.name}-{c.section}
-                  </span>
-                  {value === c.id && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
-                </button>
-              ))}
-              {isFetchingNextPage && (
-                <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span className="text-xs">Loading more...</span>
-                </div>
-              )}
-            </>
-          )}
+            {classes.length === 0 ? (
+              <div className="p-3 text-xs text-muted-foreground text-center">No classes found.</div>
+            ) : (
+              <>
+                {classes.map((c, index) => (
+                  <button
+                    key={`${c.id}-${index}`}
+                    ref={index === classes.length - 1 ? lastElementRef : null}
+                    type="button"
+                    role="option"
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      onValueChange(c.id);
+                      setOpen(false);
+                    }}
+                    onClick={() => {
+                      onValueChange(c.id);
+                      setOpen(false);
+                    }}
+                    className="relative z-10 flex items-center justify-between w-full text-left px-3 py-2 text-sm rounded-lg transition-transform duration-200 ease-spring active:scale-[0.98] cursor-pointer group"
+                  >
+                    <span className="font-semibold text-foreground truncate">
+                      {c.name}-{c.section}
+                    </span>
+                    {value === c.id && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
+                  </button>
+                ))}
+                {isFetchingNextPage && (
+                  <div className="flex items-center justify-center p-2 text-muted-foreground gap-1.5">
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span className="text-xs">Loading more...</span>
+                  </div>
+                )}
+              </>
+            )}
+          </HoverList>
         </ScrollArea>
       </PopoverContent>
     </Popover>

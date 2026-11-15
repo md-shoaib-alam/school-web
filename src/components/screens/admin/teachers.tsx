@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo, useState } from "react";
+import { useReducer, useEffect, useMemo, useRef, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { toast } from "sonner";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -17,9 +17,11 @@ import { TeacherDialog } from "./teachers/TeacherDialog";
 import { TeacherDetailDialog } from "./teachers/TeacherDetailDialog";
 import { TeacherProfileView } from "./teachers/TeacherProfileView";
 import { TeacherSkeleton } from "./teachers/TeacherSkeleton";
+import { TeacherProfileSkeleton } from "@/components/screens/profile/TeacherProfileSkeleton";
 import { TeachersHeader } from "./teachers/TeachersHeader";
 import { TeachersTableView } from "./teachers/TeachersTableView";
 import { TeachersGridView } from "./teachers/TeachersGridView";
+import { LayoutGroup } from "framer-motion";
 import { TeachersEmptyState } from "./teachers/TeachersEmptyState";
 import { Eye } from "lucide-react";
 import type { TeacherInfo } from "./teachers/types";
@@ -40,6 +42,20 @@ const emptyFormData = {
   subjects: "Mathematics",
   joiningDate: "",
   status: "active",
+  employeeId: "",
+  department: "",
+  designation: "",
+  employmentType: "full-time",
+  bloodGroup: "",
+  maritalStatus: "",
+  nationality: "",
+  religion: "",
+  panNumber: "",
+  aadhaarNumber: "",
+  pfEnabled: false,
+  esiEnabled: false,
+  ptEnabled: false,
+  avatar: "",
 };
 
 function validateTeacherForm(formData: typeof emptyFormData): boolean {
@@ -195,6 +211,14 @@ export function AdminTeachers() {
   const totalPages = teachersData?.totalPages || 1;
   const [viewMode, setViewMode] = useViewMode("teachers", "grid");
 
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    if (!loading && teachers.length > 0) painted.current = true;
+  }, [loading, teachers]);
+
   const handleOpenAdd = () => {
     dispatch({ type: "OPEN_DIALOG", payload: { teacher: null, formData: emptyFormData } });
   };
@@ -216,6 +240,23 @@ export function AdminTeachers() {
           joiningDate: teacher.joiningDate || "",
           status: teacher.status || "active",
           password: "",
+          employeeId: teacher.employeeId || "",
+          department: teacher.department || "",
+          designation: teacher.designation || "",
+          employmentType: teacher.employmentType || "full-time",
+          gender: teacher.gender || "male",
+          dateOfBirth: teacher.dateOfBirth || "",
+          bloodGroup: teacher.bloodGroup || "",
+          maritalStatus: teacher.maritalStatus || "",
+          nationality: teacher.nationality || "",
+          religion: teacher.religion || "",
+          alternatePhone: teacher.alternatePhone || "",
+          panNumber: teacher.panNumber || "",
+          aadhaarNumber: teacher.aadhaarNumber || "",
+          pfEnabled: !!teacher.pfEnabled,
+          esiEnabled: !!teacher.esiEnabled,
+          ptEnabled: !!teacher.ptEnabled,
+          avatar: teacher.avatar || "",
         },
       },
     });
@@ -386,7 +427,8 @@ export function AdminTeachers() {
     router.replace(newQuery ? `${pathname}?${newQuery}` : pathname, { scroll: false });
   };
 
-  if (loading || (teacherUrlParam && !viewingTeacher)) return <TeacherSkeleton />;
+  if (teacherUrlParam && !viewingTeacher) return <TeacherProfileSkeleton />;
+  if (loading) return <TeacherSkeleton />;
 
   if (viewingTeacher) {
     return (
@@ -395,6 +437,7 @@ export function AdminTeachers() {
           teacher={viewingTeacher}
           onBack={handleCloseView}
           canEdit={canEdit}
+          currentSession={teachersData?.currentSession || null}
           onEdit={(teacher) => {
             handleCloseView();
             handleOpenEdit(teacher);
@@ -444,28 +487,34 @@ export function AdminTeachers() {
         <TeacherSkeleton />
       ) : teachers.length === 0 ? (
         <TeachersEmptyState />
-      ) : viewMode === "table" ? (
-        <TeachersTableView 
-          teachers={teachers}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onEdit={handleOpenEdit}
-          onDelete={handleDelete}
-          deletingId={deletingId}
-          setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
-          onView={handleOpenView}
-        />
       ) : (
-        <TeachersGridView 
-          teachers={teachers}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          deletingId={deletingId}
-          setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
-          onEdit={handleOpenEdit}
-          onDelete={handleDelete}
-          onView={handleOpenView}
-        />
+        <LayoutGroup id="teachers">
+          {viewMode === "table" ? (
+            <TeachersTableView 
+              teachers={teachers}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              deletingId={deletingId}
+              setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
+              onView={handleOpenView}
+            />
+          ) : (
+            <TeachersGridView 
+              teachers={teachers}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              deletingId={deletingId}
+              setDeletingId={(id) => dispatch({ type: "SET_DELETING_ID", payload: id })}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              onView={handleOpenView}
+            />
+          )}
+        </LayoutGroup>
       )}
 
       <Pagination

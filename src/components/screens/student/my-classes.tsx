@@ -8,21 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { BookOpen, GraduationCap, User, Hash, ArrowRight } from "lucide-react";
+import { BookOpen, GraduationCap, User } from "lucide-react";
 import type { StudentInfo, SubjectInfo } from "@/types";
-
-const subjectColors = [
-  "from-violet-500 to-purple-600",
-  "from-pink-500 to-rose-600",
-  "from-blue-500 to-violet-600",
-  "from-emerald-500 to-teal-600",
-  "from-amber-500 to-orange-600",
-  "from-cyan-500 to-sky-600",
-  "from-fuchsia-500 to-pink-600",
-  "from-lime-500 to-green-600",
-];
-
-const subjectIconNames = ["BookOpen", "GraduationCap", "Hash", "User"] as const;
 
 export function StudentClasses() {
   const { currentUser } = useAppStore();
@@ -57,8 +44,6 @@ export function StudentClasses() {
     ? subjects.filter((s) => s.className === student.className)
     : [];
 
-  const firstName = currentUser?.name?.split(" ")[0] || "Student";
-
   if (loading) return <ClassesSkeleton />;
 
   return (
@@ -67,7 +52,7 @@ export function StudentClasses() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-foreground">
-            My Classes
+            My Subjects
           </h2>
           <p className="text-sm text-muted-foreground mt-0.5">
             {mySubjects.length} subjects enrolled in{" "}
@@ -77,42 +62,13 @@ export function StudentClasses() {
         {student && (
           <Badge
             variant="secondary"
-            className="text-sm px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800"
+            className="text-sm px-3 py-1 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80"
           >
             <GraduationCap className="size-3.5 mr-1.5" />
             {student.className} • Roll {student.rollNumber}
           </Badge>
         )}
       </div>
-
-      {/* Class Info Banner */}
-      {student && (
-        <div className="rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-violet-800 p-4 lg:p-5">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-sm">
-              <GraduationCap className="size-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-foreground">
-                Welcome, {firstName}!
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Class {student.className} • {mySubjects.length} Subjects
-              </p>
-            </div>
-            <div className="hidden sm:flex items-center gap-6 text-center">
-              <div>
-                <p className="text-lg font-bold text-violet-600 dark:text-violet-400">
-                  {mySubjects.length}
-                </p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-                  Subjects
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Subjects Grid */}
       {mySubjects.length === 0 ? (
@@ -129,50 +85,37 @@ export function StudentClasses() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {mySubjects.map((subject, i) => (
+          {mySubjects.map((subject) => (
             <div
               key={subject.id}
-              className="group relative rounded-xl border  bg-card shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:border-violet-200 dark:border-violet-800 dark:hover:border-violet-800"
+              className="flex flex-col rounded-xl border  bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800/60"
             >
-              {/* Color Accent */}
-              <div
-                className={`h-1.5 bg-gradient-to-r ${subjectColors[i % subjectColors.length]}`}
-              />
-
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div
-                    className={`p-2.5 rounded-lg bg-gradient-to-br ${subjectColors[i % subjectColors.length]} text-white shadow-sm`}
-                  >
-                    <BookOpen className="size-5" />
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-mono text-muted-foreground "
-                  >
-                    {subject.code}
-                  </Badge>
+              <div className="flex items-start justify-between gap-3">
+                <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <BookOpen className="size-5" />
                 </div>
-
-                <h3 className="font-semibold text-foreground text-sm mb-3 line-clamp-1">
-                  {subject.name}
-                </h3>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <User className="size-3.5 text-muted-foreground" />
-                    <span className="truncate">{subject.teacherName}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <GraduationCap className="size-3.5 text-muted-foreground" />
-                    <span>{subject.className}</span>
-                  </div>
-                </div>
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-mono text-muted-foreground"
+                >
+                  {subject.code}
+                </Badge>
               </div>
 
-              {/* Hover Arrow */}
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowRight className="size-4 text-violet-400" />
+              <h3 className="mt-4 font-semibold text-foreground text-sm line-clamp-1">
+                {subject.name}
+              </h3>
+
+              {/* Pushed to the bottom so every card in the row ends at the same line. */}
+              <div className="mt-auto space-y-2 border-t  pt-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <User className="size-3.5 shrink-0" />
+                  <span className="truncate">{subject.teacherName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="size-3.5 shrink-0" />
+                  <span className="truncate">{subject.className}</span>
+                </div>
               </div>
             </div>
           ))}
@@ -192,7 +135,6 @@ function ClassesSkeleton() {
         </div>
         <Skeleton className="h-7 w-36 rounded-full" />
       </div>
-      <Skeleton className="h-20 w-full rounded-xl" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {[...Array(6)].map((_, i) => (
           <Skeleton key={i} className="h-48 rounded-xl" />

@@ -12,7 +12,6 @@ import {
   getRoleRelationsLabel,
   getUserInitials,
 } from "./user-detail-sheet-model";
-import { copyToClipboard } from "@/lib/clipboard";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useUpdateUser, useTenants } from "@/lib/graphql/hooks";
@@ -37,7 +36,6 @@ export function UserDetailSheet({
 }: UserDetailSheetProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<UserDetailTab>("overview");
-  const [copiedEmail, setCopiedEmail] = useState(false);
 
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
@@ -96,13 +94,6 @@ export function UserDetailSheet({
 
   const roleConf = getRoleConfig(currentUserData.role);
   const initials = getUserInitials(currentUserData.name);
-
-  const handleCopyEmail = () => {
-    copyToClipboard(currentUserData.email);
-    setCopiedEmail(true);
-    toast.success("Email copied to clipboard");
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
 
   const handleSaveEdit = async () => {
     if (!editName.trim()) {
@@ -267,11 +258,9 @@ export function UserDetailSheet({
             editRole={editRole}
             setEditRole={setEditRole}
             isSaving={updateUserMutation.isPending}
-            copiedEmail={copiedEmail}
             onStartEdit={handleStartEdit}
             onCancelEdit={handleCancelEdit}
             onSaveEdit={handleSaveEdit}
-            onCopyEmail={handleCopyEmail}
           />
 
           {/* Section 2: School Information */}

@@ -121,7 +121,7 @@ export const getGroupedExams = (examsList: ExamRecord[]) => {
   
   examsList.forEach(exam => {
     const cycleName = exam.name.includes(' - ') ? exam.name.split(' - ')[0] : exam.name;
-    const academicYear = exam.academicYear || '2024-2025';
+    const academicYear = exam.academicYear || '2024 - 2025';
     const key = `${cycleName}::${academicYear}`;
     
     if (!groups[key]) {

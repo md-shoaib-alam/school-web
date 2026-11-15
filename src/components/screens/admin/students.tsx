@@ -51,6 +51,7 @@ const emptyFormData: StudentFormData = {
   transportEnabled: false,
   routeId: "",
   pickupPoint: "",
+  avatar: "",
 };
 
 type State = {
@@ -125,6 +126,7 @@ function reducer(state: State, action: Action): State {
           dateOfBirth: action.payload.dateOfBirth || "",
           bloodGroup: action.payload.bloodGroup || "",
           house: action.payload.house || "",
+          avatar: action.payload.avatar || "",
           transportEnabled: !!action.payload.transport,
           routeId: action.payload.transport?.routeId || "",
           pickupPoint: action.payload.transport?.pickupPoint || "",
@@ -379,6 +381,9 @@ function AdminStudentsContent() {
           }
           if (formData.bloodGroup?.trim()) {
             payload.bloodGroup = formData.bloodGroup.trim();
+          }
+          if (formData.avatar) {
+            payload.avatar = formData.avatar;
           }
           if (formData.transportEnabled && formData.routeId?.trim()) {
             payload.routeId = formData.routeId.trim();

@@ -20,13 +20,15 @@ import { ProfileDetails } from "./profile/ProfileDetails";
 import { SecuritySettings } from "./profile/SecuritySettings";
 import { QuickActions } from "./profile/QuickActions";
 import { EditProfileDialog } from "./profile/EditProfileDialog";
-import { copyToClipboard } from "@/lib/clipboard";
+import { TeacherProfile } from "./profile/TeacherProfile";
+import { StaffProfile } from "./profile/StaffProfile";
+import { StudentProfile } from "./profile/StudentProfile";
+import { TeacherProfileSkeleton } from "./profile/TeacherProfileSkeleton";
 
 export function UserProfileScreen() {
   const { push, replace } = useRouter();
   const { theme, setTheme } = useTheme();
   const { currentUser, currentTenantName, currentTenantSlug, logout } = useAppStore();
-  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -34,8 +36,18 @@ export function UserProfileScreen() {
   const [editAddress, setEditAddress] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [editTeacher, setEditTeacher] = useState({
+    dateOfBirth: "",
+    gender: "",
+    bloodGroup: "",
+    maritalStatus: "",
+    nationality: "",
+    religion: "",
+    panNumber: "",
+    aadhaarNumber: "",
+  });
 
-  if (!currentUser) return null;
+  if (!currentUser) return <TeacherProfileSkeleton />;
 
   const initials = currentUser.name
     .split(" ")
@@ -43,24 +55,6 @@ export function UserProfileScreen() {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-  const handleCopy = (text: string, field: string) => {
-    copyToClipboard(text);
-    setCopiedField(field);
-    toast.success(`${field} copied to clipboard!`);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleCopySchoolUrl = () => {
-    if (typeof window === "undefined" || !currentUser) return;
-    const slug = currentTenantSlug || currentUser.tenantSlug || "";
-    const url = `${window.location.origin}/${slug}`;
-    
-    copyToClipboard(url);
-    setCopiedField("SchoolUrl");
-    toast.success("School portal URL copied!");
-    setTimeout(() => setCopiedField(null), 2000);
-  };
 
   const getSchoolUrl = () => {
     if (typeof window === "undefined" || !currentUser) return "";
@@ -83,6 +77,17 @@ export function UserProfileScreen() {
     setEditPhone(currentUser?.phone || "");
     setEditAddress(currentUser?.address || "");
     setEditAvatar(currentUser?.avatar || "");
+    const tp = currentUser?.teacherProfile || currentUser?.staffProfile || currentUser?.studentProfile;
+    setEditTeacher({
+      dateOfBirth: tp?.dateOfBirth || "",
+      gender: tp?.gender || "",
+      bloodGroup: tp?.bloodGroup || "",
+      maritalStatus: tp?.maritalStatus || "",
+      nationality: tp?.nationality || "",
+      religion: tp?.religion || "",
+      panNumber: "panNumber" in (tp ?? {}) ? (tp as any).panNumber || "" : "",
+      aadhaarNumber: tp?.aadhaarNumber || "",
+    });
     setIsEditOpen(true);
   };
 
@@ -95,15 +100,15 @@ export function UserProfileScreen() {
 
     setSavingProfile(true);
     try {
+      const isTeacher = currentUser?.role === "teacher" || currentUser?.role === "staff" || currentUser?.role === "student";
       const res = await apiFetch("/api/auth/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editName.trim(),
-          phone: editPhone,
-          address: editAddress,
-          avatar: editAvatar,
-        }),
+        body: JSON.stringify(
+          isTeacher
+            ? { name: editName.trim(), address: editAddress, avatar: editAvatar, ...editTeacher }
+            : { name: editName.trim(), phone: editPhone, address: editAddress, avatar: editAvatar }
+        ),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
@@ -144,6 +149,108 @@ export function UserProfileScreen() {
     reader.readAsDataURL(file);
   };
 
+  if (currentUser.role === "teacher") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <TeacherProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+          role="teacher"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
+        />
+      </div>
+    );
+  }
+
+  if (currentUser.role === "staff") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <StaffProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+          role="staff"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
+        />
+      </div>
+    );
+  }
+
+  if (currentUser.role === "student") {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <StudentProfile
+          user={currentUser}
+          initials={initials}
+          onEditClick={handleOpenEdit}
+          tenantName={currentTenantName}
+        />
+
+        <EditProfileDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initials={initials}
+          editName={editName}
+          setEditName={setEditName}
+          editPhone={editPhone}
+          setEditPhone={setEditPhone}
+          editAddress={editAddress}
+          setEditAddress={setEditAddress}
+          editAvatar={editAvatar}
+          setEditAvatar={setEditAvatar}
+          onFileChange={handleFileChange}
+          onSave={handleSaveProfile}
+          saving={savingProfile}
+          role="student"
+          email={currentUser.email}
+          teacherFields={editTeacher}
+          setTeacherFields={setEditTeacher}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <ProfileHero 
@@ -174,12 +281,9 @@ export function UserProfileScreen() {
             </TabsList>
 
             <TabsContent value="overview" className="mt-4 focus-visible:outline-none">
-              <ProfileDetails 
+              <ProfileDetails
                 user={currentUser}
-                onCopy={handleCopy}
-                copiedField={copiedField}
                 onEditClick={handleOpenEdit}
-                onCopySchoolUrl={handleCopySchoolUrl}
                 getSchoolUrl={getSchoolUrl}
               />
             </TabsContent>

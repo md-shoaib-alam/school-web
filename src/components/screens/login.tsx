@@ -90,7 +90,13 @@ export function LoginScreen() {
           role: userData.role as UserRole, avatar: userData.avatar,
           tenantId: userData.tenantId, tenantSlug: userData.tenantSlug,
           tenantName: userData.tenantName, tenantLogo: userData.tenantLogo || null,
+          phone: userData.phone, address: userData.address,
           customRole: userData.customRole || null,
+          platformRole: userData.platformRole || null,
+          teacherProfile: userData.teacherProfile || null,
+          staffProfile: userData.staffProfile || null,
+          studentProfile: userData.studentProfile || null,
+          currentSession: userData.currentSession || null,
         },
         { token: data.token, refreshToken: data.refreshToken },
       );

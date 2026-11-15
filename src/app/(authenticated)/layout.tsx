@@ -7,6 +7,7 @@ import { useSyncExternalStore, useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 import { MaintenanceScreen } from '@/components/screens/error/maintenance';
 import { FullPageSkeleton } from '@/components/ui/full-page-skeleton';
+import { AccountSwitchOverlay } from '@/components/shared/account-switch-overlay';
 
 // Prevents hydration mismatch
 const emptySubscribe = () => () => { };
@@ -57,20 +58,24 @@ export default function AuthenticatedLayout({
     };
   }, [isLoggedIn, currentUser?.role]);
 
-  if (!hydrated) return <FullPageSkeleton />;
-
-  if (!isLoggedIn) {
-    return <LoginScreen />;
-  }
-
   const isSuperAdmin = currentUser?.role === "super_admin";
-  if (!isSuperAdmin && maintenanceLoading) {
-    return <FullPageSkeleton />;
-  }
+  // The shell is on screen and the maintenance check is done: what the switch overlay waits for.
+  const ready = hydrated && isLoggedIn && (isSuperAdmin || !maintenanceLoading);
 
-  if (!isSuperAdmin && maintenanceActive) {
-    return <MaintenanceScreen message={maintenanceMessage} />;
-  }
+  const shell = !hydrated
+    ? <FullPageSkeleton />
+    : !isLoggedIn
+      ? <LoginScreen />
+      : !ready
+        ? <FullPageSkeleton />
+        : !isSuperAdmin && maintenanceActive
+          ? <MaintenanceScreen message={maintenanceMessage} />
+          : <AppLayout>{children}</AppLayout>;
 
-  return <AppLayout>{children}</AppLayout>;
+  return (
+    <>
+      {shell}
+      {isLoggedIn && <AccountSwitchOverlay ready={ready} />}
+    </>
+  );
 }

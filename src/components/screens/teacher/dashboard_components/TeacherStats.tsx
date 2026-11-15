@@ -63,11 +63,11 @@ export function TeacherStats({
         <div
           key={card.title}
           onClick={() => onNavigate?.(card.screen)}
-          className="relative overflow-hidden rounded-2xl border  bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col justify-between"
+          className="relative overflow-hidden rounded-xl border bg-card p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col justify-between"
         >
           {/* Subtle bottom curved gradient wave */}
           <div
-            className={`absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t ${card.bottomWave} pointer-events-none rounded-b-2xl`}
+            className={`absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t ${card.bottomWave} pointer-events-none rounded-b-xl`}
           />
 
           <div className="relative z-10">
@@ -75,11 +75,11 @@ export function TeacherStats({
             <div className="flex items-center justify-between gap-1.5">
               <div className="flex items-center gap-2 min-w-0">
                 <div
-                  className={`size-8 sm:size-9 rounded-xl border flex items-center justify-center shrink-0 shadow-xs ${card.iconBox}`}
+                  className={`size-8 sm:size-9 rounded-lg border flex items-center justify-center shrink-0 shadow-xs ${card.iconBox}`}
                 >
                   {card.icon}
                 </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate">
+                <span className="text-xs sm:text-sm font-medium text-foreground truncate">
                   {card.title}
                 </span>
               </div>

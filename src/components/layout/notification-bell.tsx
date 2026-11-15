@@ -184,7 +184,7 @@ export function NotificationBell() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0 gap-0 rounded-xl">
+      <PopoverContent align="end" collisionPadding={12} className="w-[calc(100vw-1.5rem)] sm:w-80 p-0 gap-0 rounded-xl">
         <div className="flex items-center justify-between px-3 py-2 border-b ">
           <span className="text-sm font-semibold">Notifications</span>
           <div className="flex items-center gap-1">

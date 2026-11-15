@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Table,
@@ -17,14 +18,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Pencil, Trash2, Shield, Phone, Mail, Copy, Check, Eye, MoreVertical } from "lucide-react";
-import { useState } from "react";
+import { Pencil, Trash2, Shield, Phone, Eye, MoreVertical } from "lucide-react";
 import { StaffMember } from "./types";
-import { getInitials, roleBadgeStyle, avatarStyle } from "./utils";
-import { copyToClipboard } from "@/lib/clipboard";
+import { getInitials, roleBadgeStyle } from "./utils";
+import { LazyMotion, domMax, m } from "framer-motion";
+
+const premiumLayoutTransition = {
+  type: "spring",
+  stiffness: 280,
+  damping: 28,
+  mass: 0.7
+} as const;
 
 interface StaffTableProps {
   staff: StaffMember[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   onEdit: (member: StaffMember) => void;
   onDelete: (member: StaffMember) => void;
   onView: (member: StaffMember) => void;
@@ -34,29 +43,25 @@ interface StaffTableProps {
 
 export function StaffTable({
   staff,
+  enter,
   onEdit,
   onDelete,
   onView,
   canEdit,
   canDelete,
 }: StaffTableProps) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopy = (email: string, id: string) => {
-    copyToClipboard(email);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
   return (
-    <div className="overflow-x-auto px-4 sm:px-6">
-      <Table>
-        <TableHeader className="bg-muted">
+    <Card className="shadow-sm border-0 overflow-hidden mb-4">
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+      <Table className="text-left">
+        <TableHeader className="text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
           <TableRow>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Member</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden sm:table-cell">Contact</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden md:table-cell">Role</TableHead>
-            <TableHead className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground hidden sm:table-cell">Status</TableHead>
-            <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Actions</TableHead>
+            <TableHead className="px-6 py-4">Member</TableHead>
+            <TableHead className="px-6 py-4 hidden sm:table-cell">Contact</TableHead>
+            <TableHead className="px-6 py-4 hidden md:table-cell">Role</TableHead>
+            <TableHead className="px-6 py-4 hidden sm:table-cell">Status</TableHead>
+            <TableHead className="px-6 py-4 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,40 +72,33 @@ export function StaffTable({
               </TableCell>
             </TableRow>
           ) : (
-            staff.map((member) => (
-              <TableRow 
-                key={member.id} 
-                className="hover:bg-muted transition-colors cursor-pointer"
+            <LazyMotion features={domMax}>
+              {staff.map((member, index) => (
+              <m.tr
+                key={member.id}
+                id={`staff-item-${member.id}`}
+                layoutId={`staff-${member.id}`}
+                initial={enter ? { y: 6 } : undefined}
+                animate={{ y: 0 }}
+                transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                data-slot="table-row"
+                className="hover:bg-muted border-b transition-colors cursor-pointer"
                 onClick={() => onView(member)}
               >
-                <TableCell>
+                <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="size-9">
-                      <AvatarFallback style={avatarStyle(member.customRole?.color || "#6366f1")}>
+                    <Avatar className="size-8 shrink-0">
+                      <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                         {getInitials(member.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col group">
-                      <span className="font-bold text-sm text-foreground">{member.name}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-muted-foreground">{member.email}</span>
-                        <button 
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); handleCopy(member.email, member.id); }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-accent rounded"
-                          title="Copy email"
-                        >
-                          {copiedId === member.id ? (
-                            <Check className="size-2.5 text-emerald-500" />
-                          ) : (
-                            <Copy className="size-2.5 text-muted-foreground" />
-                          )}
-                        </button>
-                      </div>
+                    <div className="flex flex-col min-w-0 group">
+                      <span className="font-bold text-sm text-foreground truncate">{member.name}</span>
+                      <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{member.email}</span>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell className="px-6 py-4 hidden sm:table-cell">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-foreground">
                       <Phone className="size-3" />
@@ -108,7 +106,7 @@ export function StaffTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell className="px-6 py-4 hidden md:table-cell">
                   {member.customRole ? (
                     <Badge
                       variant="outline"
@@ -122,7 +120,7 @@ export function StaffTable({
                     <Badge variant="secondary" className="text-[10px] font-bold">Standard</Badge>
                   )}
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell className="px-6 py-4 hidden sm:table-cell">
                   <Badge
                     variant="outline"
                     className={`text-[10px] font-bold shadow-none ${
@@ -134,14 +132,14 @@ export function StaffTable({
                     {member.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                <TableCell className="px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                     {/* Desktop Actions (xl and up) */}
-                    <div className="hidden xl:flex items-center gap-1">
+                    <div className="hidden xl:flex items-center gap-2">
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-8 text-muted-foreground hover:text-emerald-600 dark:hover:bg-emerald-900/20 shrink-0"
+                        className="size-8 text-muted-foreground hover:text-emerald-600"
                         onClick={() => onView(member)}
                         title="View Details"
                       >
@@ -151,7 +149,7 @@ export function StaffTable({
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="size-8 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 shrink-0"
+                          className="size-8 text-muted-foreground hover:text-emerald-600"
                           onClick={() => onEdit(member)}
                         >
                           <Pencil className="size-3.5" />
@@ -161,7 +159,7 @@ export function StaffTable({
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="size-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+                          className="size-8 text-muted-foreground hover:text-red-600"
                           onClick={() => onDelete(member)}
                         >
                           <Trash2 className="size-3.5" />
@@ -203,11 +201,14 @@ export function StaffTable({
                     </div>
                   </div>
                 </TableCell>
-              </TableRow>
-            ))
+              </m.tr>
+              ))}
+            </LazyMotion>
           )}
         </TableBody>
       </Table>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

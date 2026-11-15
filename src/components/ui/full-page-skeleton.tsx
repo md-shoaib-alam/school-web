@@ -4,33 +4,128 @@
  * FullPageSkeleton - shown while the app shell / dynamic chunks are loading.
  * Uses pure CSS animate-pulse. No boneyard-js/react used here.
  */
-export function FullPageSkeleton() {
-  return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-background">
-      {/* Top header bar */}
-      <header className="h-16 flex items-center gap-3 px-4 lg:px-6 border-b border-border shrink-0">
-        <ShimmerBox className="size-8 rounded-lg" />
-        <ShimmerBox className="h-5 w-36 rounded-md" />
-        <div className="flex-1" />
-        <ShimmerBox className="size-8 rounded-full" />
-        <ShimmerBox className="size-8 rounded-full" />
-        <ShimmerBox className="size-8 rounded-full" />
-      </header>
+/**
+ * FullPageSkeleton - the whole shell, for when nothing of it is on screen yet: before hydration,
+ * during maintenance, or before a session resolves. Once the shell is up, a screen that is still
+ * loading uses ScreenSkeleton instead, or this would draw a second sidebar inside the page.
+ *
+ * ScreenSkeleton - the same content shapes, without the header or the sidebar beside it.
+ *
+ * Both use pure CSS animate-pulse. No boneyard-js/react used here.
+ *
+ * `blueprint` draws the same geometry as a wireframe - dashed outlines instead of shimmer - which
+ * is the state the account-switch overlay sweeps away. Keeping it one component is what stops the
+ * two from drifting apart.
+ */
+/** One rule language for the whole sheet: dashed brand while drawn, the shell's grey once solid. */
+const edge = (blueprint: boolean) => (blueprint ? "border-dashed border-brand/70" : "border-border");
 
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden p-4 lg:p-6">
-        <ContentSkeleton />
-      </main>
+export function FullPageSkeleton({
+  blueprint = false,
+  header,
+}: {
+  blueprint?: boolean;
+  /** Real content for the header row, in place of its placeholder blocks. */
+  header?: React.ReactNode;
+}) {
+  return (
+    <div className="h-dvh w-screen flex flex-col overflow-hidden bg-background p-1.5 sm:p-2 lg:p-2.5">
+      <div className={`flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl lg:rounded-3xl border shadow-xs bg-background ${blueprint ? "border-dashed border-brand/70" : "border-border/80"}`}>
+        <div className="flex-1 flex min-h-0 overflow-hidden">
+          {/* The sidebar stands beside the header, as it does in the real shell. */}
+          <SidebarSkeleton blueprint={blueprint} />
+
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* One rule under the header: dashed brand while drawn, the shell's grey once solid. */}
+            <header className={`h-14 sm:h-16 flex items-center gap-3 px-4 lg:px-6 border-b shrink-0 bg-background ${edge(blueprint)}`}>
+              {header ?? (
+                <>
+                  <ShimmerBox blueprint={blueprint} className="size-8 rounded-lg" />
+                  <ShimmerBox blueprint={blueprint} className="h-5 w-36 rounded-md" />
+                  <div className="flex-1" />
+                  <ShimmerBox blueprint={blueprint} className="size-8 rounded-full" />
+                  <ShimmerBox blueprint={blueprint} className="size-8 rounded-full" />
+                  <ShimmerBox blueprint={blueprint} className="size-8 rounded-full" />
+                </>
+              )}
+            </header>
+
+            <main className="flex-1 overflow-hidden p-4 lg:p-6 bg-background">
+              <ScreenSkeleton blueprint={blueprint} />
+            </main>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-/** Shimmer block - building block for all skeleton shapes */
-function ShimmerBox({ className, style }: { className?: string; style?: React.CSSProperties }) {
+/** Just the page area, for a screen loading inside a shell that is already on screen. */
+export function ScreenSkeleton({ blueprint = false }: { blueprint?: boolean }) {
+  // No height or padding of its own: the shell's `main` already scrolls and pads the screen.
+  return <ContentSkeleton blueprint={blueprint} />;
+}
+
+/** Sidebar column: brand block, the search field, the list of tabs, and the footer cards. */
+function SidebarSkeleton({ blueprint }: { blueprint: boolean }) {
+  return (
+    <aside className={`hidden lg:flex w-72 shrink-0 flex-col border-r overflow-hidden bg-background ${edge(blueprint)}`}>
+      <div className={`h-16 px-5 flex items-center gap-3 border-b shrink-0 ${edge(blueprint)}`}>
+        <ShimmerBox blueprint={blueprint} className="size-10 rounded-xl" />
+        <ShimmerBox blueprint={blueprint} className="h-4 w-28 rounded" />
+      </div>
+
+      {/* The rail's filter, mirroring SidebarSearch: icon, query run and the ⌘K hint. */}
+      <div className="px-3 pt-2 pb-1">
+        <div className={`h-10 rounded-xl border flex items-center gap-2.5 px-3 ${edge(blueprint)}`}>
+          <ShimmerBox blueprint={blueprint} className="size-4 rounded-full" />
+          <ShimmerBox blueprint={blueprint} className="h-3.5 w-16 rounded" />
+          <ShimmerBox blueprint={blueprint} className="ml-auto h-4 w-7 rounded-md" />
+        </div>
+      </div>
+
+      <div className="flex-1 p-3 space-y-1 overflow-hidden">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="h-10 px-3 flex items-center gap-3 rounded-xl">
+            <ShimmerBox blueprint={blueprint} className="size-5 rounded" />
+            <ShimmerBox
+              blueprint={blueprint}
+              className="h-4 rounded"
+              style={{ width: `${52 + ((i * 13) % 36)}px` }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className={`p-3 border-t shrink-0 space-y-3 ${edge(blueprint)}`}>
+        <ShimmerBox blueprint={blueprint} className="h-[76px] rounded-2xl" />
+        <div className="flex items-center gap-3 p-1.5">
+          <ShimmerBox blueprint={blueprint} className="size-9 rounded-full" />
+          <div className="flex-1 space-y-1.5">
+            <ShimmerBox blueprint={blueprint} className="h-3.5 w-24 rounded" />
+            <ShimmerBox blueprint={blueprint} className="h-3 w-32 rounded" />
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+/** Shimmer block - building block for all skeleton shapes, or its dashed twin in blueprint mode. */
+function ShimmerBox({
+  className,
+  style,
+  blueprint,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+  blueprint?: boolean;
+}) {
   return (
     <div
       className={[
-        "bg-muted animate-pulse rounded-md shrink-0",
+        blueprint ? "blueprint-box" : "bg-muted animate-pulse rounded-md",
+        "shrink-0",
         className,
       ]
         .filter(Boolean)
@@ -41,32 +136,33 @@ function ShimmerBox({ className, style }: { className?: string; style?: React.CS
 }
 
 /** Content area skeleton - generic header + stats + table */
-function ContentSkeleton() {
+function ContentSkeleton({ blueprint }: { blueprint: boolean }) {
   return (
     <div className="space-y-5">
       {/* Top bar: search + action buttons */}
       <div className="flex items-center justify-between gap-3">
-        <ShimmerBox className="h-9 w-52 rounded-lg" />
+        <ShimmerBox blueprint={blueprint} className="h-9 w-52 rounded-lg" />
         <div className="flex gap-2">
-          <ShimmerBox className="h-9 w-28 rounded-lg" />
-          <ShimmerBox className="h-9 w-28 rounded-lg" />
+          <ShimmerBox blueprint={blueprint} className="h-9 w-28 rounded-lg" />
+          <ShimmerBox blueprint={blueprint} className="h-9 w-28 rounded-lg" />
         </div>
       </div>
 
       {/* Stats cards row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(4)].map((_, i) => (
-          <ShimmerBox key={i} className="h-20 sm:h-24 rounded-xl" />
+          <ShimmerBox key={i} blueprint={blueprint} className="h-20 sm:h-24 rounded-xl" />
         ))}
       </div>
 
       {/* Table block */}
-      <div className="rounded-2xl border border-border overflow-hidden">
+      <div className={`rounded-2xl border overflow-hidden ${edge(blueprint)}`}>
         {/* Table header */}
-        <div className="flex items-center gap-4 px-5 py-3 border-b border-border bg-muted/30">
+        <div className={`flex items-center gap-4 px-5 py-3 border-b ${edge(blueprint)} ${blueprint ? "" : "bg-muted/30"}`}>
           {[10, 36, 20, 20, 16].map((w, i) => (
             <ShimmerBox
               key={i}
+              blueprint={blueprint}
               className={`h-4 rounded ${i === 4 ? "ml-auto" : ""}`}
               style={{ width: `${w}%` } as React.CSSProperties}
             />
@@ -77,19 +173,19 @@ function ContentSkeleton() {
         {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 px-5 py-3.5 border-b border-border last:border-none"
+            className={`flex items-center gap-4 px-5 py-3.5 border-b last:border-none ${edge(blueprint)}`}
           >
-            <ShimmerBox className="h-4 w-8 rounded" />
+            <ShimmerBox blueprint={blueprint} className="h-4 w-8 rounded" />
             <div className="flex items-center gap-3 flex-1">
-              <ShimmerBox className="size-8 rounded-full" />
-              <ShimmerBox className="h-4 w-32 rounded" />
+              <ShimmerBox blueprint={blueprint} className="size-8 rounded-full" />
+              <ShimmerBox blueprint={blueprint} className="h-4 w-32 rounded" />
             </div>
-            <ShimmerBox className="h-6 w-16 rounded-full hidden md:block" />
-            <ShimmerBox className="h-4 w-12 rounded hidden sm:block" />
-            <ShimmerBox className="h-4 w-24 rounded hidden lg:block" />
+            <ShimmerBox blueprint={blueprint} className="h-6 w-16 rounded-full hidden md:block" />
+            <ShimmerBox blueprint={blueprint} className="h-4 w-12 rounded hidden sm:block" />
+            <ShimmerBox blueprint={blueprint} className="h-4 w-24 rounded hidden lg:block" />
             <div className="flex gap-2 ml-auto">
-              <ShimmerBox className="size-8 rounded-md" />
-              <ShimmerBox className="size-8 rounded-md" />
+              <ShimmerBox blueprint={blueprint} className="size-8 rounded-md" />
+              <ShimmerBox blueprint={blueprint} className="size-8 rounded-md" />
             </div>
           </div>
         ))}

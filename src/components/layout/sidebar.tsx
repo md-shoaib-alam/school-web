@@ -4,10 +4,12 @@ import { useAppStore } from "@/store/use-app-store";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { roleColors, roleLabels, type NavItem } from "./nav-config";
+import { firstNavMatch } from "./nav-sections";
 import { useState, useEffect } from "react";
 
 // Sub-components
 import { SidebarHeader } from "./sidebar/SidebarHeader";
+import { SidebarSearch } from "./sidebar/SidebarSearch";
 import { SidebarNav } from "./sidebar/SidebarNav";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 
@@ -35,6 +37,9 @@ export function Sidebar({
     logout,
   } = useAppStore();
   const { replace } = useRouter();
+
+  // What the rail's search holds; the list filters on it, and Enter goes to the first match.
+  const [query, setQuery] = useState("");
 
   // State for expanded accordions
   const [expandedKeys, setExpandedKeys] = useState<string[]>(() => {
@@ -77,7 +82,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-out will-change-transform transform-gpu lg:transition-all lg:duration-300 lg:will-change-auto lg:transform-none lg:h-full border-r overflow-hidden",
+        "fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-spring will-change-transform transform-gpu lg:transition-[width] lg:duration-300 lg:ease-spring lg:will-change-[width] lg:transform-none lg:h-full border-r overflow-hidden max-lg:rounded-r-2xl",
         isModernUI
           ? "bg-sidebar border-r "
           : "bg-sidebar border-sidebar-border",
@@ -96,8 +101,21 @@ export function Sidebar({
         onToggle={toggleSidebar}
       />
 
+      <SidebarSearch
+        value={query}
+        onChange={setQuery}
+        sidebarOpen={sidebarOpen}
+        onSubmit={() => {
+          const key = firstNavMatch(currentUser.role, items, query);
+          if (!key) return;
+          navigateTo(key);
+          setQuery("");
+        }}
+      />
+
       <SidebarNav 
         items={items}
+        query={query}
         resolvedScreen={resolvedScreen}
         sidebarOpen={sidebarOpen}
         isSuperAdmin={isSuperAdmin}

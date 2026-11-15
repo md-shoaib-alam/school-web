@@ -27,12 +27,12 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  Copy,
   Eye,
   Power,
   Users
 } from "lucide-react";
 import { PlatformUser, ROLE_CONFIG } from "./types";
+import { CopyGlyph } from "@/components/ui/copy-button";
 import { copyToClipboard } from "@/lib/clipboard";
 import { toast } from "sonner";
 
@@ -329,12 +329,15 @@ export function UserTable({
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              copyToClipboard(user.email);
-                              toast.success("Email copied to clipboard");
+                              void copyToClipboard(user.email).then((ok) =>
+                                ok
+                                  ? toast.success("Email copied to clipboard")
+                                  : toast.error("Couldn't copy — select the text and copy it manually"),
+                              );
                             }}
                             className="text-xs font-medium gap-2 cursor-pointer"
                           >
-                            <Copy className="size-3.5" />
+                            <CopyGlyph className="size-3.5" />
                             Copy Email
                           </DropdownMenuItem>
                           {onToggleStatus && (

@@ -7,6 +7,8 @@ export interface StudentOverviewTabProps {
   canEdit?: boolean;
   onEdit?: (student: StudentInfo) => void;
   onSelectStudent?: (studentId: string) => void;
+  editingSection?: string | null;
+  setEditingSection?: (section: string | null) => void;
   formatDate: (dateStr: string | null | undefined) => string;
   calculateAge: (dateStr: string | null | undefined) => string;
 }

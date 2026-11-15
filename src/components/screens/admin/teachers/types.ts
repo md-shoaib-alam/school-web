@@ -1,5 +1,6 @@
 export interface TeacherInfo {
   id: string;
+  userId?: string;
   name: string;
   email: string;
   phone?: string;
@@ -10,19 +11,35 @@ export interface TeacherInfo {
   classes?: string[];
   joiningDate?: string;
   teacherId?: string;
+  employeeId?: string | null;
   address?: string;
+  avatar?: string | null;
   role?: string;
+  department?: string | null;
+  designation?: string | null;
+  employmentType?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  bloodGroup?: string | null;
+  maritalStatus?: string | null;
+  nationality?: string | null;
+  religion?: string | null;
+  alternatePhone?: string | null;
+  panNumber?: string | null;
+  aadhaarNumber?: string | null;
+  pfEnabled?: boolean;
+  esiEnabled?: boolean;
+  ptEnabled?: boolean;
 }
 
-export const avatarColors = [
-  "bg-emerald-500",
-  "bg-teal-500",
-  "bg-cyan-500",
-  "bg-blue-500",
-  "bg-violet-500",
-  "bg-purple-500",
-  "bg-rose-500",
-  "bg-amber-500",
-  "bg-orange-500",
-  "bg-lime-500",
-];
+export interface TeacherDocumentInfo {
+  id: string;
+  teacherId: string;
+  name: string;
+  category: string;
+  fileUrl: string;
+  size: number;
+  status: string;
+  verifiedAt: string | null;
+  createdAt: string;
+}

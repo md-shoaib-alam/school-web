@@ -22,7 +22,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
   const getBodyText = () => {
     const studentName = cert.content?.studentName || cert.student?.user?.name || 'the student';
     const className = cert.content?.class
-      ? `${cert.content.class.grade} - ${cert.content.class.name} (${cert.content.class.section})`
+      ? `${cert.content.class.grade}-${cert.content.class.section}`
       : 'the institution';
 
     switch (cert.certificateType) {
@@ -79,7 +79,7 @@ export function CertificateTemplate({ cert, formatDate, schoolName, affiliation,
 
           <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left border  bg-muted rounded-xl p-8 mt-6">
             <DetailRow label="Roll Number" value={cert.content?.rollNumber || cert.student?.rollNumber || ''} />
-            <DetailRow label="Class / Grade" value={cert.content?.class ? `${cert.content.class.grade} - ${cert.content.class.name}` : ''} />
+            <DetailRow label="Class" value={cert.content?.class ? `${cert.content.class.grade}-${cert.content.class.section}` : ''} />
             <DetailRow label="Date of Birth" value={formatDate(cert.content?.dateOfBirth || '')} />
             <DetailRow label="Gender" value={cert.content?.gender || ''} />
             <DetailRow label="Parent's Name" value={getParentName()} />

@@ -392,7 +392,7 @@ export function TeacherQRScanModal({
               </div>
 
               <div>
-                <h3 className="text-lg font-black text-foreground">
+                <h3 className="text-lg font-semibold text-foreground">
                   {scanResult.action} Confirmed!
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -400,7 +400,7 @@ export function TeacherQRScanModal({
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-sm">
                 <Clock className="size-4" />
                 <span>Time: {scanResult.time} (IST)</span>
               </div>
@@ -408,7 +408,7 @@ export function TeacherQRScanModal({
               <div className="pt-2">
                 <Button
                   onClick={() => handleClose(false)}
-                  className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm h-10 shadow-xs"
+                  className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm h-10 shadow-xs"
                 >
                   Done
                 </Button>
@@ -465,7 +465,7 @@ export function TeacherQRScanModal({
                 )}
               </div>
 
-              <p className="text-center text-[11px] text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground">
                 Hold phone steady over the QR code on the admin screen
               </p>
             </div>
@@ -482,7 +482,7 @@ export function TeacherQRScanModal({
                   placeholder="e.g. 849 201"
                   value={manualCode}
                   onChange={(e) => setManualCode(e.target.value)}
-                  className="h-12 text-center text-xl sm:text-2xl font-mono tracking-widest font-black rounded-2xl"
+                  className="h-12 text-center text-xl sm:text-2xl font-mono tracking-widest font-semibold rounded-xl"
                   autoFocus
                 />
               </div>

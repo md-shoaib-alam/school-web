@@ -78,7 +78,7 @@ export function ChildSelector({ students, selectedStudentId, onSelect }: ChildSe
                     className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all ${
                       isSelected 
                         ? "bg-amber-50/50 dark:bg-amber-950/10 text-amber-700 dark:text-amber-400" 
-                        : "hover:bg-accent/50"
+                        : "hover:bg-accent/50 dark:hover:bg-accent"
                     }`}
                   >
                     <div className="flex items-center gap-3">

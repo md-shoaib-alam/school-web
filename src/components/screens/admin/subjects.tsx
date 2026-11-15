@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ import { SubjectsTableView } from "./subjects/SubjectsTableView";
 import { SubjectsGridView } from "./subjects/SubjectsGridView";
 import { SubjectDialogs } from "./subjects/SubjectDialogs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LayoutGroup } from "framer-motion";
 
 interface SubjectInfo {
   id: string;
@@ -193,6 +194,16 @@ export function AdminSubjects() {
     return matchesSearch && matchesClass;
   });
 
+  // Only the first paint of the list arrives with a staggered entrance; a view switch
+  // must not, or its items would fade while they are travelling to their new boxes.
+  const painted = useRef(false);
+  const enter = !painted.current;
+  useEffect(() => {
+    // The "Select a Class" gate shows no list, so paint counts only once the
+    // filtered subjects are actually there.
+    if (!loading && filtered.length > 0) painted.current = true;
+  }, [loading, filtered]);
+
   const handleCreate = async () => {
     if (!form.name || !form.code || !form.classId) {
       toast.error("Please fill in all required fields");
@@ -306,22 +317,28 @@ export function AdminSubjects() {
             <p className="text-sm text-muted-foreground">Try adjusting your search or filters.</p>
           </CardContent>
         </Card>
-      ) : viewMode === "table" ? (
-        <SubjectsTableView 
-          filtered={filtered}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
-          onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
-        />
       ) : (
-        <SubjectsGridView 
-          filtered={filtered}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
-          onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
-        />
+        <LayoutGroup id="subjects">
+          {viewMode === "table" ? (
+            <SubjectsTableView 
+              filtered={filtered}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
+              onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
+            />
+          ) : (
+            <SubjectsGridView 
+              filtered={filtered}
+              enter={enter}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onEdit={(s) => dispatch({ type: 'OPEN_EDIT', payload: s })}
+              onDelete={(s) => dispatch({ type: 'OPEN_DELETE', payload: s })}
+            />
+          )}
+        </LayoutGroup>
       )}
 
       <SubjectDialogs 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ import {
   Bus,
   X,
   User,
+  Camera,
   GraduationCap,
   FileText,
   RotateCcw,
@@ -40,6 +41,38 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import type { ClassInfo, StudentFormData } from "./types";
+
+/**
+ * Teachers store the raw data URL, but the student list query returns avatar on
+ * every cached row, so a 2 MB phone photo would ride along for all 50 students on
+ * the page. Cropping to a 256 px square keeps the stored value near 20 KB base64,
+ * which is also what the server's 200 000-char cap expects.
+ */
+const PHOTO_SIDE = 256;
+
+async function toSquareDataUrl(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const side = Math.min(bitmap.width, bitmap.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = PHOTO_SIDE;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas unavailable");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, PHOTO_SIDE, PHOTO_SIDE);
+  ctx.drawImage(
+    bitmap,
+    (bitmap.width - side) / 2,
+    (bitmap.height - side) / 2,
+    side,
+    side,
+    0,
+    0,
+    PHOTO_SIDE,
+    PHOTO_SIDE
+  );
+  bitmap.close?.();
+  return canvas.toDataURL("image/jpeg", 0.82);
+}
 
 interface StudentDialogProps {
   open: boolean;
@@ -67,6 +100,24 @@ export function StudentDialog({
   const [showCustomPickup, setShowCustomPickup] = useState(false);
   const [customPickupName, setCustomPickupName] = useState("");
   const [customPickupFee, setCustomPickupFee] = useState("");
+
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Photo must be under 2MB");
+      return;
+    }
+    try {
+      setFormData({ ...formData, avatar: await toSquareDataUrl(file) });
+      toast.success("Photo attached — save to apply");
+    } catch {
+      toast.error("Could not read that image file");
+    }
+  };
 
   // Keep a snapshot of the initial form data when opened to support Reset button
   const [initialSnapshot, setInitialSnapshot] = useState<StudentFormData>(formData);
@@ -199,6 +250,47 @@ export function StudentDialog({
             data-lenis-prevent
           >
             {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 0: Profile Photo                                   */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                  <Camera className="size-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Profile Photo</p>
+                  <p className="text-[11px] text-muted-foreground">Upload a clear photo of the student (Optional)</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="size-14 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
+                  {formData.avatar ? (
+                    <img src={formData.avatar} alt="" className="size-full object-cover" />
+                  ) : formData.name ? (
+                    formData.name.slice(0, 2).toUpperCase()
+                  ) : (
+                    <User className="size-6 text-emerald-600/70" />
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <input ref={photoRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
+                    onClick={() => photoRef.current?.click()}
+                  >
+                    <Upload className="size-3.5 text-emerald-600" />
+                    Upload Photo
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 2MB</p>
+                </div>
+              </div>
+            </div>
+
+            {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 1: Personal Information                           */}
             {/* ────────────────────────────────────────────────────────── */}
             <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
@@ -261,8 +353,8 @@ export function StudentDialog({
               </div>
             </div>
 
-            {/* Row 2: Email, Phone Number, Student Photo */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            {/* Row 2: Email, Phone Number (the photo has its own card above) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
               {/* Email */}
               <div className="space-y-1.5">
                 <Label htmlFor="std_email" className="text-xs font-semibold text-foreground">
@@ -302,30 +394,6 @@ export function StudentDialog({
                 </div>
               </div>
 
-              {/* Student Photo */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">
-                  Student Photo <span className="text-muted-foreground font-normal">(Optional)</span>
-                </Label>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-muted border  flex items-center justify-center text-muted-foreground shrink-0">
-                    <User className="size-5" />
-                  </div>
-                  <div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-9 px-3 text-xs rounded-xl  font-semibold gap-1.5 hover:bg-muted"
-                      onClick={() => toast.info("Photo upload is enabled and will be stored with student records")}
-                    >
-                      <Upload className="size-3.5" />
-                      Upload Photo
-                    </Button>
-                    <p className="text-[10px] text-muted-foreground mt-1">JPG, PNG (Max 2MB)</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 

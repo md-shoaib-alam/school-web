@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Eye, MoreVertical } from "lucide-react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
+import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,7 +23,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { avatarColors } from "./types";
 import type { TeacherInfo } from "./types";
 
 const premiumLayoutTransition = {
@@ -35,6 +34,8 @@ const premiumLayoutTransition = {
 
 interface TeachersTableViewProps {
   teachers: TeacherInfo[];
+  /** First paint only: items arrive with a staggered fade instead of the view-switch travel. */
+  enter?: boolean;
   canEdit: boolean;
   canDelete: boolean;
   onEdit: (t: TeacherInfo) => void;
@@ -46,6 +47,7 @@ interface TeachersTableViewProps {
 
 export function TeachersTableView({
   teachers,
+  enter,
   canEdit,
   canDelete,
   onEdit,
@@ -59,7 +61,7 @@ export function TeachersTableView({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+            <thead className="[&_tr]:border-b text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="px-6 py-4">Teacher</th>
                 <th className="px-6 py-4 hidden sm:table-cell">Experience</th>
@@ -68,37 +70,30 @@ export function TeachersTableView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              <LazyMotion features={domAnimation}>
+              <LazyMotion features={domMax}>
                 <AnimatePresence mode="popLayout">
                   {teachers.map((teacher, index) => {
                     const initials = teacher.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                    const color = avatarColors[index % avatarColors.length];
                     return (
                       <m.tr 
                         key={teacher.id} 
                         id={`teacher-item-${teacher.id}`}
-                        layout="position"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{
-                          layout: premiumLayoutTransition,
-                          opacity: { duration: 0.2 }
-                        }}
-                        className="hover:bg-muted transition-colors"
+                        layoutId={`teacher-${teacher.id}`}
+                        initial={enter ? { y: 6 } : undefined}
+                        animate={{ y: 0 }}
+                        transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
+                        className="hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => onView(teacher)}
                       >
                         <TableCell className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="size-8 shrink-0">
-                              <AvatarFallback className={`${color} text-white text-[10px] font-bold`}>
+                              <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col min-w-0">
-                              <span 
-                                onClick={() => onView(teacher)}
-                                className="font-bold text-foreground truncate cursor-pointer hover:underline hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
-                              >
+                              <span className="font-bold text-foreground truncate">
                                 {teacher.name}
                               </span>
                               <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{teacher.email}</span>
@@ -120,7 +115,7 @@ export function TeachersTableView({
                           <Badge variant="outline" className="font-normal text-xs">{teacher.qualification || 'N/A'}</Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4">
-                          <div className="flex items-center justify-center gap-2">
+                          <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
                             {/* Desktop Actions (xl and above) */}
                             <div className="hidden xl:flex items-center gap-2">
                               <Button 

@@ -395,8 +395,8 @@ export const navItems: Record<UserRole, NavItem[]> = {
     },
     {
       key: "my-classes",
-      label: "My Classes",
-      icon: <School className="size-4" />,
+      label: "My Subjects",
+      icon: <BookOpen className="size-4" />,
     },
     {
       key: "grades-group",

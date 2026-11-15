@@ -23,7 +23,7 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   if (loading) {
     return (
-      <div className="bg-card border  shadow-sm rounded-2xl p-5 sm:p-6 h-full">
+      <div className="bg-card border shadow-sm rounded-xl p-5 sm:p-6 h-full">
         <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
           {/* Weekdays */}
           {WEEKDAY_LABELS.map((day) => (
@@ -46,7 +46,7 @@ export function CalendarGrid({
   }
 
   return (
-    <div className="bg-card border  shadow-sm rounded-2xl p-5 sm:p-6 h-full">
+    <div className="bg-card border shadow-sm rounded-xl p-5 sm:p-6 h-full">
       {/* Grid container */}
       <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center">
         {/* Weekdays */}
@@ -77,9 +77,9 @@ export function CalendarGrid({
                   relative w-full h-full flex flex-col items-center justify-center rounded-xl text-sm font-medium 
                   transition-all duration-200 active:scale-95 group cursor-pointer border
                   ${isSelected 
-                    ? "bg-blue-600 dark:bg-rose-600 text-white border-2 border-white dark:border-white shadow-lg shadow-blue-500/30 dark:shadow-rose-500/30 scale-[1.03] z-10 font-bold" 
+                    ? "bg-blue-600 dark:bg-rose-600 text-white border-2 border-white dark:border-white shadow-lg shadow-blue-500/30 dark:shadow-rose-500/30 scale-[1.03] z-10 font-semibold" 
                     : isDayToday
-                      ? "border-2 border-blue-500 dark:border-rose-500 text-blue-600 dark:text-rose-400 font-extrabold bg-blue-50/60 dark:bg-rose-500/15 dark:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
+                      ? "border-2 border-blue-500 dark:border-rose-500 text-blue-600 dark:text-rose-400 font-semibold bg-blue-50/60 dark:bg-rose-500/15 dark:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
                       : !inCurrentMonth
                         ? "text-muted-foreground bg-muted " 
                         : "text-foreground bg-muted  shadow-sm hover:bg-accent hover: dark:hover: hover:shadow-md"

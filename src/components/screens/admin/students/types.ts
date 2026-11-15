@@ -3,6 +3,7 @@ export interface StudentInfo {
   name: string;
   email: string;
   username?: string;
+  avatar?: string | null;
   phone: string | null;
   classId: string;
   className: string;
@@ -13,6 +14,13 @@ export interface StudentInfo {
   admissionDate?: string | null;
   createdAt?: string | null;
   bloodGroup?: string | null;
+  maritalStatus?: string | null;
+  nationality?: string | null;
+  religion?: string | null;
+  category?: string | null;
+  alternatePhone?: string | null;
+  aadhaarNumber?: string | null;
+  academicYear?: string | null;
   emergencyContact?: string | null;
   address?: string | null;
   house?: string | null;
@@ -51,6 +59,7 @@ export interface StudentFormData {
   dateOfBirth: string;
   bloodGroup?: string;
   house?: string;
+  avatar?: string;
   password?: string;
   transportEnabled?: boolean;
   routeId?: string;

@@ -64,7 +64,7 @@ export const PremiumModernAdmitCard = memo(function PremiumModernAdmitCard({ car
             </div>
             <div>
               <span className="text-[8px] font-medium text-muted-foreground uppercase tracking-wider block">Class & Sec</span>
-              <span className="font-semibold text-foreground block">{card.class.grade} - {card.class.name} ({card.class.section})</span>
+              <span className="font-semibold text-foreground block">{card.class.grade} - {card.class.section}</span>
             </div>
             <div>
               <span className="text-[8px] font-medium text-muted-foreground uppercase tracking-wider block">Guardian</span>

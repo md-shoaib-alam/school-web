@@ -38,4 +38,4 @@ export {
 } from './hooks/dashboard.hooks'
 
 // Auth Hooks
-export { useRequestPasswordReset, useChangePassword } from './hooks/auth.hooks'
+export { useChangePassword } from './hooks/auth.hooks'
