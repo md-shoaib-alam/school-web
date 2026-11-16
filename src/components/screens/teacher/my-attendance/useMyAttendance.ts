@@ -14,8 +14,8 @@ const sameAttendanceRecord = (a: AttendanceRecordItem, b: AttendanceRecordItem) 
 export function useMyAttendance() {
   const { currentUser } = useAppStore();
 
-  // Anchored strictly to real current month
-  const now = useMemo(() => new Date(), []);
+  // Always use a fresh Date() — do NOT memoize so values stay accurate past midnight
+  const now = new Date();
   const currentRealYear = now.getFullYear();
   const currentRealMonth = now.getMonth(); // 0-indexed
   const currentMonthStr = useMemo(() => {
@@ -26,7 +26,7 @@ export function useMyAttendance() {
   }, [currentRealYear, currentRealMonth]);
 
   // Real local today string: YYYY-MM-DD
-  const todayStr = useMemo(() => formatLocalDate(now), [now]);
+  const todayStr = formatLocalDate(now);
 
   // Calendar navigation state (defaults to current month)
   const [calendarDate, setCalendarDate] = useState<Date>(() => new Date());

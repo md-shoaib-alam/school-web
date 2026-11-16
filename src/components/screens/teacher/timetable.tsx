@@ -645,10 +645,10 @@ function ListView({
         <Button
           size="sm"
           variant={selectedDayFilter === "all" ? "default" : "outline"}
-          className={`rounded-full px-4 text-xs font-medium shrink-0 transition-colors ${
+          className={`rounded-full px-4 text-xs font-medium shrink-0 transition-all duration-200 active:scale-[0.97] ${
             selectedDayFilter === "all"
               ? "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
-              : "text-muted-foreground hover:text-foreground hover:bg-accent"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent hover:scale-[0.98]"
           }`}
           onClick={() => setSelectedDayFilter("all")}
         >
@@ -665,16 +665,16 @@ function ListView({
               key={day}
               size="sm"
               variant={isActive ? "default" : "outline"}
-              className={`rounded-full px-4 text-xs font-medium shrink-0 transition-colors ${
+              className={`rounded-full px-4 text-xs font-medium shrink-0 transition-all duration-200 active:scale-[0.97] ${
                 isActive
                   ? "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
                   : isCurrentDay
-                    ? "border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/20 hover:bg-blue-100/80"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? "border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/20 hover:bg-blue-100/80 hover:scale-[0.98]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent hover:scale-[0.98]"
               }`}
               onClick={() => setSelectedDayFilter(isActive ? "all" : day)}
             >
-              <span>{label}</span>
+              <span>{isCurrentDay && !isActive ? "Today" : label}</span>
               {isCurrentDay && !isActive && (
                 <span className="ml-1.5 size-1.5 rounded-full bg-blue-500 inline-block" />
               )}
@@ -1073,7 +1073,7 @@ function DayView({
               type="button"
               variant="ghost"
               size="icon"
-              className="size-7 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+              className="size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-[0.90] transition-all duration-150 cursor-pointer"
               onClick={handlePrevDay}
               title="Previous Day"
             >
@@ -1086,7 +1086,7 @@ function DayView({
               type="button"
               variant="ghost"
               size="icon"
-              className="size-7 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+              className="size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-[0.90] transition-all duration-150 cursor-pointer"
               onClick={handleNextDay}
               title="Next Day"
             >

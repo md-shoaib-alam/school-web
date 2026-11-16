@@ -2,7 +2,8 @@
 
 
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/store/use-app-store";
 import { useParentDashboard } from "@/lib/graphql/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,13 +36,13 @@ const DAY_FULL_LABELS: Record<string, string> = {
 };
 
 const SUBJECT_COLORS = [
-  "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800",
-  "bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+  "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
   "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+  "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
   "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
-  "bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800",
-  "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800",
+  "bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800",
   "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+  "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800",
 ];
 
 function formatTime(time: string): string {
@@ -55,33 +56,29 @@ export function ParentTimetable() {
   const { currentUser } = useAppStore();
   const { data: parentData, isLoading: parentLoading } = useParentDashboard(currentUser?.name || "");
   const [selectedChildId, setSelectedChildId] = useState<string>("");
-  const [timetable, setTimetable] = useState<TimetableSlot[]>([]);
   const [selectedDay, setSelectedDay] = useState("monday");
 
   const children = parentData?.children ?? [];
+  const effectiveChildId = selectedChildId || children[0]?.id || "";
+  const currentChild = children.find((c) => c.id === effectiveChildId);
+  const classId = currentChild?.classId || "";
 
-  const fetchTimetable = useCallback(async (classId: string) => {
-    if (!classId) return;
-    try {
-      const res = await apiFetch(`/api/timetable?classId=${classId}`);
-      const data = await res.json();
-      setTimetable(Array.isArray(data) ? data : []);
-    } catch {
-      setTimetable([]);
-    }
-  }, []);
+  const { data: timetableData } = useQuery<TimetableSlot[]>({
+    queryKey: ["parent-timetable", classId],
+    queryFn: async () => {
+      if (!classId) return [];
+      try {
+        const res = await apiFetch(`/api/timetable?classId=${classId}`);
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!classId,
+  });
 
-  useEffect(() => {
-    if (children.length > 0 && !selectedChildId) {
-      setSelectedChildId(children[0].id);
-    }
-  }, [children, selectedChildId]);
-
-  useEffect(() => {
-    if (!selectedChildId || parentLoading) return;
-    const child = children.find((c) => c.id === selectedChildId);
-    if (child) fetchTimetable(child.classId);
-  }, [selectedChildId, children, fetchTimetable, parentLoading]);
+  const timetable: TimetableSlot[] = timetableData ?? [];
 
   const subjectColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -158,10 +155,10 @@ export function ParentTimetable() {
 
   return (
     <div className="space-y-6 select-none animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b  pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-border pb-5">
         <div className="space-y-3.5 text-left">
           <div className="flex items-center gap-2">
-            <CalendarDays className="size-5 text-amber-600" />
+            <CalendarDays className="size-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-lg font-semibold text-foreground uppercase tracking-tight">
               Class Timetable
             </h2>
@@ -169,7 +166,7 @@ export function ParentTimetable() {
           {/* Children Selector */}
           <ChildSelector 
             students={children} 
-            selectedStudentId={selectedChildId} 
+            selectedStudentId={effectiveChildId} 
             onSelect={setSelectedChildId} 
           />
         </div>
@@ -177,30 +174,29 @@ export function ParentTimetable() {
 
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="rounded-xl shadow-sm">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white">
+            <div className="size-11 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
               <BookOpen className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">
-                {children.find((c) => c.id === selectedChildId)?.name || "–"}
+              <p className="text-sm font-semibold text-foreground">
+                {children.find((c) => c.id === effectiveChildId)?.name || "–"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {children.find((c) => c.id === selectedChildId)?.className ||
-                  "–"}
+                {children.find((c) => c.id === effectiveChildId)?.className || "–"}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl shadow-sm">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
+            <div className="size-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
               <CalendarDays className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-sm font-semibold text-foreground">
                 {selectedDaySlots.length} Periods
               </p>
               <p className="text-xs text-muted-foreground">
@@ -210,13 +206,13 @@ export function ParentTimetable() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl shadow-sm">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
+            <div className="size-11 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
               <Clock className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-sm font-semibold text-foreground">
                 {selectedDaySlots.length > 0
                   ? `${formatTime(selectedDaySlots[0].startTime)} – ${formatTime(selectedDaySlots[selectedDaySlots.length - 1].endTime)}`
                   : "No classes"}
@@ -237,10 +233,10 @@ export function ParentTimetable() {
             size="sm"
             variant={selectedDay === day ? "default" : "outline"}
             onClick={() => setSelectedDay(day)}
-            className={`rounded-full px-4 shrink-0 ${
+            className={`rounded-xl px-4 h-9 font-medium text-xs shrink-0 cursor-pointer transition-all ${
               selectedDay === day
-                ? "bg-amber-600 text-white hover:bg-amber-700 shadow-sm"
-                : "text-muted-foreground"
+                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-xs shadow-blue-500/20"
+                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             {DAY_LABELS[day]}
@@ -250,10 +246,10 @@ export function ParentTimetable() {
 
       {/* Day Schedule */}
       {timeSlots.length === 0 ? (
-        <Card className="rounded-xl shadow-sm">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs">
           <CardContent className="py-16 text-center">
-            <BookOpen className="size-12 mx-auto text-muted-foreground" />
-            <p className="text-sm font-medium text-muted-foreground">
+            <BookOpen className="size-12 mx-auto text-muted-foreground/40 mb-3" />
+            <p className="text-sm font-semibold text-foreground">
               No timetable configured
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -262,14 +258,14 @@ export function ParentTimetable() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="rounded-xl shadow-sm">
-          <CardHeader className="pb-3">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs">
+          <CardHeader className="pb-3 border-b border-border">
             <CardTitle className="text-base flex items-center gap-2">
-              <CalendarDays className="size-4 text-amber-500" />
+              <CalendarDays className="size-4 text-blue-600 dark:text-blue-400" />
               {DAY_FULL_LABELS[selectedDay]} Schedule
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
             <ScrollArea className="max-h-[500px]">
               <div className="space-y-3">
                 {timeSlots.map((ts) => {
@@ -278,7 +274,7 @@ export function ParentTimetable() {
                     return (
                       <div
                         key={`${selectedDay}-${ts.start}`}
-                        className="flex items-center gap-4 p-3 rounded-lg border border-dashed  bg-muted"
+                        className="flex items-center gap-4 p-3.5 rounded-xl border border-dashed border-border bg-muted/30"
                       >
                         <div className="text-xs text-muted-foreground font-medium min-w-[90px]">
                           {formatTime(ts.start)} – {formatTime(ts.end)}
@@ -295,12 +291,12 @@ export function ParentTimetable() {
 
                   const colorClass =
                     subjectColorMap[slot.subjectName] ||
-                    "bg-muted text-foreground ";
+                    "bg-muted text-foreground";
 
                   return (
                     <div
                       key={slot.id}
-                      className="flex items-center gap-4 p-3 rounded-lg border  hover:shadow-sm transition-all"
+                      className="flex items-center gap-4 p-3.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors"
                     >
                       <div className="text-xs text-foreground font-medium min-w-[90px]">
                         {formatTime(slot.startTime)} –{" "}
@@ -309,7 +305,7 @@ export function ParentTimetable() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${colorClass}`}
+                            className={`inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold border ${colorClass}`}
                           >
                             {slot.subjectName}
                           </span>
@@ -336,14 +332,14 @@ export function ParentTimetable() {
 
       {/* Subject Legend */}
       {Object.keys(subjectColorMap).length > 0 && (
-        <Card className="rounded-xl shadow-sm">
-          <CardHeader className="pb-3">
+        <Card className="rounded-2xl border border-border bg-card shadow-xs">
+          <CardHeader className="pb-3 border-b border-border">
             <CardTitle className="text-base flex items-center gap-2">
-              <BookOpen className="size-4 text-amber-500" />
+              <BookOpen className="size-4 text-blue-600 dark:text-blue-400" />
               Subjects
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
             <div className="flex flex-wrap gap-2">
               {Object.entries(subjectColorMap).map(([subject, colorClass]) => (
                 <div
