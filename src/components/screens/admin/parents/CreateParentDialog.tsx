@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +33,10 @@ import {
   Plus,
   Shield,
   Info,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
+import { toSquareDataUrl } from "@/lib/image-utils";
 
 interface CreateParentDialogProps {
   open: boolean;
@@ -57,6 +59,20 @@ export function CreateParentDialog({
 
   // Local state for initial snapshot to allow resetting
   const [initialSnapshot, setInitialSnapshot] = useState<any>(createForm);
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      setCreateForm({ ...createForm, avatar: dataUrl });
+      toast.success("Photo attached");
+    } catch {
+      toast.error("Failed to process photo");
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -141,6 +157,45 @@ export function CreateParentDialog({
             className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
             data-lenis-prevent
           >
+            {/* ────────────────────────────────────────────────────────── */}
+            {/* SECTION 0: Profile Photo                                   */}
+            {/* ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-5">
+              <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+              <button
+                type="button"
+                onClick={() => photoRef.current?.click()}
+                className="group size-28 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1.5 transition-colors cursor-pointer overflow-hidden"
+              >
+                {createForm.avatar ? (
+                  <img src={createForm.avatar} alt="" className="size-full object-cover" />
+                ) : (
+                  <>
+                    <Camera className="size-5 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                    <span className="text-xs font-semibold text-foreground">Upload photo</span>
+                    <span className="text-[10px] text-muted-foreground">JPG or PNG</span>
+                  </>
+                )}
+              </button>
+
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-semibold text-foreground">Parent Photo</p>
+                <p className="text-xs text-muted-foreground">Upload a clear photo of the parent. Click the square tile to browse or change photo.</p>
+                {createForm.avatar && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCreateForm({ ...createForm, avatar: "" });
+                    }}
+                    className="text-xs text-rose-500 hover:underline pt-1 cursor-pointer block"
+                  >
+                    Remove photo
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 1: Personal Information                           */}
             {/* ────────────────────────────────────────────────────────── */}

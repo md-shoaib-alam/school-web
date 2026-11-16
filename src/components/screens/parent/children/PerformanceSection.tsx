@@ -18,38 +18,30 @@ interface PerformanceSectionProps {
 
 export function PerformanceSection({ data }: PerformanceSectionProps) {
   return (
-    <Card className="rounded-3xl border  shadow-[0_8px_30px_rgb(0,0,0,0.02)] bg-card hover:shadow-md transition-all duration-300">
-      <CardHeader className="p-5 pb-3 border-b ">
-        <div className="flex items-center gap-2.5 text-left">
-          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-            <TrendingUp className="size-4" />
-          </div>
-          <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Subject-wise Performance
-          </CardTitle>
+    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden">
+      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0">
+        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+          <TrendingUp className="size-4" />
         </div>
+        <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+          Subject-wise Performance
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-5">
         <div className="space-y-4">
           {data.map((sp) => (
-            <div key={sp.subject} className="space-y-2 text-left group">
+            <div key={sp.subject} className="space-y-2 text-left">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-foreground group-hover:text-amber-500 transition-colors">
+                <span className="text-xs font-semibold text-foreground">
                   {sp.subject}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-tight">
+                  <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">
                     {sp.exams} {sp.exams === 1 ? "exam" : "exams"}
                   </span>
                   <Badge
                     variant="outline"
-                    className={`text-[9px] font-semibold shadow-none rounded-md px-1.5 border-0 ${
-                      sp.bestGrade.startsWith("A")
-                        ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
-                        : sp.bestGrade.startsWith("B")
-                          ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400"
-                          : "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400"
-                    }`}
+                    className="text-[10px] font-semibold rounded-md px-2 py-0.5 bg-muted text-foreground border-border"
                   >
                     Best: {sp.bestGrade}
                   </Badge>
@@ -58,18 +50,18 @@ export function PerformanceSection({ data }: PerformanceSectionProps) {
               <div className="flex items-center gap-3">
                 <Progress
                   value={sp.avgPct}
-                  className="h-2 flex-1 bg-muted [&>div]:bg-gradient-to-r [&>div]:from-amber-400 [&>div]:to-orange-500"
+                  className="h-2 flex-1 bg-muted [&>div]:bg-foreground"
                 />
-                <span className="text-xs font-semibold text-foreground w-10 text-right">
+                <span className="text-xs font-semibold text-foreground w-10 text-right tabular-nums">
                   {sp.avgPct}%
                 </span>
               </div>
             </div>
           ))}
           {data.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Award className="size-8 mb-2 opacity-30" />
-              <p className="text-xs font-semibold">No grade data available</p>
+            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+              <Award className="size-8 mb-2 opacity-30 text-muted-foreground" />
+              <p className="text-xs font-medium">No grade data available</p>
             </div>
           )}
         </div>

@@ -117,11 +117,22 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
 
 // --- PARENT PLANS (B2C) ---
 
+export const PARENT_FEATURES = [
+  "Attendance & notices dashboard",
+  "Detailed attendance trends",
+  "Online fee payment access",
+  "Detailed performance analytics",
+  "Real-time notifications",
+  "AI performance insights",
+  "Direct parent-teacher chat",
+  "Monthly progress reports (PDF)",
+];
+
 export const PARENT_PLANS: ParentPlan[] = [
   {
     id: "basic",
     name: "Basic",
-    description: "Essential access to track your child's progress",
+    description: "The essentials to stay in the loop: your child's attendance and school notices, free forever.",
     icon: <BookOpen className="size-6" />,
     color: "blue",
     pricing: {
@@ -129,19 +140,17 @@ export const PARENT_PLANS: ParentPlan[] = [
       quarterly: { price: 0, discountType: "none" },
       yearly: { price: 0, discountType: "none" },
     },
-    features: [
-      { text: "View child's grades & reports", included: true },
-      { text: "Basic attendance overview", included: true },
-      { text: "View school notices", included: true },
-      { text: "Fee payment status", included: true },
-    ],
+    features: PARENT_FEATURES.map((text, idx) => ({
+      text,
+      included: idx < 1,
+    })),
   },
   {
     id: "standard",
     name: "Standard",
-    description: "Complete visibility into your child's academics",
-    badge: "Most Popular",
-    badgeColor: "bg-amber-500",
+    description: "For everyday school life: detailed trends, online fee payments, performance analytics and real-time alerts.",
+    badge: "Recommended",
+    badgeColor: "bg-foreground text-background",
     popular: true,
     icon: <Star className="size-6" />,
     color: "amber",
@@ -150,19 +159,17 @@ export const PARENT_PLANS: ParentPlan[] = [
       quarterly: { price: 49, originalPrice: 79, discountType: "percentage" },
       yearly: { price: 149, originalPrice: 249, discountType: "percentage" },
     },
-    features: [
-      { text: "Detailed attendance with trends", included: true },
-      { text: "Online fee payment", included: true },
-      { text: "Detailed performance analytics", included: true },
-      { text: "Real-time notifications", included: true },
-    ],
+    features: PARENT_FEATURES.map((text, idx) => ({
+      text,
+      included: idx < 5,
+    })),
   },
   {
     id: "premium",
     name: "Premium",
-    description: "The ultimate parental engagement experience",
+    description: "Everything in Standard plus AI insights, direct parent-teacher chat and monthly PDF progress reports.",
     badge: "Best Value",
-    badgeColor: "bg-emerald-500",
+    badgeColor: "bg-emerald-600 text-white",
     icon: <Crown className="size-6" />,
     color: "emerald",
     pricing: {
@@ -170,11 +177,9 @@ export const PARENT_PLANS: ParentPlan[] = [
       quarterly: { price: 129, originalPrice: 199, discountType: "percentage" },
       yearly: { price: 399, originalPrice: 599, discountType: "percentage" },
     },
-    features: [
-      { text: "AI-powered performance analytics", included: true },
-      { text: "Instant push notifications", included: true },
-      { text: "Direct parent-teacher chat", included: true },
-      { text: "Monthly progress reports (PDF + email)", included: true },
-    ],
+    features: PARENT_FEATURES.map((text) => ({
+      text,
+      included: true,
+    })),
   },
 ];

@@ -71,7 +71,7 @@ export function TicketDetailSheet({
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="size-8 animate-spin text-violet-500" />
+            <Loader2 className="size-8 animate-spin text-blue-500" />
           </div>
         ) : ticket ? (
           <div className="flex-1 flex flex-col min-h-0">
@@ -89,19 +89,19 @@ export function TicketDetailSheet({
               <div className="flex flex-wrap gap-2">
                 <Badge
                   variant="outline"
-                  className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
+                  className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${STATUS_COLORS[ticket.status] || ""}`}
                 >
                   {STATUS_LABELS[ticket.status]}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ""}`}
+                  className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${PRIORITY_COLORS[ticket.priority] || ""}`}
                 >
                   {PRIORITY_LABELS[ticket.priority]}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-[10px] font-medium bg-muted text-foreground"
+                  className="text-[10px] font-medium rounded-lg px-2 py-0.5 bg-muted text-foreground"
                 >
                   {getCategoryLabel(ticket.category)}
                 </Badge>
@@ -113,7 +113,7 @@ export function TicketDetailSheet({
                     Assigned to:
                   </span>
                   <Avatar className="size-5">
-                    <AvatarFallback className="text-[9px] bg-violet-100 text-violet-700">
+                    <AvatarFallback className="text-[9px] bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 font-semibold">
                       {getInitials(ticket.assignee.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -172,7 +172,7 @@ export function TicketDetailSheet({
                             </Badge>
                           )}
                           {msg.author?.id === currentUserId && (
-                            <span className="text-[9px] text-violet-500 font-medium">
+                            <span className="text-[9px] text-blue-600 dark:text-blue-400 font-semibold">
                               (You)
                             </span>
                           )}
@@ -197,7 +197,7 @@ export function TicketDetailSheet({
                       placeholder="Type your reply..."
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
-                      className="min-h-[60px] max-h-[120px] resize-none text-sm"
+                      className="min-h-[60px] max-h-[120px] resize-none text-sm rounded-xl"
                       rows={2}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -212,7 +212,7 @@ export function TicketDetailSheet({
                     </span>
                     <Button
                       size="sm"
-                      className="bg-violet-600 hover:bg-violet-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-xl shadow-xs shadow-blue-500/20 cursor-pointer font-medium"
                       onClick={handleReplySubmit}
                       disabled={sendingReply || !replyMessage.trim()}
                     >

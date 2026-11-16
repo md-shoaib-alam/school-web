@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
+import { isTenDigitMobile } from "@/lib/format";
 import {
   parseRouteStops,
   type StudentOverviewTabProps,
@@ -12,6 +13,7 @@ import { StudentPersonalInfoCard } from "./StudentPersonalInfoCard";
 import { StudentAcademicInfoCard } from "./StudentAcademicInfoCard";
 import { StudentStatutoryCard } from "./StudentStatutoryCard";
 import { StudentParentContactCard } from "./StudentParentContactCard";
+import type { ParentOption } from "./ParentSelect";
 import { StudentSiblingsCard } from "./StudentSiblingsCard";
 import { StudentTransportCard } from "./StudentTransportCard";
 
@@ -71,6 +73,7 @@ export function StudentOverviewTab({
     admissionDate: sourceStudent?.admissionDate ? sourceStudent.admissionDate.split("T")[0] : (sourceStudent?.createdAt ? sourceStudent.createdAt.split("T")[0] : ""),
     academicStatus: sourceStudent?.status || "enrolled",
     house: sourceStudent?.house || "Not Assigned",
+    parentId: sourceStudent?.parentId || "",
     parentName: sourceStudent?.parentName || "",
     parentRelationship: "Parent",
     parentEmail: sourceStudent?.parentEmail || "",
@@ -98,6 +101,37 @@ export function StudentOverviewTab({
   });
   const routes = Array.isArray(routesData) ? routesData : [];
 
+  const { data: parentsData, isLoading: parentsLoading } = useQuery({
+    queryKey: ["parents-for-student-link"],
+    queryFn: async () => {
+      try {
+        const res = await apiFetch("/api/parents?limit=100");
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data?.items) ? data.items : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+  const parents: ParentOption[] = (parentsData || []).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    email: p.email,
+    phone: p.phone,
+  }));
+
+  const handleParentChange = (id: string) => {
+    const p = parents.find((x) => x.id === id);
+    setFormData({
+      ...formData,
+      parentId: id,
+      parentName: p?.name || "",
+      parentEmail: p?.email || "",
+      parentPhone: p?.phone || "",
+    });
+  };
+
   const buildForm = (s: any) => ({
     name: s?.name || "",
     gender: s?.gender || "male",
@@ -118,6 +152,7 @@ export function StudentOverviewTab({
     admissionDate: s?.admissionDate ? s.admissionDate.split("T")[0] : (s?.createdAt ? s.createdAt.split("T")[0] : ""),
     academicStatus: s?.status || "enrolled",
     house: s?.house || "Not Assigned",
+    parentId: s?.parentId || "",
     parentName: s?.parentName || "",
     parentRelationship: "Parent",
     parentEmail: s?.parentEmail || "",
@@ -145,6 +180,10 @@ export function StudentOverviewTab({
 
   // Save changes for a section or whole student
   const handleSave = async (sectionName?: string) => {
+    if (formData.phone && !isTenDigitMobile(formData.phone)) {
+      toast.error("Phone number must be 10 digits");
+      return;
+    }
     setSaving(true);
     try {
       const s = studentDetails || currentStudent;
@@ -165,9 +204,7 @@ export function StudentOverviewTab({
         alternatePhone: formData.alternatePhone,
         aadhaarNumber: formData.aadhaarNumber,
         status: formData.academicStatus,
-        parentName: formData.parentName,
-        parentPhone: formData.parentPhone,
-        parentEmail: formData.parentEmail,
+        parentId: formData.parentId,
         address: formData.address,
         transportEnabled: formData.transportEnabled,
         routeId: formData.routeId,
@@ -219,6 +256,7 @@ export function StudentOverviewTab({
       rollNumber: s?.rollNumber || "",
       username: s?.username || "",
       academicStatus: s?.status || "enrolled",
+      parentId: s?.parentId || "",
       parentName: s?.parentName || "",
       parentRelationship: "Parent",
       parentEmail: s?.parentEmail || "",
@@ -260,7 +298,6 @@ export function StudentOverviewTab({
         onToggleCollapse={toggleCollapse}
         onCancel={cancelSection}
         onSave={handleSave}
-        onUploadPhotoClick={() => toast.info("Photo upload will be saved with profile")}
         formatDate={formatDate}
         calculateAge={calculateAge}
       />
@@ -324,15 +361,16 @@ export function StudentOverviewTab({
         canEdit={canEdit}
         dimmed={dimmed("parent")}
         currentStudent={currentStudent}
+        parents={parents}
+        parentsLoading={parentsLoading}
+        parentId={formData.parentId}
         parentName={formData.parentName}
         parentRelationship={formData.parentRelationship}
         parentPhone={formData.parentPhone}
         parentEmail={formData.parentEmail}
         email={formData.email}
         address={formData.address}
-        onParentNameChange={(value) => setFormData({ ...formData, parentName: value })}
-        onParentPhoneChange={(value) => setFormData({ ...formData, parentPhone: value })}
-        onParentEmailChange={(value) => setFormData({ ...formData, parentEmail: value })}
+        onParentChange={handleParentChange}
         onEmailChange={(value) => setFormData({ ...formData, email: value })}
         onAddressChange={(value) => setFormData({ ...formData, address: value })}
         onEditSection={startEditSection}

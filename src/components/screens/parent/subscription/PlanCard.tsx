@@ -1,10 +1,8 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { BadgeCheck, Check, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Check, CheckCircle2, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Plan } from "./types";
 
 interface PlanCardProps {
@@ -12,161 +10,129 @@ interface PlanCardProps {
   isActive: boolean;
   cycle: "monthly" | "quarterly" | "yearly";
   onPurchase: (plan: Plan) => void;
+  processing?: boolean;
 }
 
-export function PlanCard({ plan, isActive, cycle, onPurchase }: PlanCardProps) {
-  const isPopular = plan.popular;
+export function PlanCard({ plan, isActive, cycle, onPurchase, processing }: PlanCardProps) {
   const currentPricing = plan.pricing[cycle];
-  const price = currentPricing.price;
-  const originalPrice = currentPricing.originalPrice;
+  const price = currentPricing?.price ?? 0;
+  const originalPrice = currentPricing?.originalPrice;
 
   const cycleLabels = {
-    monthly: "per month",
-    quarterly: "per quarter",
-    yearly: "per year"
+    monthly: "month",
+    quarterly: "quarter",
+    yearly: "year",
   };
 
   return (
-    <Card
-      className={`relative rounded-2xl transition-all duration-500 ${
-        isPopular
-          ? "border-amber-500 shadow-xl bg-card"
-          : "bg-card  shadow-lg"
-      } ${
-        isActive
-          ? "ring-2 ring-emerald-500/50"
-          : ""
-      }`}
+    <div
+      className={cn(
+        "relative bg-card border rounded-3xl p-6 sm:p-7 pt-12 sm:pt-14 flex flex-col justify-between transition-all duration-200",
+        plan.popular
+          ? "border-2 border-foreground shadow-lg shadow-black/5 dark:shadow-white/5"
+          : "border-border shadow-xs hover:border-border/80",
+        isActive && "ring-2 ring-emerald-500/40 border-emerald-500"
+      )}
     >
-      {plan.badge && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-white ${plan.badgeColor}`}
-          >
-            {plan.badge}
-          </span>
-        </div>
+      {/* Badges */}
+      {plan.popular && (
+        <span className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-xl rounded-tr-3xl bg-foreground text-background px-3.5 py-1.5 text-xs font-semibold tracking-tight">
+          <Star className="size-3 fill-current" aria-hidden />
+          Recommended
+        </span>
+      )}
+      {isActive && (
+        <span className="absolute top-0 left-0 flex items-center gap-1.5 rounded-br-xl rounded-tl-3xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white tracking-tight">
+          <BadgeCheck className="size-3.5" aria-hidden />
+          Current plan
+        </span>
       )}
 
-      <CardHeader className={`pt-6 sm:pt-8 ${isPopular ? "pb-2" : ""}`}>
-        <div className="flex items-center justify-between">
-          <div
-            className={`size-10 sm:size-12 rounded-xl flex items-center justify-center ${
-              isPopular
-                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
-                : isActive
-                  ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-                  : "bg-muted text-foreground"
-            }`}
-          >
-            {plan.icon}
-          </div>
-          {isActive && (
-            <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] sm:text-xs border-emerald-200 dark:border-emerald-800 shadow-none">
-              <CheckCircle2 className="size-3 mr-1" /> Active
-            </Badge>
-          )}
-        </div>
-        <div className="mt-3 sm:mt-4">
-          <CardTitle className="text-lg sm:text-xl">{plan.name}</CardTitle>
-          <CardDescription className="mt-1 text-xs sm:text-sm line-clamp-1 sm:line-clamp-none">
+      {/* Top Section: Title & Price */}
+      <div className="space-y-5">
+        <div>
+          <h3 className="text-xl font-bold tracking-tight text-foreground">{plan.name}</h3>
+          <p className="text-sm text-muted-foreground mt-1.5 min-h-[42px] leading-relaxed">
             {plan.description}
-          </CardDescription>
+          </p>
         </div>
-        <div className="mt-3 sm:mt-4 flex items-baseline gap-1">
-          {price === 0 ? (
-            <span className="text-2xl sm:text-3xl font-bold text-foreground">
-              Free
-            </span>
-          ) : (
-            <>
-              <span className="text-2xl sm:text-3xl font-bold text-foreground">
-                ₹{price}
+
+        {/* Pricing */}
+        <div className="space-y-1">
+          <div className="flex items-baseline gap-1.5">
+            {price === 0 ? (
+              <span className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums text-foreground">
+                Free
               </span>
-              {originalPrice && (
-                <span className="text-xs sm:text-sm text-muted-foreground line-through ml-1 sm:ml-2">
-                  ₹{originalPrice}
+            ) : (
+              <>
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums text-foreground">
+                  ₹{price.toLocaleString("en-IN")}
                 </span>
-              )}
-            </>
-          )}
-          {price !== 0 && (
-            <span className="text-xs sm:text-sm text-muted-foreground ml-1">
-              / {cycleLabels[cycle]}
-            </span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  / {cycleLabels[cycle]}
+                </span>
+              </>
+            )}
+          </div>
+          {originalPrice && originalPrice > price && (
+            <div className="flex items-center gap-2 pt-0.5">
+              <span className="text-xs text-muted-foreground/60 line-through tabular-nums font-medium">
+                ₹{originalPrice.toLocaleString("en-IN")}
+              </span>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                Save {Math.round(((originalPrice - price) / originalPrice) * 100)}%
+              </span>
+            </div>
           )}
         </div>
-        {originalPrice && price > 0 && (
-          <Badge className="mt-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-[10px] sm:text-xs shadow-none">
-            Save{" "}
-            {Math.round(
-              ((originalPrice - price) / originalPrice) *
-                100,
-            )}
-            %
-          </Badge>
-        )}
-      </CardHeader>
 
-      <CardContent className="pt-0 pb-6 sm:pb-8">
-        <Button
-          className={`w-full h-10 sm:h-11 text-xs sm:text-sm font-semibold rounded-xl mt-2 ${
-            isActive
-              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-              : isPopular
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
-                : plan.id === "premium"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md"
-                  : "bg-zinc-900 dark:bg-muted text-white"
-          }`}
-          onClick={() => (isActive ? null : onPurchase({ ...plan, price } as any))}
-          disabled={isActive}
-        >
-          {isActive ? (
-            <>
-              <CheckCircle2 className="size-3 sm:size-4 mr-2" /> Current Plan
-            </>
-          ) : price === 0 ? (
-            "Switch to Free"
-          ) : (
-            <>
-              Get {plan.name} <ArrowRight className="size-3 sm:size-4 ml-2" />
-            </>
-          )}
-        </Button>
-
-        <Separator className="my-4 sm:my-5" />
-
-        <div className="space-y-2 sm:space-y-3">
-          <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        {/* Features Checklist */}
+        <div className="border-t border-border/70 pt-6 space-y-3.5">
+          <p className="text-[11px] font-semibold text-foreground/80 uppercase tracking-wider">
             What&apos;s included
           </p>
-          {plan.features.map((feature, idx) => {
-            const isObject = typeof feature !== "string";
-            const text = isObject ? (feature as any).text : feature;
-            const included = isObject ? (feature as any).included : true;
-
-            return (
-              <div key={text} className="flex items-start gap-2 sm:gap-2.5">
-                {included ? (
-                  <div className="size-4 sm:size-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="size-2.5 sm:size-3" />
-                  </div>
-                ) : (
-                  <div className="size-4 sm:size-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-[10px]">✕</span>
-                  </div>
-                )}
-                <span
-                  className={`text-[11px] sm:text-sm ${included ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {text}
-                </span>
-              </div>
-            );
-          })}
+          <ul className="space-y-3 text-sm text-muted-foreground">
+            {plan.features.map((feature) => {
+              const text = typeof feature === "string" ? feature : feature.text;
+              const included = typeof feature === "string" ? true : feature.included;
+              return (
+                <li key={text} className="flex items-start gap-3">
+                  {included ? (
+                    <div className="size-4 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="size-2.5 stroke-[3]" aria-hidden />
+                    </div>
+                  ) : (
+                    <div className="size-4 rounded-full bg-muted/70 text-muted-foreground/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-[10px] leading-none">✕</span>
+                    </div>
+                  )}
+                  <span
+                    className={cn(
+                      "leading-snug text-xs sm:text-sm",
+                      included ? "text-foreground font-medium" : "text-muted-foreground/40"
+                    )}
+                  >
+                    {text}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Action Button */}
+      <div className="pt-8">
+        <Button
+          className="w-full h-11 rounded-xl text-sm font-semibold shadow-xs transition-transform active:scale-[0.99]"
+          variant={isActive ? "outline" : "default"}
+          disabled={isActive || processing}
+          onClick={() => (isActive ? null : onPurchase({ ...plan, price } as any))}
+        >
+          {isActive ? "Current plan" : price === 0 ? "Switch to Free" : `Choose ${plan.name}`}
+        </Button>
+      </div>
+    </div>
   );
 }

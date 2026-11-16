@@ -31,17 +31,21 @@ export function GradeDistributionChart({
   chartConfig,
 }: GradeDistributionChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm  h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2 font-semibold">
-          <CircleDot className="size-4 text-violet-500" />
-          Grade Distribution
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Breakdown of terms letter grades
-        </CardDescription>
+    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden h-full flex flex-col">
+      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0 text-left">
+        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+          <CircleDot className="size-4" />
+        </div>
+        <div>
+          <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+            Grade Distribution
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
+            Breakdown of terms letter grades
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-5 flex-1 flex items-center justify-center">
         {pieData.length > 0 ? (
           <div className="flex items-center gap-6">
             {!recharts ? (

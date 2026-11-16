@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PillTabs } from "@/components/ui/pill-tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,7 +20,7 @@ import {
   Link as LinkIcon, GraduationCap,
   CreditCard, FileText, StickyNote, MoreHorizontal,
   Building2, ChevronUp, ChevronDown, Eye, EyeOff, Lock,
-  Upload, MapPin, Unlink2
+  Upload, MapPin, Unlink2, Camera, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/ui/copy-button";
@@ -27,6 +28,7 @@ import { ProfileSection } from "@/components/ui/profile-section";
 import api from "@/lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import { ParentInfo, getInitials } from "./types";
 
 interface ParentProfileViewProps {
@@ -64,6 +66,9 @@ export function ParentProfileView({
   // Track which section is in independent edit mode
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [savingSection, setSavingSection] = useState<string | null>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const editPhotoRef = useRef<HTMLInputElement>(null);
+  const [photoSaving, setPhotoSaving] = useState(false);
 
   // Form Data for inline editing
   const [formData, setFormData] = useState({
@@ -75,7 +80,27 @@ export function ParentProfileView({
     address: parent.address || "",
     gender: parent.gender || "male",
     dateOfBirth: parent.dateOfBirth || "",
+    avatar: parent.avatar || "",
   });
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoSaving(true);
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      await api.put("/parents", { id: currentParent.id, avatar: dataUrl });
+      setCurrentParent((prev) => ({ ...prev, avatar: dataUrl }));
+      setFormData((prev) => ({ ...prev, avatar: dataUrl }));
+      queryClient.invalidateQueries({ queryKey: queryKeys.parents });
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save photo");
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
 
   const toggleCollapse = (key: keyof typeof collapsed) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -93,6 +118,7 @@ export function ParentProfileView({
       address: currentParent.address || "",
       gender: currentParent.gender || "male",
       dateOfBirth: currentParent.dateOfBirth || "",
+      avatar: currentParent.avatar || "",
     });
     setEditingSection(section);
   };
@@ -125,6 +151,7 @@ export function ParentProfileView({
         phone: formData.phone,
         occupation: formData.occupation,
         address: formData.address,
+        avatar: formData.avatar || null,
       };
 
       await api.put("/parents", payload);
@@ -139,6 +166,7 @@ export function ParentProfileView({
         address: formData.address,
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
+        avatar: formData.avatar || null,
       };
 
       setCurrentParent(updated);
@@ -201,9 +229,27 @@ export function ParentProfileView({
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-4 flex-1 min-w-0">
             <div className="flex items-center gap-4">
-              <div className="size-16 sm:size-[72px] rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-200/60 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-xl sm:text-2xl font-bold shadow-xs shrink-0">
-                {getInitials(currentParent.name)}
-              </div>
+              {/* Avatar — the tile itself opens the picker, matching the student profile */}
+              <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+              <button
+                type="button"
+                onClick={() => photoRef.current?.click()}
+                disabled={!canEdit || photoSaving}
+                aria-label="Change parent photo"
+                title={canEdit ? "Click to change photo" : undefined}
+                className="group relative size-16 sm:size-[72px] rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-xl sm:text-2xl font-bold shadow-xs shrink-0 overflow-hidden transition-colors enabled:cursor-pointer enabled:hover:border-emerald-500/60"
+              >
+                {currentParent.avatar ? (
+                  <img src={currentParent.avatar} alt={currentParent.name} className="size-full object-cover" />
+                ) : (
+                  getInitials(currentParent.name)
+                )}
+                {canEdit && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                    {photoSaving ? <Loader2 className="size-5 animate-spin" /> : <Camera className="size-5" />}
+                  </span>
+                )}
+              </button>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight truncate">{currentParent.name}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-1.5">
@@ -263,20 +309,7 @@ export function ParentProfileView({
       </div>
 
       {/* Tab Bar */}
-      <div className="bg-card rounded-xl border  px-2 py-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all ${isActive ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30" : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:text-muted-foreground"}`}>
-                <Icon className={`size-4 shrink-0 ${isActive ? "text-white stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <PillTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
       {/* Overview Tab */}
       {activeTab === "overview" && (
@@ -404,22 +437,44 @@ export function ParentProfileView({
                   </div>
 
                   {/* Photo Upload */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 sm:col-span-2">
                     <Label data-fade className="text-xs font-semibold text-foreground">Parent Photo</Label>
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
-                        {getInitials(formData.name)}
-                      </div>
-                      <Button
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <input ref={editPhotoRef} type="file" accept="image/png,image/jpeg" onChange={async (e) => {
+                        const file = e.target.files?.[0]; e.target.value = "";
+                        if (!file) return;
+                        try {
+                          const dataUrl = await toSquareDataUrl(file);
+                          setFormData({ ...formData, avatar: dataUrl });
+                          toast.success("Photo attached — save to apply");
+                        } catch {
+                          toast.error("Failed to process photo");
+                        }
+                      }} className="hidden" />
+                      <button
                         type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
-                        onClick={() => toast.info("Photo upload will be saved with profile")}
+                        onClick={() => editPhotoRef.current?.click()}
+                        className="group size-24 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer overflow-hidden"
                       >
-                        <Upload className="size-3.5" />
-                        Upload Photo
-                      </Button>
+                        {formData.avatar ? (
+                          <img src={formData.avatar} alt="" className="size-full object-cover" />
+                        ) : (
+                          <>
+                            <Camera className="size-4 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                            <span className="text-[11px] font-semibold text-foreground">Upload photo</span>
+                            <span className="text-[9px] text-muted-foreground">JPG or PNG</span>
+                          </>
+                        )}
+                      </button>
+                      {formData.avatar && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, avatar: "" })}
+                          className="text-xs text-rose-500 hover:underline cursor-pointer"
+                        >
+                          Remove photo
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

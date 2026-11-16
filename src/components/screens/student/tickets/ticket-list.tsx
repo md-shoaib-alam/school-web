@@ -20,10 +20,10 @@ interface TicketListProps {
 export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
   if (tickets.length === 0) {
     return (
-      <Card className="rounded-xl shadow-sm">
+      <Card className="rounded-2xl border border-border bg-card shadow-xs">
         <CardContent className="py-16 text-center">
-          <Ticket className="size-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm font-medium text-muted-foreground">
+          <Ticket className="size-12 mx-auto text-muted-foreground/40 mb-3" />
+          <p className="text-sm font-semibold text-foreground">
             No tickets yet
           </p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -39,7 +39,7 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
       {tickets.map((ticket) => (
         <Card
           key={ticket.id}
-          className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer "
+          className="rounded-2xl border border-border bg-card shadow-xs hover:border-blue-500/30 hover:shadow-sm transition-all duration-200 cursor-pointer overflow-hidden"
           onClick={() => onOpenDetail(ticket.id)}
         >
           <CardContent className="p-4">
@@ -53,19 +53,19 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${STATUS_COLORS[ticket.status] || ""}`}
                   >
                     {STATUS_LABELS[ticket.status]}
                   </Badge>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ""}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${PRIORITY_COLORS[ticket.priority] || ""}`}
                   >
                     {PRIORITY_LABELS[ticket.priority]}
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-medium bg-muted text-muted-foreground"
+                    className="text-[10px] font-medium rounded-lg px-2 py-0.5 bg-muted text-muted-foreground"
                   >
                     {getCategoryLabel(ticket.category)}
                   </Badge>
@@ -91,7 +91,7 @@ export function TicketList({ tickets, onOpenDetail }: TicketListProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/20 shrink-0"
+                className="size-8 rounded-xl text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 shrink-0 cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenDetail(ticket.id);

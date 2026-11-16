@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -28,51 +29,21 @@ import {
   User,
   Camera,
   GraduationCap,
-  FileText,
   RotateCcw,
   Plus,
-  Upload,
   Droplet,
-  Home,
   Info,
-  ChevronDown,
+  Sparkles,
+  Phone,
+  Mail,
+  Contact,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import type { ClassInfo, StudentFormData } from "./types";
 
-/**
- * Teachers store the raw data URL, but the student list query returns avatar on
- * every cached row, so a 2 MB phone photo would ride along for all 50 students on
- * the page. Cropping to a 256 px square keeps the stored value near 20 KB base64,
- * which is also what the server's 200 000-char cap expects.
- */
-const PHOTO_SIDE = 256;
-
-async function toSquareDataUrl(file: File): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const side = Math.min(bitmap.width, bitmap.height);
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = PHOTO_SIDE;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("canvas unavailable");
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, PHOTO_SIDE, PHOTO_SIDE);
-  ctx.drawImage(
-    bitmap,
-    (bitmap.width - side) / 2,
-    (bitmap.height - side) / 2,
-    side,
-    side,
-    0,
-    0,
-    PHOTO_SIDE,
-    PHOTO_SIDE
-  );
-  bitmap.close?.();
-  return canvas.toDataURL("image/jpeg", 0.82);
-}
+import { toSquareDataUrl } from "@/lib/image-utils";
 
 interface StudentDialogProps {
   open: boolean;
@@ -83,6 +54,75 @@ interface StudentDialogProps {
   setFormData: (data: StudentFormData) => void;
   submitting: boolean;
   onSubmit: () => void;
+}
+
+/** A numbered section card — icon tile, title, and a step badge on the right. */
+function FormSection({
+  step,
+  icon: Icon,
+  title,
+  children,
+}: {
+  step: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+      <div className="flex items-center gap-2.5 pb-3 border-b">
+        <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+          <Icon className="size-4 text-emerald-600 dark:text-emerald-400" />
+        </div>
+        <h3 className="text-sm sm:text-base font-semibold text-foreground">{title}</h3>
+        <span className="ml-auto text-xs font-mono font-bold text-emerald-600/70 dark:text-emerald-400/70">
+          {step}
+        </span>
+      </div>
+      <div className="pt-4 space-y-4">{children}</div>
+    </section>
+  );
+}
+
+/** Segmented control used for Gender (Male / Female / Other). */
+function Segmented({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="inline-flex rounded-xl border bg-muted p-1 gap-1">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          onClick={() => onChange(o.value)}
+          className={cn(
+            "px-3.5 h-8 rounded-lg text-xs font-semibold transition-all",
+            value === o.value
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Small pill shown on auto-generated read-only fields. */
+function AutoBadge() {
+  return (
+    <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/70 dark:border-emerald-800/60 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+      <Sparkles className="size-3" />
+      AUTO
+    </span>
+  );
 }
 
 export function StudentDialog({
@@ -249,285 +289,207 @@ export function StudentDialog({
             className="flex-1 overflow-y-auto px-5 sm:px-8 py-5 space-y-5 overscroll-contain touch-pan-y"
             data-lenis-prevent
           >
-            {/* ────────────────────────────────────────────────────────── */}
-            {/* SECTION 0: Profile Photo                                   */}
-            {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
-                  <Camera className="size-4 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Profile Photo</p>
-                  <p className="text-[11px] text-muted-foreground">Upload a clear photo of the student (Optional)</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="size-14 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
+            {/* ── 01 Student profile ── */}
+            <FormSection step="01" icon={User} title="Student profile">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+                <button
+                  type="button"
+                  onClick={() => photoRef.current?.click()}
+                  className="group size-28 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1.5 transition-colors cursor-pointer overflow-hidden"
+                >
                   {formData.avatar ? (
                     <img src={formData.avatar} alt="" className="size-full object-cover" />
-                  ) : formData.name ? (
-                    formData.name.slice(0, 2).toUpperCase()
                   ) : (
-                    <User className="size-6 text-emerald-600/70" />
+                    <>
+                      <Camera className="size-5 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                      <span className="text-xs font-semibold text-foreground">Upload photo</span>
+                      <span className="text-[10px] text-muted-foreground">JPG or PNG</span>
+                    </>
                   )}
-                </div>
-                <div className="space-y-1.5">
-                  <input ref={photoRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
-                    onClick={() => photoRef.current?.click()}
-                  >
-                    <Upload className="size-3.5 text-emerald-600" />
-                    Upload Photo
-                  </Button>
-                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 2MB</p>
+                </button>
+
+                <div className="flex-1 space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-foreground">School Login ID</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <Input
+                        value={formData.username || (isCreate ? "Auto-generated" : "")}
+                        disabled={isCreate}
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        placeholder="Auto-generated"
+                        className="pl-9 pr-16 h-10 text-xs rounded-xl bg-muted  font-mono"
+                      />
+                      <AutoBadge />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    A square photo is cropped automatically. Leave the ID blank to let the system generate it.
+                  </p>
                 </div>
               </div>
-            </div>
+            </FormSection>
 
-            {/* ────────────────────────────────────────────────────────── */}
-            {/* SECTION 1: Personal Information                           */}
-            {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
-                <User className="size-4 text-emerald-600" />
-                Personal Information
+            {/* ── 02 Personal details ── */}
+            <FormSection step="02" icon={Contact} title="Personal details">
+              <div className="space-y-1.5">
+                <Label htmlFor="std_name" className="text-xs font-semibold text-foreground">
+                  Full Name <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="std_name"
+                    name="name"
+                    autoComplete="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Rahul Sharma"
+                    className="pl-9 h-10 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
+                  />
+                </div>
               </div>
 
-              {/* Row 1: Full Name, Gender, Date of Birth */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Full Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="std_name" className="text-xs font-semibold text-foreground">
-                    Full Name <span className="text-red-500">*</span>
+                  <Label className="text-xs font-semibold text-foreground">Date of birth</Label>
+                  <DatePicker
+                    date={formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) ? new Date(formData.dateOfBirth) : undefined}
+                    onChange={(date) => {
+                      const formatted = date ? date.toISOString().split("T")[0] : "";
+                      setFormData({ ...formData, dateOfBirth: formatted });
+                    }}
+                    placeholder="Pick date of birth"
+                    className="w-full h-10 text-xs rounded-xl bg-muted "
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-foreground">Blood group</Label>
+                  <div className="relative">
+                    <Select
+                      value={formData.bloodGroup || ""}
+                      onValueChange={(val) => setFormData({ ...formData, bloodGroup: val })}
+                    >
+                      <SelectTrigger className="h-10 text-xs rounded-xl bg-muted  pl-9">
+                        <Droplet className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                        <SelectValue placeholder="Select blood group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => (
+                          <SelectItem key={g} value={g}>{g}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Gender</Label>
+                <Segmented
+                  value={formData.gender}
+                  onChange={(val) => setFormData({ ...formData, gender: val })}
+                  options={[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                    { value: "other", label: "Other" },
+                  ]}
+                />
+              </div>
+            </FormSection>
+
+            {/* ── 03 Contact ── */}
+            <FormSection step="03" icon={Phone} title="Contact">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="std_email" className="text-xs font-semibold text-foreground">
+                    Email address <span className="text-muted-foreground font-normal">(Optional)</span>
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
-                      id="std_name"
-                      name="name"
-                      autoComplete="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Enter full name"
-                      className="pl-9 h-10 text-xs rounded-xl bg-muted  focus-visible:ring-emerald-500"
+                      id="std_email"
+                      name="email"
+                      autoComplete="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="student@example.com"
+                      className="pl-9 h-10 text-xs rounded-xl bg-muted "
                     />
                   </div>
                 </div>
 
-              {/* Gender */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">Gender</Label>
-                <Select
-                  value={formData.gender}
-                  onValueChange={(val) => setFormData({ ...formData, gender: val })}
-                >
-                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted ">
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Date of Birth */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">Date of Birth</Label>
-                <DatePicker
-                  date={formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) ? new Date(formData.dateOfBirth) : undefined}
-                  onChange={(date) => {
-                    const formatted = date ? date.toISOString().split("T")[0] : "";
-                    setFormData({ ...formData, dateOfBirth: formatted });
-                  }}
-                  placeholder="Pick date of birth"
-                  className="w-full h-10 text-xs rounded-xl bg-muted "
-                />
-              </div>
-            </div>
-
-            {/* Row 2: Email, Phone Number (the photo has its own card above) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-              {/* Email */}
-              <div className="space-y-1.5">
-                <Label htmlFor="std_email" className="text-xs font-semibold text-foreground">
-                  Email <span className="text-muted-foreground font-normal">(Optional)</span>
-                </Label>
-                <Input
-                  id="std_email"
-                  name="email"
-                  autoComplete="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="john@school.com"
-                  className="h-10 text-xs rounded-xl bg-muted "
-                />
-              </div>
-
-              {/* Phone Number */}
-              <div className="space-y-1.5">
-                <Label htmlFor="std_phone" className="text-xs font-semibold text-foreground">
-                  Phone Number
-                </Label>
-                <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
-                  <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
-                    +91
-                  </span>
-                  <input
-                    id="std_phone"
-                    name="phone"
-                    autoComplete="tel"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter phone number"
-                    className="w-full h-10 px-3 text-xs bg-transparent focus:outline-none text-foreground"
-                  />
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 2: Academic Information                           */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
-              <GraduationCap className="size-4 text-emerald-600" />
-              Academic Information
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Class */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">
-                  Class <span className="text-red-500">*</span>
-                </Label>
-                <ClassSelect
-                  value={formData.classId}
-                  onValueChange={(val) => setFormData({ ...formData, classId: val })}
-                  placeholder="Select class"
-                  className="w-full h-10 text-xs rounded-xl bg-muted "
-                />
-              </div>
-
-              {/* Roll Number */}
-              <div className="space-y-1.5">
-                <Label htmlFor="std_roll" className="text-xs font-semibold text-foreground">
-                  Roll Number <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold">#</span>
-                  <Input
-                    id="std_roll"
-                    value={formData.rollNumber}
-                    onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
-                    placeholder="Enter roll number"
-                    className="pl-8 h-10 text-xs rounded-xl bg-muted "
-                  />
-                </div>
-              </div>
-
-              {/* School Login ID */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">School Login ID</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input
-                    value={formData.username || (isCreate ? "Auto-generated" : "")}
-                    disabled={isCreate}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    placeholder="Auto-generated"
-                    className="pl-9 h-10 text-xs rounded-xl bg-muted text-muted-foreground  cursor-not-allowed"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ────────────────────────────────────────────────────────── */}
-          {/* SECTION 3: Additional Details                             */}
-          {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b  text-foreground font-semibold text-sm sm:text-base">
-              <FileText className="size-4 text-emerald-600" />
-              Additional Details
-            </div>
-
-            {/* Blood Group & House */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Blood Group */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">
-                  Blood Group <span className="text-muted-foreground font-normal">(Optional)</span>
-                </Label>
-                <div className="relative">
-                  <Select
-                    value={formData.bloodGroup || ""}
-                    onValueChange={(val) => setFormData({ ...formData, bloodGroup: val })}
-                  >
-                    <SelectTrigger className="h-10 text-xs rounded-xl bg-muted  pl-9">
-                      <Droplet className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                      <SelectValue placeholder="Select blood group" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A+">A+</SelectItem>
-                      <SelectItem value="A-">A-</SelectItem>
-                      <SelectItem value="B+">B+</SelectItem>
-                      <SelectItem value="B-">B-</SelectItem>
-                      <SelectItem value="AB+">AB+</SelectItem>
-                      <SelectItem value="AB-">AB-</SelectItem>
-                      <SelectItem value="O+">O+</SelectItem>
-                      <SelectItem value="O-">O-</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* House (Disabled / Reserved for future feature) */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">
-                  House <span className="text-[10px] text-muted-foreground font-normal">(Not Configured)</span>
-                </Label>
-                <div className="relative">
-                  <Select
-                    value="Not Assigned"
-                    disabled
-                  >
-                    <SelectTrigger className="h-10 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed pl-9">
-                      <Home className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                      <SelectValue placeholder="Not Assigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Not Assigned">Not Assigned</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            {/* Transport Service Switch & Info */}
-            <div className="pt-2 border-t  space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <Bus className="size-4 text-emerald-600" />
-                  <div>
-                    <Label htmlFor="transport_toggle" className="text-xs font-bold text-foreground cursor-pointer">
-                      Transport Service
-                    </Label>
-                    <p className="text-[11px] text-muted-foreground">
-                      Enable if this student uses school transport
-                    </p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="std_phone" className="text-xs font-semibold text-foreground">
+                    Mobile number
+                  </Label>
+                  <div className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500">
+                    <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
+                      +91
+                    </span>
+                    <input
+                      id="std_phone"
+                      name="phone"
+                      autoComplete="tel"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      placeholder="10-digit number"
+                      inputMode="numeric"
+                      maxLength={10}
+                      className="w-full h-10 px-3 text-xs bg-transparent focus:outline-none text-foreground"
+                    />
                   </div>
+                </div>
+              </div>
+            </FormSection>
+
+            {/* ── 04 Academic enrollment ── */}
+            <FormSection step="04" icon={GraduationCap} title="Academic enrollment">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-foreground">
+                    Class <span className="text-red-500">*</span>
+                  </Label>
+                  <ClassSelect
+                    value={formData.classId}
+                    onValueChange={(val) => setFormData({ ...formData, classId: val })}
+                    placeholder="Select class"
+                    className="w-full h-10 text-xs rounded-xl bg-muted "
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="std_roll" className="text-xs font-semibold text-foreground">
+                    Roll no. <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold">#</span>
+                    <Input
+                      id="std_roll"
+                      value={formData.rollNumber}
+                      onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+                      placeholder="Enter roll number"
+                      className="pl-8 h-10 text-xs rounded-xl bg-muted "
+                    />
+                  </div>
+                </div>
+              </div>
+            </FormSection>
+
+            {/* ── 05 Transport ── */}
+            <FormSection step="05" icon={Bus} title="Transport">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="transport_toggle" className="text-xs font-bold text-foreground cursor-pointer">
+                    Transport Service
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Enable if this student uses school transport
+                  </p>
                 </div>
                 <Switch
                   id="transport_toggle"
@@ -650,8 +612,7 @@ export function StudentDialog({
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+            </FormSection>
         </div>
 
         {/* Modal Action Footer matching the screenshot */}

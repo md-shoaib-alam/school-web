@@ -1,0 +1,133 @@
+.admission-view {
+  min-height: 100vh;
+  padding: 24px 16px;
+  color: #1b2440;
+  background: #eef0f3;
+  font-family: var(--font-admission-inter), Arial, sans-serif;
+}
+.admission-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 210mm;
+  margin: 0 auto 16px;
+  font-size: 13px;
+}
+.admission-toolbar p { margin: 0; color: #475569; }
+.admission-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #047857;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+.admission-toolbar button:disabled { opacity: .6; cursor: wait; }
+.admission-toolbar button:focus-visible { outline: 2px solid #047857; outline-offset: 3px; }
+.admission-actions { display: flex; align-items: center; gap: 8px; }
+.admission-download { width: 40px; height: 40px; padding: 0; flex: none; }
+.admission-scroll { overflow-x: auto; }
+.admission-paper {
+  box-sizing: border-box;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 8mm;
+  background: white;
+  box-shadow: 0 1px 8px #00000014;
+}
+.admission-state { max-width: 600px; margin: 48px auto; text-align: center; }
+.admission-state h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.af-sheet {
+  --af-line: #9aa5bd;
+  --af-label: #eef1f7;
+  --af-bar: #c6cedd;
+  width: 194mm;
+  border: 1px solid #1b2440;
+  box-sizing: border-box;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: #1b2440;
+  background: white;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.af-sheet *, .af-sheet *::before, .af-sheet *::after { box-sizing: border-box; }
+.af-head { position: relative; padding: 10px 68px; min-height: 62px; text-align: center; }
+.af-head h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.af-head p { margin: 3px 0 0; font-size: 9px; color: #475569; }
+.af-logo { position: absolute; left: 14px; top: 8px; width: 42px; height: 46px; display: grid; place-items: center; }
+.af-logo img { width: 100%; height: 100%; object-fit: contain; }
+.af-logo span { font-size: 13px; color: #047857; font-weight: 600; }
+.af-title {
+  margin: 0;
+  padding: 6px 0;
+  border-block: 1px solid #1b2440;
+  text-align: center;
+  background: #d3dae6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+.af-top { display: flex; align-items: center; border-bottom: 1px solid var(--af-line); }
+/* separate + spacing 0: Chromium's print path drops collapsed table borders,
+   so draw explicit per-cell borders that survive Save-as-PDF. */
+.af-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.af-table td { padding: 0; width: 50%; vertical-align: top; border-bottom: 1px solid var(--af-line); border-right: 1px solid var(--af-line); }
+.af-table td:last-child { border-right: 0; }
+.af-table tr:last-child td { border-bottom: 0; }
+.af-field { display: flex; min-height: 22px; }
+.af-label {
+  display: flex;
+  align-items: center;
+  flex: 0 0 94px;
+  padding: 4px 7px;
+  background: var(--af-label);
+  border-right: 1px solid var(--af-line);
+  color: #2b3550;
+  font-size: 8px;
+  line-height: 1.15;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.af-value { flex: 1; min-width: 0; padding: 4px 7px; font-weight: 400; overflow-wrap: anywhere; }
+.af-identifiers { flex: 1; min-width: 0; border-block: 1px solid var(--af-line); }
+.af-identifiers .af-label { flex-basis: 94px; }
+.af-photo { flex: 0 0 112px; align-self: stretch; min-height: 122px; padding: 5px; border-left: 1px solid var(--af-line); display: grid; place-items: center; }
+.af-photo img, .af-photo > span { width: 100px; height: 112px; border: 1px solid var(--af-line); object-fit: cover; }
+.af-photo > span { display: grid; place-items: center; font-size: 10px; color: #7b8499; }
+.af-bar { margin: 0; padding: 4px 0; border-block: 1px solid var(--af-line); background: var(--af-bar); text-align: center; font-size: 9px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; }
+.af-parent { display: flex; border-bottom: 1px solid var(--af-line); }
+.af-parent-side { flex: 0 0 76px; display: grid; place-items: center; padding: 6px; border-right: 1px solid var(--af-line); }
+.af-parent-side span { width: 62px; height: 78px; display: grid; place-items: center; border: 1px solid var(--af-line); background: var(--af-label); font-weight: 700; font-size: 15px; color: #64748b; }
+.af-parent-table { flex: 1; min-width: 0; }
+.af-documents { display: flex; flex-wrap: wrap; gap: 5px 14px; padding: 6px 7px; font-size: 9px; }
+.af-documents > div { display: flex; align-items: center; gap: 4px; }
+.af-checkbox { width: 10px; height: 10px; border: 1px solid #64748b; font-size: 8px; display: inline-grid; place-items: center; }
+.af-tag { color: #64748b; font-size: 7px; text-transform: uppercase; }
+.af-declaration { margin: 0; padding: 7px; font-size: 9px; line-height: 1.4; border-bottom: 1px solid var(--af-line); }
+.af-signatures { display: grid; grid-template-columns: 1.15fr 1fr 2fr .65fr; min-height: 60px; border-bottom: 1px solid var(--af-line); }
+.af-signatures > div { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; padding: 6px; border-right: 1px solid var(--af-line); }
+.af-signatures > div:last-child { border: 0; justify-content: center; }
+.af-signatures strong { font-size: 9px; font-weight: 600; }
+.af-signatures small { font-size: 8px; margin-top: 3px; color: #64748b; overflow-wrap: anywhere; }
+.af-seal { width: 42px; height: 42px; border: 1px dashed var(--af-line); border-radius: 50%; display: grid; place-content: center; font-size: 7px; line-height: 1.2; color: #64748b; }
+.af-foot { display: flex; justify-content: space-between; gap: 12px; padding: 4px 7px; font-size: 8px; color: #64748b; }
+@page { size: A4 portrait; margin: 8mm; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  .admission-view { padding: 0; min-height: 0; background: white; }
+  .admission-toolbar, nextjs-portal, [data-sonner-toaster] { display: none !important; }
+  .admission-scroll { overflow: visible; }
+  .admission-paper { width: 100%; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+  .af-sheet { width: 100%; break-inside: avoid; }
+}

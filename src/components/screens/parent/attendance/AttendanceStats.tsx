@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, PieChart } from "lucide-react";
 
 interface AttendanceStatsProps {
   percentage: number;
@@ -11,71 +10,45 @@ interface AttendanceStatsProps {
 
 export function AttendanceStats({ percentage, present, absent }: AttendanceStatsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-      {/* Percentage circle card */}
-      <Card className="col-span-2 md:col-span-1 rounded-3xl border  bg-card backdrop-blur-xl shadow-xs overflow-hidden group">
-        <CardContent className="p-6 flex items-center justify-center min-h-[160px]">
-          <div className="relative size-32 group-hover:scale-105 transition-transform duration-300">
-            <svg className="size-32 -rotate-90" viewBox="0 0 128 128">
-              <circle
-                cx="64" cy="64" r="54"
-                fill="none" stroke="#f4f4f5" strokeWidth="8"
-                className="dark:stroke-zinc-800"
-              />
-              <circle
-                cx="64" cy="64" r="54"
-                fill="none"
-                stroke={percentage >= 80 ? "#10b981" : percentage >= 60 ? "#f59e0b" : "#ef4444"}
-                strokeWidth="8"
-                strokeDasharray={`${(percentage / 100) * 339} 339`}
-                strokeLinecap="round"
-                className="transition-all duration-500 ease-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-left leading-none">
-              <span className={`text-2xl font-bold tracking-tight ${percentage >= 80 ? "text-emerald-600 dark:text-emerald-400" : percentage >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
-                {percentage}%
-              </span>
-              <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider mt-1.5">Attendance</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-3 gap-2.5 sm:gap-3 select-none">
+      {/* Present Box */}
+      <div className="aspect-square rounded-2xl border border-border bg-card p-2.5 sm:p-3.5 flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center shadow-xs transition-colors hover:border-emerald-500/40">
+        <div className="size-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
+          <CheckCircle2 className="size-4 stroke-[2.2]" />
+        </div>
+        <span className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-none tabular-nums">
+          {present}
+        </span>
+        <span className="text-xs sm:text-[13px] font-medium text-muted-foreground leading-none">
+          Present
+        </span>
+      </div>
 
-      {/* Present days card */}
-      <Card className="col-span-1 rounded-xl border border-emerald-100/80 dark:border-emerald-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-emerald-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
-        <CardContent className="p-4 md:p-6 flex flex-col justify-between h-full w-full">
-          <div className="flex items-center">
-            <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
-              <CheckCircle2 className="size-4 md:size-5" />
-            </div>
-          </div>
-          <div className="mt-3 md:mt-4 text-left leading-none">
-            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block">Present Days</span>
-            <span className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight block mt-1.5 md:mt-2">
-              {present}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Absent Box */}
+      <div className="aspect-square rounded-2xl border border-border bg-card p-2.5 sm:p-3.5 flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center shadow-xs transition-colors hover:border-rose-500/40">
+        <div className="size-8 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/20">
+          <XCircle className="size-4 stroke-[2.2]" />
+        </div>
+        <span className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-none tabular-nums">
+          {absent}
+        </span>
+        <span className="text-xs sm:text-[13px] font-medium text-muted-foreground leading-none">
+          Absent
+        </span>
+      </div>
 
-      {/* Absent days card */}
-      <Card className="col-span-1 rounded-xl border border-red-100/80 dark:border-red-950/40 bg-card backdrop-blur-xl shadow-xs hover:border-red-500/20 transition-all duration-300 group flex flex-col justify-between min-h-[120px] md:min-h-[160px]">
-        <CardContent className="p-4 md:p-6 flex flex-col justify-between h-full w-full">
-          <div className="flex items-center">
-            <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-red-500/5 text-red-600 dark:text-red-400 group-hover:scale-105 transition-transform">
-              <XCircle className="size-4 md:size-5" />
-            </div>
-          </div>
-          <div className="mt-3 md:mt-4 text-left leading-none">
-            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block">Absent Days</span>
-            <span className="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400 tracking-tight block mt-1.5 md:mt-2">
-              {absent}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Rate Box */}
+      <div className="aspect-square rounded-2xl border border-border bg-card p-2.5 sm:p-3.5 flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center shadow-xs transition-colors hover:border-blue-500/40">
+        <div className="size-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/20">
+          <PieChart className="size-4 stroke-[2.2]" />
+        </div>
+        <span className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-none tabular-nums">
+          {percentage}%
+        </span>
+        <span className="text-xs sm:text-[13px] font-medium text-muted-foreground leading-none">
+          Rate
+        </span>
+      </div>
     </div>
   );
 }
-

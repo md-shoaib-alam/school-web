@@ -6,29 +6,32 @@ import { queryClient } from "@/lib/query-client";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Toaster } from "sonner";
-import { useTheme } from "next-themes";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { isLowPerformanceDevice } from "@/lib/perf";
+import { useTheme } from "next-themes";
+import { DocumentGlyph, SuccessGlyph, ErrorGlyph, WarningGlyph, LoadingGlyph, CloseIcon } from "@/components/ui/toast-glyphs";
 
 function ToasterProvider() {
-  const { theme } = useTheme();
-  const [expand, setExpand] = useState(false);
+  const { resolvedTheme } = useTheme();
   return (
-    <div 
-      onMouseEnter={() => setExpand(true)}
-      onMouseLeave={() => setExpand(false)}
-      className="relative z-[999999]"
-      style={{ pointerEvents: "auto" }}
-    >
-      <Toaster 
-        richColors 
-        expand={expand}
-        position="top-center" 
-        duration={3000} 
-        swipeDirections={["left", "right"]}
-        theme={theme as "light" | "dark" | "system"}
-      />
-    </div>
+    <Toaster 
+      closeButton
+      expand={true}
+      visibleToasts={4}
+      gap={10}
+      position="top-center" 
+      duration={3500} 
+      swipeDirections={["left", "right"]}
+      theme={(resolvedTheme as "light" | "dark" | "system") || "system"}
+      icons={{
+        success: <SuccessGlyph />,
+        error: <ErrorGlyph />,
+        warning: <WarningGlyph />,
+        info: <DocumentGlyph />,
+        loading: <LoadingGlyph />,
+        close: <CloseIcon />,
+      }}
+    />
   );
 }
 
@@ -67,6 +70,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       queryClient,
       persister,
       maxAge: 30 * 60 * 1000, // 30 minutes
+      dehydrateOptions: {
+        // Subscription/tenant status must never be restored from a stale offline
+        // copy; it is refetched fresh on every mount so renewals show immediately.
+        shouldDehydrateQuery: (query) => !query.queryKey.includes("tenant-resolution"),
+      },
     });
 
     return unsubscribe;

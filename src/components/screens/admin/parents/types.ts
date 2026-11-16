@@ -16,6 +16,7 @@ export interface ParentInfo {
   name: string;
   email: string;
   username?: string;
+  avatar?: string | null;
   phone?: string;
   alternatePhone?: string;
   occupation?: string;

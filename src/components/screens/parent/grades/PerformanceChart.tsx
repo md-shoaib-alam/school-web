@@ -9,8 +9,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
+
 const chartConfig = {
-  percentage: { label: "Score %", color: "#f59e0b" },
+  percentage: { label: "Score %", color: "var(--color-brand, #0A61EE)" },
 } satisfies ChartConfig;
 
 interface PerformanceChartProps {
@@ -25,18 +26,24 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
   }, []);
 
   return (
-    <Card className="rounded-xl shadow-sm shadow-none  h-full">
-      <CardHeader className="p-4 pb-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2 text-left">
-          <BarChart3 className="size-4 text-amber-600" />
-          Performance by Subject
-        </CardTitle>
-        <CardDescription className="text-left">Average score percentage</CardDescription>
+    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden h-full flex flex-col">
+      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0 text-left">
+        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+          <BarChart3 className="size-4" />
+        </div>
+        <div>
+          <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+            Performance by Subject
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
+            Average score percentage
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-5 flex-1 flex flex-col justify-center">
         {data.length > 0 ? (
           !recharts ? (
-            <div className="h-[280px] w-full animate-pulse bg-muted rounded-lg" />
+            <div className="h-[280px] w-full animate-pulse bg-muted rounded-xl" />
           ) : (
             <ChartContainer
               config={chartConfig}
@@ -53,6 +60,7 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
+                      className="stroke-border/40"
                     />
                     <XAxis
                       type="category"
@@ -71,7 +79,7 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                     <Bar
                       dataKey="percentage"
                       fill="var(--color-percentage)"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
                       maxBarSize={32}
                     />
                   </BarChart>

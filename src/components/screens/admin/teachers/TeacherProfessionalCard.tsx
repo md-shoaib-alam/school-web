@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CopyButton } from "@/components/ui/copy-button";
 import type { TeacherInfo } from "./types";
 
 interface ProfessionalCardProps {
@@ -182,7 +183,12 @@ export function TeacherProfessionalCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs sm:text-sm">
           <div>
             <p data-fade className="text-[11px] text-muted-foreground font-medium">Employee ID</p>
-            <p data-travel="employeeId" className="font-semibold text-foreground mt-0.5 font-mono">{currentTeacher.employeeId || "—"}</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p data-travel="employeeId" className="font-semibold text-foreground font-mono">{currentTeacher.employeeId || "—"}</p>
+              {currentTeacher.employeeId && (
+                <CopyButton value={currentTeacher.employeeId} toastSubject="Employee ID" size="sm" />
+              )}
+            </div>
           </div>
 
           <div>

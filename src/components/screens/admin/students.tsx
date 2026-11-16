@@ -13,6 +13,7 @@ import {
 import { Plus, Eye, RotateCcw } from "lucide-react";
 import { SearchInput } from "@/components/ui/search-input";
 import { toast } from "sonner";
+import { isTenDigitMobile } from "@/lib/format";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
@@ -27,6 +28,7 @@ import { Suspense } from "react";
 import { StudentTable } from "./students/StudentTable";
 import { StudentDialog } from "./students/StudentDialog";
 import { StudentSkeleton } from "./students/StudentSkeleton";
+import { StudentProfileSkeleton } from "./students/StudentProfileSkeleton";
 import { Pagination } from "./students/Pagination";
 import { ImportExportButtons } from "./students/ImportExportButtons";
 import { StudentProfileView } from "./students/StudentProfileView";
@@ -328,6 +330,12 @@ function AdminStudentsContent() {
       }
     }
 
+    // Mobile is optional, but when present it is a 10-digit number (the +91 is a prefix, not data)
+    if (formData.phone && !isTenDigitMobile(formData.phone)) {
+      toast.error("Phone number must be 10 digits");
+      return;
+    }
+
     // OPTIMISTIC UPDATE: Update the UI instantly if editing
     if (!isCreate && editingStudent) {
       const updatedStudent = { ...editingStudent, ...formData };
@@ -462,7 +470,8 @@ function AdminStudentsContent() {
     );
   };
 
-  if (loading || (studentUrlParam && !viewingStudent)) return <StudentSkeleton />;
+  if (studentUrlParam && !viewingStudent) return <StudentProfileSkeleton />;
+  if (loading) return <StudentSkeleton />;
 
   // --- Profile view (full page replace, like teachers) ---
   if (viewingStudent) {

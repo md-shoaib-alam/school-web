@@ -18,9 +18,16 @@ import {
   UserCheck,
   UserX,
   Clock,
+  CheckCircle2,
+  PenLine,
+  Loader2,
+  WifiOff,
+  Send,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -40,7 +47,7 @@ interface StudentInfo {
   gender: string;
 }
 
-type AttendanceStatus = "present" | "absent";
+type AttendanceStatus = "present" | "absent" | "unmarked";
 
 interface AttendanceRecord {
   studentId: string;
@@ -52,9 +59,11 @@ interface AttendanceRecord {
 const getStatusBg = (status: AttendanceStatus) => {
   switch (status) {
     case "present":
-      return "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800";
+      return "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60";
     case "absent":
-      return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
+      return "bg-red-50/60 dark:bg-red-950/20 border-red-200 dark:border-red-800/60";
+    default:
+      return "bg-card border-border hover:bg-muted/30";
   }
 };
 
@@ -64,6 +73,8 @@ const getStatusIcon = (status: AttendanceStatus) => {
       return <UserCheck className="size-3.5" />;
     case "absent":
       return <UserX className="size-3.5" />;
+    default:
+      return null;
   }
 };
 
@@ -158,7 +169,7 @@ export function TeacherAttendance() {
 
     return students.map((s) => ({
       studentId: s.id,
-      status: (statusMap.get(s.id) as AttendanceStatus) || "present",
+      status: (statusMap.get(s.id) as AttendanceStatus) || "unmarked",
     }));
   }, [students, existingAttendance]);
 
@@ -167,12 +178,48 @@ export function TeacherAttendance() {
     Record<string, AttendanceStatus>
   >({});
   const [saved, setSaved] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [lastSavedTime, setLastSavedTime] = useState<number>(() => Date.now() - 39000);
+  const [timeAgoText, setTimeAgoText] = useState("just now");
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
+
+  // Online / offline detector
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Time ago updater
+  useEffect(() => {
+    const updateTimeAgo = () => {
+      const diffSec = Math.max(0, Math.round((Date.now() - lastSavedTime) / 1000));
+      if (diffSec < 5) {
+        setTimeAgoText("just now");
+      } else if (diffSec < 60) {
+        setTimeAgoText(`${diffSec}s ago`);
+      } else {
+        const mins = Math.round(diffSec / 60);
+        setTimeAgoText(`${mins} min ago`);
+      }
+    };
+
+    updateTimeAgo();
+    const interval = setInterval(updateTimeAgo, 5000);
+    return () => clearInterval(interval);
+  }, [lastSavedTime]);
 
   // Adjust/Reset overrides when class or date changes during rendering (prevents set-state-in-effect and extra cycles)
   const [prevClassAndDate, setPrevClassAndDate] = useState({ classId: activeClassId, date });
   if (prevClassAndDate.classId !== activeClassId || prevClassAndDate.date !== date) {
     setLocalOverrides({});
     setSaved(false);
+    setSubmitted(false);
     setPrevClassAndDate({ classId: activeClassId, date });
   }
 
@@ -189,6 +236,7 @@ export function TeacherAttendance() {
   const updateRecord = (studentId: string, status: AttendanceStatus) => {
     setLocalOverrides((prev) => ({ ...prev, [studentId]: status }));
     setSaved(false);
+    setSubmitted(false);
   };
 
   const markAll = (status: AttendanceStatus) => {
@@ -196,17 +244,23 @@ export function TeacherAttendance() {
     students.forEach((s) => (overrides[s.id] = status));
     setLocalOverrides(overrides);
     setSaved(false);
+    setSubmitted(false);
   };
 
   // ── Save mutation ──────────────────────────────────────────
 
   const saveMutation = useMutation({
-    mutationFn: () =>
-      api.post("/attendance", {
+    mutationFn: () => {
+      const payloadRecords = records.map((r) => ({
+        studentId: r.studentId,
+        status: r.status === "absent" ? "absent" : "present",
+      }));
+      return api.post("/attendance", {
         classId: activeClassId,
         date,
-        records,
-      }),
+        records: payloadRecords,
+      });
+    },
     onMutate: async () => {
       // Optimistically update the cache so the UI reflects saved state instantly
       await queryClient.cancelQueries({
@@ -226,6 +280,8 @@ export function TeacherAttendance() {
     },
     onSuccess: () => {
       setSaved(true);
+      setSubmitted(true);
+      setLastSavedTime(Date.now());
       setLocalOverrides({});
       toast.success("Attendance saved!");
 
@@ -250,15 +306,51 @@ export function TeacherAttendance() {
 
   const presentCount = records.filter((r) => r.status === "present").length;
   const absentCount = records.filter((r) => r.status === "absent").length;
+  const unmarkedCount = records.filter((r) => r.status === "unmarked").length;
   const totalCount = records.length;
 
   const selectedClass = classes.find((c) => c.id === activeClassId);
   
   const hasExistingAttendance = existingAttendance.length > 0;
   const hasUnsavedChanges = Object.keys(localOverrides).length > 0;
-  
-  // It ONLY needs saving if user toggled something, OR if it has never been submitted to the DB yet.
-  const canSave = hasUnsavedChanges || (!hasExistingAttendance && !saved);
+  const hasMarkedAny = records.some((r) => r.status !== "unmarked");
+  const isAllUnmarked = unmarkedCount === totalCount && !hasExistingAttendance && !saved;
+
+  // Has attendance already been recorded and nothing was modified?
+  const isAlreadySaved = !hasUnsavedChanges && (hasExistingAttendance || saved);
+
+  // Can submit ONLY if:
+  // 1. All students are marked (no unmarked students remain)
+  // 2. Either has unsaved changes OR attendance has not been recorded yet for the day
+  // 3. Online, not pending save, and class has students
+  const canSubmit =
+    unmarkedCount === 0 &&
+    (hasUnsavedChanges || (!hasExistingAttendance && !saved)) &&
+    isOnline &&
+    !saveMutation.isPending &&
+    totalCount > 0;
+
+  const syncStatus = !isOnline
+    ? "offline"
+    : saveMutation.isPending
+    ? "syncing"
+    : isAllUnmarked
+    ? "idle"
+    : hasUnsavedChanges
+    ? "dirty"
+    : "synced";
+
+  const statusTitle = !isOnline
+    ? "You’re offline"
+    : saveMutation.isPending
+    ? "Saving…"
+    : isAllUnmarked
+    ? "Mark Attendance"
+    : hasUnsavedChanges
+    ? "Unsaved changes"
+    : submitted
+    ? "Attendance submitted"
+    : "All changes saved";
 
   // ── Loading skeleton ───────────────────────────────────────
 
@@ -282,7 +374,7 @@ export function TeacherAttendance() {
   // ── Render ─────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 pb-6 sm:pb-20">
+    <div className="space-y-6 pb-2 sm:pb-4">
       {/* Title */}
       <div>
         <h2 className="text-2xl font-semibold text-foreground">
@@ -401,20 +493,20 @@ export function TeacherAttendance() {
               </Badge>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-muted dark:bg-[#111113] border  rounded-xl sm:w-auto">
+            <div className="flex items-center gap-1.5 p-1 bg-muted dark:bg-[#111113] border rounded-xl sm:w-auto">
               <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">
                 Quick:
               </div>
               <button
                 type="button"
-                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95"
+                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95 cursor-pointer"
                 onClick={() => markAll("present")}
               >
                 All Present
               </button>
               <button
                 type="button"
-                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95"
+                className="flex-1 sm:flex-none py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95 cursor-pointer"
                 onClick={() => markAll("absent")}
               >
                 All Absent
@@ -440,18 +532,28 @@ export function TeacherAttendance() {
                 ) : (
                   students.map((student, index) => {
                     const record = records.find((r) => r.studentId === student.id);
-                    const currentStatus = record?.status ?? "present";
+                    const currentStatus = record?.status ?? "unmarked";
                     return (
                       <div
                         key={student.id}
-                        className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all ${getStatusBg(currentStatus)}`}
+                        className={cn(
+                          "flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all",
+                          getStatusBg(currentStatus)
+                        )}
                       >
                         <div className="flex items-center gap-3 w-full sm:w-auto">
                           <span className="text-xs text-muted-foreground font-mono w-6 text-center">
                             {index + 1}
                           </span>
                           <Avatar className="size-8 flex-shrink-0">
-                            <AvatarFallback className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                            <AvatarFallback
+                              className={cn(
+                                "text-[10px] font-semibold transition-colors",
+                                currentStatus === "present" && "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400",
+                                currentStatus === "absent" && "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400",
+                                currentStatus === "unmarked" && "bg-muted text-muted-foreground"
+                              )}
+                            >
                               {getInitials(student.name)}
                             </AvatarFallback>
                           </Avatar>
@@ -466,24 +568,25 @@ export function TeacherAttendance() {
                         </div>
 
                         <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
-                          {(["present", "absent"] as AttendanceStatus[]).map((status) => (
-                            <button
-                              key={status}
-                              onClick={() => updateRecord(student.id, status)}
-                              className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                                currentStatus === status
-                                  ? `${getStatusBg(status)} ${
-                                      status === "present"
-                                        ? "bg-emerald-500 dark:bg-emerald-500 text-white"
-                                        : "bg-red-500 dark:bg-red-500 text-white"
-                                    } border-transparent shadow-sm ring-1 ring-white/10`
-                                  : " text-muted-foreground hover: dark:hover: bg-card"
-                              }`}
-                            >
-                              {getStatusIcon(status)}
-                              <span className="capitalize">{status}</span>
-                            </button>
-                          ))}
+                          {(["present", "absent"] as AttendanceStatus[]).map((status) => {
+                            const isSelected = currentStatus === status;
+                            return (
+                              <button
+                                key={status}
+                                type="button"
+                                onClick={() => updateRecord(student.id, isSelected ? "unmarked" : status)}
+                                className={cn(
+                                  "flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border",
+                                  isSelected && status === "present" && "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-500 text-white border-transparent shadow-sm ring-1 ring-white/10",
+                                  isSelected && status === "absent" && "bg-red-500 hover:bg-red-600 dark:bg-red-500 text-white border-transparent shadow-sm ring-1 ring-white/10",
+                                  !isSelected && "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                                )}
+                              >
+                                {getStatusIcon(status)}
+                                <span className="capitalize">{status}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     );
@@ -502,57 +605,120 @@ export function TeacherAttendance() {
         </CardContent>
       </Card>
 
-      {/* Floating save bar */}
+      {/* Floating Attendance Status Dock */}
       {students.length > 0 && (
-        <div className="fixed bottom-1 sm:bottom-4 left-[50%] lg:left-[calc(50%+140px)] -translate-x-1/2 w-[calc(100%-2.5rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-360px)] max-w-4xl z-50 px-3 py-1.5 sm:px-6 sm:py-3 bg-card/95 backdrop-blur-2xl border  dark:border-white/5 rounded-xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-6">
-              <div
-                className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-full text-[9px] sm:text-[10px] font-black tracking-tighter sm:tracking-widest uppercase italic transition-all duration-300 ${
-                  saved && !hasUnsavedChanges
-                    ? "text-foreground bg-zinc-800/20"
-                    : "text-amber-500 bg-amber-500/10 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]"
-                }`}
-              >
-                {saved && !hasUnsavedChanges ? (
-                  <span className="flex items-center gap-1.5">
-                    <CheckCircle className="size-3 sm:size-3.5" />
-                    <span>Synchronized</span>
+        <div className="sticky bottom-[-6px] lg:bottom-[-10px] z-40 flex justify-center mt-2 pointer-events-none px-3">
+          <div
+            role="status"
+            aria-live="polite"
+            className="pointer-events-auto w-full max-w-[420px] sm:max-w-[440px] flex items-center justify-between gap-2.5 sm:gap-3 p-2 pl-3.5 pr-2 rounded-[18px] bg-card border border-border shadow-[0_14px_34px_-12px_rgba(0,0,0,0.45)] relative backdrop-blur-md animate-in slide-in-from-bottom-2 duration-300"
+          >
+            {/* Status icon tile */}
+            <span
+              className={cn(
+                "shrink-0 size-8 rounded-[11px] grid place-items-center transition-all duration-300",
+                syncStatus === "offline" && "bg-red-500/15 text-red-600 dark:text-red-400",
+                syncStatus === "syncing" && "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+                syncStatus === "idle" && "bg-muted text-muted-foreground",
+                syncStatus === "dirty" && "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+                syncStatus === "synced" && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+              )}
+            >
+              {syncStatus === "offline" && <WifiOff className="size-[17px]" strokeWidth={2.2} />}
+              {syncStatus === "syncing" && <Loader2 className="size-[17px] animate-spin" strokeWidth={2.5} />}
+              {syncStatus === "idle" && <Clock className="size-[17px]" strokeWidth={2.2} />}
+              {syncStatus === "dirty" && <PenLine className="size-[17px]" strokeWidth={2.2} />}
+              {syncStatus === "synced" && <CheckCircle2 className="size-[17px]" strokeWidth={2.2} />}
+            </span>
+
+            {/* Status text */}
+            <div className="flex-1 min-w-0 text-left">
+              <b className="block text-[13px] font-semibold text-foreground truncate leading-tight">
+                {statusTitle}
+              </b>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11.5px] text-muted-foreground truncate mt-0.5 leading-tight">
+                {!isOnline ? (
+                  <span className="inline-flex items-center gap-1 text-red-500">
+                    <span className="size-1.5 rounded-full bg-red-500 shrink-0" />
+                    <span>Offline · Saved locally</span>
+                  </span>
+                ) : saveMutation.isPending ? (
+                  <span className="inline-flex items-center gap-1 text-blue-500">
+                    <span className="size-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
+                    <span>Sending to cloud…</span>
+                  </span>
+                ) : isAllUnmarked ? (
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground shrink-0">
+                    <span className="size-1.5 rounded-full bg-muted-foreground/60 shrink-0" />
+                    <span>{totalCount} Unmarked · Ready to mark</span>
                   </span>
                 ) : (
-                  "Unsaved Changes"
+                  <>
+                    <span className="inline-flex items-center gap-1 text-foreground font-medium shrink-0">
+                      <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span>{presentCount} Present</span>
+                    </span>
+
+                    <span className="inline-flex items-center gap-1 text-foreground font-medium shrink-0">
+                      <span className="size-1.5 rounded-full bg-red-500 shrink-0" />
+                      <span>{absentCount} Absent</span>
+                    </span>
+
+                    {unmarkedCount > 0 && (
+                      <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium shrink-0">
+                        <span className="size-1.5 rounded-full bg-amber-500 shrink-0" />
+                        <span>{unmarkedCount} Unmarked</span>
+                      </span>
+                    )}
+
+                    {unmarkedCount === 0 && (
+                      <span className="text-muted-foreground truncate">
+                        · {hasUnsavedChanges || (!hasExistingAttendance && !saved) ? "Ready" : timeAgoText}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
-              {saved && !hasUnsavedChanges && (
-                <div className="hidden md:flex items-center gap-1.5 text-emerald-500 text-[10px] sm:text-xs font-medium animate-in fade-in slide-in-from-left-1">
-                  <div className="size-1 sm:size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Cloud Live</span>
-                </div>
-              )}
             </div>
 
-            <Button
-              onClick={() => saveMutation.mutate()}
-              disabled={saveMutation.isPending || !canSave || students.length === 0}
-              className={`rounded-lg sm:rounded-xl px-4 py-1.5 sm:px-8 sm:py-5 h-8 sm:h-auto text-[11px] sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 sm:gap-3 shadow-lg ${
-                !canSave && students.length > 0
-                  ? "bg-zinc-800/50 text-foreground cursor-not-allowed border "
-                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25 active:scale-[0.96] hover:shadow-blue-500/40"
-              }`}
+            {/* Action button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (canSubmit) {
+                  saveMutation.mutate();
+                }
+              }}
+              disabled={!canSubmit}
+              title={
+                unmarkedCount > 0
+                  ? `Please mark all ${unmarkedCount} unmarked student${unmarkedCount > 1 ? "s" : ""} to submit`
+                  : undefined
+              }
+              className={cn(
+                "shrink-0 h-[38px] px-4 rounded-[13px] flex items-center gap-1.5 text-[13px] font-bold transition-all",
+                canSubmit
+                  ? "bg-emerald-500 hover:bg-emerald-600 dark:bg-[#12c58b] dark:hover:bg-[#10b981] text-white dark:text-[#04140d] cursor-pointer shadow-sm active:scale-[0.97]"
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
+              )}
             >
               {saveMutation.isPending ? (
-                <div className="size-3 sm:size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <>
+                  <Loader2 className="size-[15px] animate-spin" strokeWidth={2.3} />
+                  <span>Saving…</span>
+                </>
+              ) : isAlreadySaved ? (
+                <>
+                  <Check className="size-[15px]" strokeWidth={2.5} />
+                  <span>Submitted</span>
+                </>
               ) : (
-                <Save
-                  className={`size-3 sm:size-4 ${
-                    !(saved && !hasUnsavedChanges) && "animate-bounce"
-                  }`}
-                />
+                <>
+                  <Send className="size-[15px]" strokeWidth={2.3} />
+                  <span>Submit</span>
+                </>
               )}
-              <span>
-                {!canSave && students.length > 0 ? "Synchronized" : "Save Attendance"}
-              </span>
-            </Button>
+            </button>
           </div>
         </div>
       )}

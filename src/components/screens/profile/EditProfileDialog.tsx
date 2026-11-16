@@ -305,7 +305,7 @@ export function EditProfileDialog({
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 sm:gap-0 pt-2 border-t">
+          <DialogFooter className="flex gap-2.5 sm:gap-3 pt-2 border-t">
             <Button
               type="button"
               variant="ghost"

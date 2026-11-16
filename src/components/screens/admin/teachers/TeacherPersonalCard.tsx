@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   XCircle,
   CheckCircle2,
+  Camera,
 } from "lucide-react";
 import { ProfileSection } from "@/components/ui/profile-section";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { toast } from "sonner";
+import { CopyButton } from "@/components/ui/copy-button";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import type { TeacherInfo } from "./types";
 
 interface CardProps {
@@ -271,20 +274,17 @@ export function TeacherContactInfoCard({
 }: CardProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Photo must be under 2MB");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({ ...formData, avatar: reader.result });
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      setFormData({ ...formData, avatar: dataUrl });
       toast.success("Photo attached — save to apply");
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      toast.error("Failed to process photo");
+    }
   };
 
   return (
@@ -351,25 +351,32 @@ export function TeacherContactInfoCard({
 
           <div className="space-y-1.5" data-fade>
             <Label className="text-xs font-semibold text-foreground">Teacher Photo</Label>
-            <div className="flex items-center gap-3">
-              <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <input ref={fileRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="group size-24 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer overflow-hidden"
+              >
                 {formData.avatar ? (
                   <img src={formData.avatar} alt="" className="size-full object-cover" />
                 ) : (
-                  getInitials ? getInitials(formData.name) : ""
+                  <>
+                    <Camera className="size-4 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                    <span className="text-[11px] font-semibold text-foreground">Upload photo</span>
+                    <span className="text-[9px] text-muted-foreground">JPG or PNG</span>
+                  </>
                 )}
-              </div>
-              <input ref={fileRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-9 px-3 text-xs rounded-xl font-medium gap-1.5 hover:bg-muted"
-                onClick={() => fileRef.current?.click()}
-              >
-                <Upload className="size-3.5" />
-                Upload Photo
-              </Button>
+              </button>
+              {formData.avatar && (
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, avatar: "" })}
+                  className="text-xs text-rose-500 hover:underline cursor-pointer"
+                >
+                  Remove photo
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -377,34 +384,44 @@ export function TeacherContactInfoCard({
       view={
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs sm:text-sm">
           <div className="flex items-start gap-3">
-            <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/50 dark:border-teal-800/40 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0 mt-0.5">
               <Mail className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
               <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Email</p>
-              <a
-                href={"mailto:" + currentTeacher.email}
-                data-travel="email"
-                className="font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
-              >
-                {currentTeacher.email}
-              </a>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <a
+                  href={"mailto:" + currentTeacher.email}
+                  data-travel="email"
+                  className="font-semibold text-foreground hover:underline block truncate"
+                >
+                  {currentTeacher.email}
+                </a>
+                {currentTeacher.email && (
+                  <CopyButton value={currentTeacher.email} toastSubject="Email" size="sm" />
+                )}
+              </div>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 border border-teal-200/50 dark:border-teal-800/40 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0 mt-0.5">
               <Phone className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
               <p data-fade className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Mobile</p>
-              <a
-                href={"tel:" + (currentTeacher.phone || "")}
-                data-travel="phone"
-                className="font-semibold text-teal-600 dark:text-teal-400 hover:underline mt-0.5 block truncate"
-              >
-                {currentTeacher.phone || "—"}
-              </a>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <a
+                  href={"tel:" + (currentTeacher.phone || "")}
+                  data-travel="phone"
+                  className="font-semibold text-foreground hover:underline block truncate"
+                >
+                  {currentTeacher.phone || "—"}
+                </a>
+                {currentTeacher.phone && (
+                  <CopyButton value={currentTeacher.phone} toastSubject="Phone" size="sm" />
+                )}
+              </div>
             </div>
           </div>
 

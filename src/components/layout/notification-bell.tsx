@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { Bell, Check, CreditCard, Trash2, UserX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { apiFetch } from "@/lib/api";
@@ -35,6 +35,16 @@ function timeAgo(value: string | Date): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d ago`;
   return new Date(value).toLocaleDateString();
+}
+
+function typeTint(type: string): { icon: React.ReactNode; cls: string } {
+  if (type === "absence" || type === "attendance_alert") {
+    return { icon: <UserX className="size-[19px]" />, cls: "bg-destructive/10 text-destructive" };
+  }
+  if (type === "fee" || type === "fee_due" || type === "subscription" || type === "subscription_alert") {
+    return { icon: <CreditCard className="size-[19px]" />, cls: "bg-warning/10 text-warning" };
+  }
+  return { icon: <Bell className="size-[19px]" />, cls: "bg-brand/10 text-brand" };
 }
 
 export function NotificationBell() {
@@ -125,13 +135,32 @@ export function NotificationBell() {
     if (next) void loadList();
   };
 
+  const markAsRead = async (item: NotificationItem) => {
+    if (item.isRead) return;
+
+    setItems((prev) => prev.map((n) => (n.id === item.id ? { ...n, isRead: true } : n)));
+    setUnread((prev) => Math.max(0, prev - 1));
+    unreadRef.current = Math.max(0, unreadRef.current - 1);
+
+    try {
+      await apiFetch(`/api/notifications/${encodeURIComponent(item.id)}/read`, { method: "PATCH" });
+      void refreshCount();
+    } catch {
+      // Best-effort; converges on next refresh
+    }
+  };
+
   const dismiss = async (item: NotificationItem) => {
     setHiddenIds((prev) => new Set(prev).add(item.id));
+    if (!item.isRead) {
+      setUnread((prev) => Math.max(0, prev - 1));
+      unreadRef.current = Math.max(0, unreadRef.current - 1);
+    }
     try {
       if (item.id.startsWith("transient_")) {
-        await apiFetch(`/api/notifications/transient/${item.id}`, { method: "DELETE" });
+        await apiFetch(`/api/notifications/transient/${encodeURIComponent(item.id)}`, { method: "DELETE" });
       } else if (!item.isRead) {
-        await apiFetch(`/api/notifications/${item.id}/read`, { method: "PATCH" });
+        await apiFetch(`/api/notifications/${encodeURIComponent(item.id)}/read`, { method: "PATCH" });
         setItems((prev) => prev.map((n) => (n.id === item.id ? { ...n, isRead: true } : n)));
       }
       void refreshCount();
@@ -172,84 +201,120 @@ export function NotificationBell() {
         <Button
           type="button"
           variant="ghost"
-          size="icon"
           aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
-          className="size-8.5 sm:size-9 shrink-0 rounded-xl border  bg-card/80 text-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-muted shadow-2xs transition-all cursor-pointer relative"
+          aria-expanded={open}
+          className={cn(
+            "relative size-8.5 sm:size-9 shrink-0 rounded-xl border bg-card/80 text-foreground hover:bg-muted shadow-2xs cursor-pointer p-0",
+            open && "ring-2 ring-brand ring-offset-2 ring-offset-background"
+          )}
         >
-          <Bell className="size-4" />
+          <Bell className="size-4" strokeWidth={1.9} />
           {unread > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 flex items-center justify-center rounded-full bg-brand text-brand-foreground text-[10px] font-semibold leading-none ring-2 ring-border">
+            <span className="absolute -top-1 -right-1 grid h-4 min-w-4 place-items-center rounded-full border border-background bg-brand px-0.5 text-[10px] font-semibold leading-none text-brand-foreground">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" collisionPadding={12} className="w-[calc(100vw-1.5rem)] sm:w-80 p-0 gap-0 rounded-xl">
-        <div className="flex items-center justify-between px-3 py-2 border-b ">
-          <span className="text-sm font-semibold">Notifications</span>
-          <div className="flex items-center gap-1">
+      <PopoverContent
+        align="end"
+        collisionPadding={12}
+        sideOffset={10}
+        className={cn(
+          "w-[calc(100vw-1.5rem)] sm:w-[400px] overflow-hidden rounded-[24px] border-border p-0 gap-0",
+          "bg-[radial-gradient(120%_100%_at_80%_0%,var(--card),var(--background)_62%)]",
+          "shadow-[0_26px_50px_-16px_rgba(0,0,0,0.35)] dark:shadow-[0_26px_50px_-16px_rgba(0,0,0,0.65)]"
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 pt-4 pb-3">
+          <h2 className="text-base font-semibold tracking-tight">Notifications</h2>
+          <div className="flex gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 text-xs gap-1"
+              className="h-8 gap-1.5 rounded-[10px] px-2 text-[13px] text-muted-foreground hover:text-foreground"
               onClick={markAllRead}
               disabled={items.length === 0}
               title="Mark all as read"
             >
-              <Check className="size-3.5" /> Read all
+              <Check className="size-4" /> Read all
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 text-xs gap-1"
+              className="h-8 gap-1.5 rounded-[10px] px-2 text-[13px] text-muted-foreground hover:text-foreground"
               onClick={clearAll}
               disabled={items.length === 0}
               title="Clear all notifications"
             >
-              <Trash2 className="size-3.5" /> Clear
+              <Trash2 className="size-4" /> Clear
             </Button>
           </div>
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-[420px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent]">
           {loadingList && visibleItems.length === 0 && (
-            <div className="px-3 py-6 text-center text-xs text-muted-foreground">Loading…</div>
+            <div className="px-4 py-9 text-center text-sm text-muted-foreground">Loading…</div>
           )}
           {!loadingList && visibleItems.length === 0 && (
-            <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-              You're all caught up.
+            <div className="px-5 py-9 text-center">
+              <span className="mx-auto mb-3 grid size-12 place-items-center rounded-2xl bg-brand/10 text-brand">
+                <Check className="size-5" strokeWidth={2} />
+              </span>
+              <p className="text-sm text-muted-foreground">You're all caught up</p>
             </div>
           )}
-          {visibleItems.map((item) => (
-            <div
-              key={item.id}
-              className="group flex items-start gap-2 px-3 py-2.5 border-b  last:border-b-0 hover:bg-muted"
-            >
-              <span
+          {visibleItems.map((item) => {
+            const tint = typeTint(item.type);
+            return (
+              <div
+                key={item.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => markAsRead(item)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    markAsRead(item);
+                  }
+                }}
                 className={cn(
-                  "mt-1.5 size-2 rounded-full shrink-0",
-                  item.isRead ? "bg-transparent" : "bg-brand"
+                  "group relative flex items-start gap-3 border-b border-border/60 px-4 py-3.5 transition-colors last:border-b-0 cursor-pointer hover:bg-muted/60 outline-none focus-visible:bg-muted/70",
+                  !item.isRead ? "bg-brand/5 hover:bg-brand/10" : "opacity-80 hover:opacity-100"
                 )}
-              />
-              <div className="min-w-0 flex-1">
-                <div className="text-[13px] font-medium leading-tight truncate">{item.title}</div>
-                <div className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                  {item.content}
-                </div>
-                <div className="text-[11px] text-muted-foreground mt-0.5">
-                  {timeAgo(item.createdAt)}
-                </div>
-              </div>
-              <button
-                type="button"
-                aria-label="Dismiss notification"
-                onClick={() => dismiss(item)}
-                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-accent cursor-pointer"
               >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          ))}
+                <span
+                  className={cn(
+                    "mt-3.5 size-2 shrink-0 rounded-full transition-colors",
+                    item.isRead ? "bg-transparent" : "bg-brand shadow-[0_0_8px_var(--brand)]"
+                  )}
+                />
+                <span className={cn("grid size-[38px] shrink-0 place-items-center rounded-xl", tint.cls)}>
+                  {tint.icon}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold tracking-tight">{item.title}</div>
+                  <p className="mt-0.5 line-clamp-2 text-[13px] leading-snug text-muted-foreground">
+                    {item.content}
+                  </p>
+                  <div className="mt-1.5 text-xs text-muted-foreground/80">
+                    {timeAgo(item.createdAt)}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Dismiss notification"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dismiss(item);
+                  }}
+                  className="absolute right-2 top-2 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground focus:opacity-100 group-hover:opacity-100 cursor-pointer"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       </PopoverContent>
     </Popover>

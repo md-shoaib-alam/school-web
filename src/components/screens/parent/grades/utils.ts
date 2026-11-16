@@ -68,9 +68,5 @@ export function getOverallStats(studentId: string, grades: GradeRecord[]) {
   };
 }
 
-export const gradeBadgeClasses = (grade?: string) =>
-  grade?.startsWith("A")
-    ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-    : grade?.startsWith("B")
-      ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
-      : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400";
+export const gradeBadgeClasses = (_grade?: string) =>
+  "border-border bg-muted text-foreground";

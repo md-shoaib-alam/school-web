@@ -15,6 +15,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import {
   FileText,
   Clock,
@@ -272,19 +273,19 @@ export function StudentHomework() {
     switch (status) {
       case "submitted":
         return (
-          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">
+          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-semibold">
             Submitted
           </Badge>
         );
       case "active":
         return (
-          <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">
+          <Badge variant="outline" className="bg-muted text-muted-foreground border-border text-[10px] font-semibold">
             Pending
           </Badge>
         );
       case "overdue":
         return (
-          <Badge className="bg-red-100 text-red-700 border-red-200 text-[10px]">
+          <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 text-[10px] font-semibold">
             Overdue
           </Badge>
         );
@@ -296,13 +297,13 @@ export function StudentHomework() {
   const getCountdownColor = (status: HomeworkStatus) => {
     switch (status) {
       case "submitted":
-        return "text-emerald-600";
+        return "text-emerald-600 dark:text-emerald-400";
       case "active":
-        return "text-muted-foreground dark:text-muted-foreground";
+        return "text-muted-foreground";
       case "overdue":
-        return "text-red-600 dark:text-red-400 font-medium";
+        return "text-rose-600 dark:text-rose-400 font-medium";
       default:
-        return "text-muted-foreground dark:text-muted-foreground";
+        return "text-muted-foreground";
     }
   };
 
@@ -324,11 +325,11 @@ export function StudentHomework() {
       case "submitted":
         return "[&>div]:bg-emerald-500";
       case "active":
-        return "[&>div]:bg-violet-500";
+        return "[&>div]:bg-foreground";
       case "overdue":
-        return "[&>div]:bg-red-500";
+        return "[&>div]:bg-rose-500";
       default:
-        return "";
+        return "[&>div]:bg-foreground";
     }
   };
 
@@ -337,21 +338,26 @@ export function StudentHomework() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">
             My Homework
           </h2>
-          <p className="text-sm  mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Manage and track your school homework
           </p>
         </div>
-        <div className="flex bg-violet-50/60 border border-violet-100/50 p-0.5 rounded-lg w-fit">
+        <div className="flex items-center bg-muted p-1 rounded-xl border border-border w-fit">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setViewMode("list")}
-            className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "list" ? "bg-white text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
+            className={cn(
+              "text-xs gap-1.5 h-7 px-3 rounded-lg transition-all shadow-none cursor-pointer",
+              viewMode === "list" 
+                ? "bg-card text-foreground font-semibold shadow-xs" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
           >
             <List className="size-3.5" />
             List View
@@ -360,7 +366,12 @@ export function StudentHomework() {
             variant="ghost"
             size="sm"
             onClick={() => setViewMode("diary")}
-            className={`text-xs gap-1.5 h-7 px-3 rounded-md transition-all shadow-none ${viewMode === "diary" ? "bg-white text-violet-700 dark:text-violet-300 font-semibold shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
+            className={cn(
+              "text-xs gap-1.5 h-7 px-3 rounded-lg transition-all shadow-none cursor-pointer",
+              viewMode === "diary" 
+                ? "bg-card text-foreground font-semibold shadow-xs" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
           >
             <CalendarIcon className="size-3.5" />
             Daily Diary
@@ -372,50 +383,48 @@ export function StudentHomework() {
       {viewMode === "list" && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <SummaryCard
-            label="Today's Homework"
+            label="Due Today"
             count={selectedDateHomeworks.length + dueSelectedDateHomeworks.length}
             icon={<FileText className="size-4" />}
-            color="violet"
           />
           <SummaryCard
             label="Active"
             count={counts.active}
             icon={<Clock className="size-4" />}
-            color="amber"
           />
           <SummaryCard
             label="Submitted"
             count={counts.submitted}
             icon={<CheckCircle2 className="size-4" />}
-            color="emerald"
           />
           <SummaryCard
             label="Overdue"
             count={counts.overdue}
             icon={<AlertTriangle className="size-4" />}
-            color="red"
           />
         </div>
       )}
 
       {/* Homework List / Diary Card */}
-      <Card className="rounded-xl shadow-sm">
-        <CardHeader className={`pb-3 ${viewMode === "diary" ? "hidden lg:block" : ""}`}>
-          <CardTitle className="text-base flex items-center gap-2">
-            <FileText className="size-4 text-violet-500" />
+      <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden">
+        <CardHeader className={`px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0 ${viewMode === "diary" ? "hidden lg:flex" : ""}`}>
+          <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+            <FileText className="size-4" />
+          </div>
+          <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
             {viewMode === "list" ? "Homework List" : "My Daily Planner Diary"}
           </CardTitle>
         </CardHeader>
-        <CardContent className={viewMode === "diary" ? "p-0 lg:p-6 lg:pt-0" : "px-4 py-4 sm:p-6 sm:pt-0"}>
+        <CardContent className={viewMode === "diary" ? "p-0 lg:p-5" : "p-5"}>
           {viewMode === "list" ? (
             <div className="space-y-4">
               {/* Date Header / Selector for List View */}
-              <div className="flex items-center justify-between border-b  pb-3">
+              <div className="flex items-center justify-between border-b border-border pb-3.5">
                 <div className="text-left flex flex-col justify-center">
-                  <h3 className="text-sm font-bold tracking-tight text-foreground dark:text-stone-100">
+                  <h3 className="text-sm font-semibold tracking-tight text-foreground">
                     {selectedDate ? format(selectedDate, "eeee") : "Select Date"}
                   </h3>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
                     {selectedDate ? format(selectedDate, "MMM d, yyyy") : ""}
                   </p>
                 </div>
@@ -424,20 +433,20 @@ export function StudentHomework() {
                   <PopoverTrigger asChild>
                     <button 
                       type="button"
-                      className="h-8 text-[11px] font-bold px-3 bg-violet-50/60 border border-violet-100/50 text-violet-700 dark:text-violet-300 hover:bg-violet-100/30 rounded-lg flex items-center justify-center transition-colors"
+                      className="h-8 text-xs font-medium px-3 bg-card border border-border text-foreground hover:bg-muted/70 rounded-xl flex items-center justify-center transition-colors shadow-xs cursor-pointer"
                     >
-                      <CalendarDays className="size-3.5 mr-1 text-violet-500" />
+                      <CalendarDays className="size-3.5 mr-1.5 text-muted-foreground" />
                       Select Date
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white dark:bg-stone-950 border " align="end">
+                  <PopoverContent className="w-auto p-0 bg-card border border-border rounded-2xl shadow-xl overflow-hidden" align="end">
                     <Calendar
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
                       modifiers={{ hasHomework: homeworkDays }}
                       modifiersClassNames={{
-                        hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-violet-500 after:rounded-full font-bold text-violet-700"
+                        hasHomework: "relative after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:size-1.5 after:bg-foreground after:rounded-full font-bold"
                       }}
                       initialFocus
                     />
@@ -446,12 +455,12 @@ export function StudentHomework() {
               </div>
 
               {/* List of homework for selected date */}
-              <ScrollArea className="max-h-150 pr-3">
+              <ScrollArea className="max-h-[500px] pr-2">
                 {selectedDateHomeworks.length === 0 && dueSelectedDateHomeworks.length === 0 ? (
-                  <div className="text-center py-16 text-muted-foreground border-2 border-dashed  rounded-xl">
-                    <FileText className="size-10 mx-auto mb-3 opacity-30" />
+                  <div className="text-center py-14 text-muted-foreground border border-dashed border-border bg-muted/20 rounded-2xl">
+                    <FileText className="size-9 mx-auto mb-2.5 opacity-30 text-muted-foreground" />
                     <p className="text-sm font-semibold text-foreground">No homework found</p>
-                    <p className="text-xs  mt-1">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       No homework assigned or due on this date.
                     </p>
                   </div>
@@ -460,11 +469,11 @@ export function StudentHomework() {
                     {/* Assigned Today */}
                     {selectedDateHomeworks.length > 0 && (
                       <div>
-                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-violet-755 dark:text-violet-400 mb-2 flex items-center gap-1.5">
-                          <span className="size-1.5 rounded-full bg-violet-500" />
+                        <h4 className="text-xs font-semibold text-foreground tracking-tight mb-2.5 flex items-center gap-2">
+                          <span className="size-2 rounded-full bg-foreground" />
                           Assigned Today ({selectedDateHomeworks.length})
                         </h4>
-                        <div className="space-y-2.5">
+                        <div className="space-y-2">
                           {selectedDateHomeworks.map((a) => (
                             <ListHomeworkCard
                               key={a.id}
@@ -484,11 +493,11 @@ export function StudentHomework() {
                     {/* Due Today */}
                     {dueSelectedDateHomeworks.length > 0 && (
                       <div>
-                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-755 dark:text-rose-450 mb-2 flex items-center gap-1.5 mt-2">
-                          <span className="size-1.5 rounded-full bg-rose-500" />
+                        <h4 className="text-xs font-semibold text-foreground tracking-tight mb-2.5 flex items-center gap-2 mt-4">
+                          <span className="size-2 rounded-full bg-rose-500" />
                           Due Today ({dueSelectedDateHomeworks.length})
                         </h4>
-                        <div className="space-y-2.5">
+                        <div className="space-y-2">
                           {dueSelectedDateHomeworks.map((a) => (
                             <ListHomeworkCard
                               key={a.id}
@@ -549,30 +558,32 @@ function ListHomeworkCard({
 }) {
   return (
     <div
-      className={`p-4 rounded-xl border bg-card hover:shadow-sm transition-all ${
-        a.status === "overdue" ? "border-rose-100 dark:border-rose-950/40 bg-rose-50/10" :
-        a.status === "submitted" ? "border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/10" :
-        ""
-      }`}
+      className={cn(
+        "p-4 rounded-2xl border border-border bg-card hover:bg-muted/40 transition-colors shadow-xs text-left",
+        a.status === "overdue" && "border-rose-500/30",
+        a.status === "submitted" && "border-emerald-500/30"
+      )}
     >
-      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div className="flex-1 min-w-0 text-left">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1.5">
             <h4 className="font-semibold text-sm text-foreground truncate">{a.title}</h4>
             {getStatusBadge(a.status)}
           </div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium">{a.subjectName}</Badge>
-            <Badge variant="outline" className="text-[10px] bg-muted/30 border-border shadow-none font-medium flex items-center gap-1">
-              {a.mode === "online" ? <Globe className="size-2.5 text-sky-500" /> : <BookOpen className="size-2.5 text-amber-500" />}
+            <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border font-medium">
+              {a.subjectName}
+            </Badge>
+            <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border font-medium flex items-center gap-1">
+              {a.mode === "online" ? <Globe className="size-2.5 text-foreground" /> : <BookOpen className="size-2.5 text-foreground" />}
               {a.mode === "online" ? "Online Submission" : "Offline Paper"}
             </Badge>
           </div>
           <p className="text-[11px] text-muted-foreground mb-2">Teacher: {a.teacherName}</p>
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1" suppressHydrationWarning>
-              <Clock className={`size-3.5 ${getCountdownColor(a.status)}`} />
+            <div className="flex items-center gap-1.5" suppressHydrationWarning>
+              <Clock className={cn("size-3.5", getCountdownColor(a.status))} />
               <span className={getCountdownColor(a.status)} suppressHydrationWarning>{a.countdown}</span>
             </div>
             <span suppressHydrationWarning>Due: {formatHomeworkDate(a.dueDate)}</span>
@@ -580,19 +591,13 @@ function ListHomeworkCard({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col items-end gap-2 sm:ml-4 shrink-0 self-center sm:self-start">
+        <div className="flex flex-col items-end gap-2 shrink-0 self-center sm:self-start">
           {a.status !== "submitted" && (
             <Button
               size="sm"
               onClick={() => onSubmit(a)}
               disabled={submittingId === a.id}
-              className={`
-                text-xs gap-1.5
-                ${a.status === "overdue"
-                  ? "bg-red-500 hover:bg-red-600 text-white"
-                  : "bg-violet-500 hover:bg-violet-600 text-white"
-                }
-              `}
+              className="text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-xs cursor-pointer"
             >
               {submittingId === a.id ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -603,7 +608,7 @@ function ListHomeworkCard({
             </Button>
           )}
           {a.status === "submitted" && (
-            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] gap-1">
+            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1">
               <CheckCircle2 className="size-3" />
               Submitted
             </Badge>
@@ -611,12 +616,12 @@ function ListHomeworkCard({
         </div>
       </div>
 
-      <div className="mt-3 pt-2 border-t  flex flex-col gap-1">
+      <div className="mt-3 pt-2.5 border-t border-border flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <span>Progress Tracking</span>
-          <span className="font-medium text-foreground">{getProgressValue(a.status)}%</span>
+          <span className="font-semibold text-foreground">{getProgressValue(a.status)}%</span>
         </div>
-        <Progress value={getProgressValue(a.status)} className={`h-1 ${getProgressColor(a.status)}`} />
+        <Progress value={getProgressValue(a.status)} className={cn("h-1.5 bg-muted", getProgressColor(a.status))} />
       </div>
     </div>
   );
@@ -627,34 +632,25 @@ function SummaryCard({
   label,
   count,
   icon,
-  color,
 }: {
   label: string;
   count: number;
   icon: React.ReactNode;
-  color: string;
+  color?: string;
 }) {
-  const colorMap: Record<string, string> = {
-    violet: "bg-violet-500 dark:bg-violet-600 text-white",
-    amber: "bg-amber-500 dark:bg-amber-600 text-white",
-    emerald: "bg-emerald-500 dark:bg-emerald-600 text-white",
-    red: "bg-red-500 dark:bg-red-600 text-white",
-  };
-  const iconBg = colorMap[color] || colorMap.violet;
-
   return (
-    <Card className="rounded-xl shadow-sm">
-      <CardContent className="p-4">
+    <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+      <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
         <div className="flex items-center justify-between">
-          <div className={`p-2 rounded-lg ${iconBg}`}>
+          <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
             {icon}
           </div>
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
             {count}
           </p>
         </div>
-        <p className="text-xs  mt-2">
-          {label} Homework
+        <p className="text-xs font-medium text-muted-foreground mt-3">
+          {label}
         </p>
       </CardContent>
     </Card>

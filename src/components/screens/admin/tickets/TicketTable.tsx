@@ -80,7 +80,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-mono"
+                    className="text-[10px] font-mono rounded-lg"
                   >
                     {ticket.id.slice(-6).toUpperCase()}
                   </Badge>
@@ -93,7 +93,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium}`}
                   >
                     {PRIORITY_LABELS[ticket.priority] ||
                       ticket.priority}
@@ -107,7 +107,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="size-6">
-                      <AvatarFallback className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                      <AvatarFallback className="text-[10px] bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 font-semibold">
                         {ticket.creator
                           ? getInitials(ticket.creator.name)
                           : "??"}
@@ -120,7 +120,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                       {ticket.creator?.role && (
                         <Badge
                           variant="outline"
-                          className={`text-[9px] px-1.5 py-0 ${ROLE_COLORS[ticket.creator.role] || ""}`}
+                          className={`text-[9px] px-1.5 py-0 rounded-md ${ROLE_COLORS[ticket.creator.role] || ""}`}
                         >
                           {ticket.creator.role}
                         </Badge>
@@ -132,7 +132,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                   {ticket.assignee ? (
                     <div className="flex items-center gap-2">
                       <Avatar className="size-6">
-                        <AvatarFallback className="text-[10px] bg-muted text-foreground">
+                        <AvatarFallback className="text-[10px] bg-muted text-foreground font-semibold">
                           {getInitials(ticket.assignee.name)}
                         </AvatarFallback>
                       </Avatar>
@@ -149,7 +149,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${STATUS_COLORS[ticket.status] || ""}`}
                   >
                     {STATUS_LABELS[ticket.status] || ticket.status}
                   </Badge>
@@ -169,7 +169,7 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-8 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                    className="size-8 rounded-xl text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer"
                     onClick={() => onOpenDetail(ticket.id)}
                     title="View"
                   >
@@ -206,19 +206,19 @@ export function TicketTable({ tickets, loading, onOpenDetail }: TicketTableProps
                 <div className="flex items-center gap-2 mt-1">
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ""}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${PRIORITY_COLORS[ticket.priority] || ""}`}
                   >
                     {PRIORITY_LABELS[ticket.priority]}
                   </Badge>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
+                    className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${STATUS_COLORS[ticket.status] || ""}`}
                   >
                     {STATUS_LABELS[ticket.status]}
                   </Badge>
                 </div>
               </div>
-              <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-emerald-600">
+              <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                 <Eye className="size-4" />
               </span>
             </div>

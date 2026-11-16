@@ -1,156 +1,89 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
-import { Receipt, CheckCircle2, XCircle } from "lucide-react";
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { SubscriptionRecord } from "./types";
 
 interface HistoryTableProps {
   subscriptions: SubscriptionRecord[];
+  slug?: string;
 }
 
-const formatSubscriptionDate = (dateStr?: string | null) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
+const fmtDate = (v?: string | null) => {
+  if (!v) return "—";
+  return new Date(v).toLocaleDateString("en-GB", {
     day: "numeric",
+    month: "short",
     year: "numeric",
   });
 };
 
-export function HistoryTable({ subscriptions }: HistoryTableProps) {
+export function HistoryTable({ subscriptions, slug: propSlug }: HistoryTableProps) {
+  const params = useParams();
+  const slug = propSlug || (params?.slug as string) || "demo-academy";
+  const [showAllInvoices, setShowAllInvoices] = useState(false);
+
   if (subscriptions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-        <Receipt className="size-10 mb-3 opacity-40" />
-        <p className="text-sm font-medium">No payment history</p>
-        <p className="text-xs mt-1">
-          Your past subscriptions will appear here
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        No invoices yet. They appear here after each payment.
+      </p>
     );
   }
 
-  return (
-    <div>
-      {/* Mobile View: Vertical Cards */}
-      <div className="md:hidden divide-y divide-border">
-        {subscriptions.map((sub) => (
-          <div key={sub.id} className="p-4 space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-bold text-foreground">
-                  {sub.planName}
-                </p>
-                {sub.period && (
-                  <p className="text-xs text-muted-foreground">
-                    {sub.period.charAt(0).toUpperCase() + sub.period.slice(1)} Billing
-                  </p>
-                )}
-              </div>
-              <p className="font-bold text-foreground">
-                {sub.amount === 0 ? "Free" : `₹${sub.amount.toLocaleString()}`}
-              </p>
-            </div>
-            
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground" suppressHydrationWarning>
-                {formatSubscriptionDate(sub.createdAt)}
-              </span>
-              {sub.status === "active" ? (
-                <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-[10px] shadow-none">
-                  <CheckCircle2 className="size-3 mr-1" /> Active
-                </Badge>
-              ) : (
-                <Badge className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-[10px] shadow-none">
-                  <XCircle className="size-3 mr-1" /> Cancelled
-                </Badge>
-              )}
-            </div>
-            
-            {sub.transactionId && (
-              <div className="pt-1 border-t border-dashed ">
-                <p className="text-[10px] text-muted-foreground font-mono truncate">
-                  ID: {sub.transactionId}
-                </p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+  const visibleInvoices = showAllInvoices ? subscriptions : subscriptions.slice(0, 3);
 
-      {/* Desktop View: Table */}
-      <div className="hidden md:block overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead className="font-semibold text-foreground">
-                Plan
-              </TableHead>
-              <TableHead className="font-semibold text-foreground">
-                Amount
-              </TableHead>
-              <TableHead className="font-semibold text-foreground">
-                Date
-              </TableHead>
-              <TableHead className="font-semibold text-foreground">
-                Status
-              </TableHead>
-              <TableHead className="font-semibold text-foreground">
-                Transaction ID
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {subscriptions.map((sub) => (
-              <TableRow key={sub.id}>
-                <TableCell className="font-medium text-foreground">
-                  {sub.planName}
-                  {sub.period && (
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      ({sub.period})
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-foreground">
-                  {sub.amount === 0 ? (
-                    <span className="text-muted-foreground">
-                      Free
-                    </span>
-                  ) : (
-                    <span>₹{sub.amount.toLocaleString()}</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-muted-foreground" suppressHydrationWarning>
-                  {formatSubscriptionDate(sub.createdAt)}
-                </TableCell>
-                <TableCell>
-                  {sub.status === "active" ? (
-                    <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-xs shadow-none">
-                      <CheckCircle2 className="size-3 mr-1" /> Active
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 text-xs shadow-none">
-                      <XCircle className="size-3 mr-1" /> Cancelled
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-xs text-muted-foreground font-mono max-w-[140px] truncate">
-                  {sub.transactionId || "–"}
-                </TableCell>
-              </TableRow>
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-muted-foreground">
+              <th className="py-2 pr-4 font-medium">Date</th>
+              <th className="py-2 pr-4 font-medium">Plan</th>
+              <th className="py-2 pr-4 font-medium">Amount</th>
+              <th className="py-2 pr-4 font-medium">Status</th>
+              <th className="py-2 font-medium text-right"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {visibleInvoices.map((inv) => (
+              <tr key={inv.id} className="border-t border-border">
+                <td className="py-3 pr-4 tabular-nums" suppressHydrationWarning>
+                  {fmtDate(inv.createdAt)}
+                </td>
+                <td className="py-3 pr-4">{inv.planName}</td>
+                <td className="py-3 pr-4 tabular-nums">
+                  {inv.amount === 0 ? "Free" : `₹${Number(inv.amount).toLocaleString("en-IN")}`}
+                </td>
+                <td className="py-3 pr-4 capitalize text-muted-foreground">{inv.status}</td>
+                <td className="py-3 text-right">
+                  <Button asChild variant="outline" size="sm" className="h-7 px-2.5">
+                    <a
+                      href={`/invoice/${slug}/${inv.transactionId || inv.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View invoice
+                    </a>
+                  </Button>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
-    </div>
+      {subscriptions.length > 3 && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          onClick={() => setShowAllInvoices((v) => !v)}
+        >
+          {showAllInvoices ? "Show less" : "See more"}
+        </Button>
+      )}
+    </>
   );
 }

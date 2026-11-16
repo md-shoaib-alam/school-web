@@ -50,13 +50,13 @@ type State = {
   linking: boolean;
   createOpen: boolean;
   createForm: {
-    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; password: ""; username?: string; gender?: string; dateOfBirth?: string; relationship?: string; address?: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; password: ""; username?: string; gender?: string; dateOfBirth?: string; relationship?: string; address?: string; avatar?: string | null;
   };
   creating: boolean;
   editOpen: boolean;
   editingParent: ParentInfo | null;
   editForm: {
-    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; gender?: string; dateOfBirth?: string; address?: string;
+    name: string; email: string; phone: string; alternatePhone?: string; occupation: string; gender?: string; dateOfBirth?: string; address?: string; avatar?: string | null;
   };
   editing: boolean;
   detailOpen: boolean;
@@ -92,13 +92,13 @@ const initialState: State = {
   linking: false,
   createOpen: false,
   createForm: {
-    name: "", email: "", phone: "", alternatePhone: "", occupation: "", password: "", username: "", gender: "male", dateOfBirth: "", relationship: "Parent", address: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", password: "", username: "", gender: "male", dateOfBirth: "", relationship: "Parent", address: "", avatar: "",
   },
   creating: false,
   editOpen: false,
   editingParent: null,
   editForm: {
-    name: "", email: "", phone: "", alternatePhone: "", occupation: "", gender: "male", dateOfBirth: "", address: "",
+    name: "", email: "", phone: "", alternatePhone: "", occupation: "", gender: "male", dateOfBirth: "", address: "", avatar: "",
   },
   editing: false,
   detailOpen: false,
@@ -131,6 +131,7 @@ const actionHandlers: {
       gender: (payload as any).gender || "male",
       dateOfBirth: (payload as any).dateOfBirth || "",
       address: (payload as any).address || "",
+      avatar: payload.avatar || "",
     },
     editOpen: true
   }),

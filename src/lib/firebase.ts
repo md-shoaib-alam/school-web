@@ -40,10 +40,12 @@ export const requestNotificationPermission = async () => {
   try {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      // Register service worker explicitly to guarantee it exists, has root scope, and is controlled
+      // Register service worker explicitly to guarantee it exists, has root scope, and is controlled.
+      // The static SW file cannot read Next env vars, so the public config rides on the URL.
       let swRegistration;
       if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-        swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        const swUrl = `/firebase-messaging-sw.js?cfg=${encodeURIComponent(JSON.stringify(firebaseConfig))}`;
+        swRegistration = await navigator.serviceWorker.register(swUrl);
         
         // Wait for the service worker to become active to prevent PushManager subscription failure
         if (swRegistration && !swRegistration.active) {

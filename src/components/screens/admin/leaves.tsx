@@ -775,7 +775,7 @@ function StaffSelfServiceView() {
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2.5 sm:gap-3">
             <Button variant="outline" onClick={() => setApplyOpen(false)} className="rounded-xl text-xs">
               Cancel
             </Button>

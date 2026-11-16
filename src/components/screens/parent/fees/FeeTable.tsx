@@ -1,8 +1,5 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -14,10 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IndianRupee, Printer, Lock } from "lucide-react";
-import { STATUS_CONFIG, TYPE_ICONS } from "./constants";
+import { 
+  IndianRupee, 
+  ArrowDownToLine, 
+  Lock, 
+  School 
+} from "lucide-react";
+import { STATUS_CONFIG, getFeeTypeIcon } from "./constants";
 import type { FeeRecord } from "@/types";
 import { ReceiptTemplate } from "./ReceiptTemplate";
+import { cn } from "@/lib/utils";
 
 interface FeeTableProps {
   studentName: string;
@@ -28,17 +31,17 @@ interface FeeTableProps {
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return "";
-  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (match) {
-    const [_, year, month, day] = match;
-    return `${day}/${month}/${year}`;
+  try {
+    const d = new Date(dateStr.includes("T") ? dateStr : `${dateStr}T00:00:00`);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch (e) {
+    return dateStr;
   }
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
 };
 
 export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps) {
@@ -47,6 +50,7 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
   const slug = params?.slug as string;
 
   const [selectedFee, setSelectedFee] = useState<FeeRecord | null>(null);
+  const [filter, setFilter] = useState<"all" | "unpaid" | "paid">("all");
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -60,14 +64,23 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
       return;
     }
     setSelectedFee(fee);
-    // Give state a moment to update before printing
     setTimeout(() => {
       handlePrint();
     }, 100);
   };
 
+  const totalCount = fees.length;
+  const paidCount = fees.filter((f) => f.status === "paid").length;
+  const unpaidCount = fees.filter((f) => f.status !== "paid").length;
+
+  const filteredFees = fees.filter((fee) => {
+    if (filter === "paid") return fee.status === "paid";
+    if (filter === "unpaid") return fee.status !== "paid";
+    return true;
+  });
+
   return (
-    <Card className="rounded-xl shadow-sm shadow-none">
+    <div className="rounded-[18px] border border-border bg-card shadow-xs overflow-hidden font-manrope">
       {/* Hidden Receipt for Printing */}
       <div className="hidden">
         {selectedFee && (
@@ -79,99 +92,200 @@ export function FeeTable({ studentName, fees, onPay, isPremium }: FeeTableProps)
         )}
       </div>
 
-      <CardHeader className="text-left">
-        <CardTitle className="text-base">Fee Details — {studentName}</CardTitle>
-        <CardDescription>{fees.length} fee records</CardDescription>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
+      {/* Tabs Row (Matching Fee Details HTML / Reference UI) */}
+      <div className="flex items-center gap-1.5 p-3 border-b border-border overflow-x-auto bg-card">
+        <button
+          type="button"
+          onClick={() => setFilter("all")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-full font-bold text-sm transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap",
+            filter === "all"
+              ? "bg-[#ebeafd] dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400"
+              : "text-[#6a6f83] dark:text-muted-foreground hover:bg-muted/50"
+          )}
+        >
+          All
+          <span className="text-xs font-semibold opacity-75">{totalCount}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilter("unpaid")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-full font-bold text-sm transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap",
+            filter === "unpaid"
+              ? "bg-[#ebeafd] dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400"
+              : "text-[#6a6f83] dark:text-muted-foreground hover:bg-muted/50"
+          )}
+        >
+          Unpaid
+          <span className="text-xs font-semibold opacity-75">{unpaidCount}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilter("paid")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-full font-bold text-sm transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap",
+            filter === "paid"
+              ? "bg-[#ebeafd] dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400"
+              : "text-[#6a6f83] dark:text-muted-foreground hover:bg-muted/50"
+          )}
+        >
+          Paid
+          <span className="text-xs font-semibold opacity-75">{paidCount}</span>
+        </button>
+      </div>
+
+      {/* Table Content */}
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-border hover:bg-transparent">
+              <TableHead className="text-left py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Fee type
+              </TableHead>
+              <TableHead className="text-left py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Amount
+              </TableHead>
+              <TableHead className="text-left py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Due date
+              </TableHead>
+              <TableHead className="text-left py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Paid
+              </TableHead>
+              <TableHead className="text-left py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Status
+              </TableHead>
+              <TableHead className="text-right py-3 px-4 text-[13px] font-semibold text-[#6a6f83] dark:text-muted-foreground">
+                Action
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredFees.length === 0 ? (
               <TableRow>
-                <TableHead className="text-left pl-6">Fee Type</TableHead>
-                <TableHead className="hidden sm:table-cell text-left">Amount</TableHead>
-                <TableHead className="hidden md:table-cell text-left">Due Date</TableHead>
-                <TableHead className="hidden md:table-cell text-left">Paid Amount</TableHead>
-                <TableHead className="w-28 text-center">Status</TableHead>
-                <TableHead className="w-24 text-center">Action</TableHead>
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                  <IndianRupee className="size-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm font-medium">
+                    {filter === "unpaid"
+                      ? "No unpaid fee records found"
+                      : filter === "paid"
+                      ? "No paid fee records found"
+                      : "No fee records found"}
+                  </p>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {fees.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    <IndianRupee className="size-10 mx-auto mb-2 opacity-30" />
-                    <p>No fee records found</p>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                fees.map((fee) => {
-                  const config = STATUS_CONFIG[fee.status] || STATUS_CONFIG.pending;
-                  return (
-                    <TableRow key={fee.id} className="hover:bg-amber-50/30 dark:hover:bg-amber-900/10 transition-colors">
-                      <TableCell className="pl-6">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{TYPE_ICONS[fee.type] || "💰"}</span>
-                          <span className="font-medium text-sm capitalize">{fee.type}</span>
+            ) : (
+              filteredFees.map((fee) => {
+                const config = STATUS_CONFIG[fee.status] || STATUS_CONFIG.pending;
+                const FeeIcon = getFeeTypeIcon(fee.type);
+                const isPaid = fee.status === "paid";
+                const isOverdue = fee.status === "overdue";
+                const isPending = fee.status === "pending";
+
+                return (
+                  <TableRow key={fee.id} className="border-b border-border hover:bg-muted/40 transition-colors">
+                    {/* Fee type with 36x36 icon */}
+                    <TableCell className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="size-9 rounded-xl bg-[#ebeafd] dark:bg-indigo-950/50 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center shrink-0">
+                          <FeeIcon className="size-4.5" />
                         </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-sm font-medium text-left">
-                        ₹{fee.amount.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground text-left" suppressHydrationWarning>
-                        {formatDate(fee.dueDate)}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm text-left">
-                        <span className={fee.paidAmount > 0 ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>
-                          ₹{fee.paidAmount.toLocaleString()}
+                        <span className="font-bold text-[15px] text-foreground capitalize">
+                          {fee.type}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="outline" className={`${config.bg} font-medium capitalize shadow-none`}>
-                          {config.icon}
-                          <span className="ml-1">{fee.status}</span>
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {fee.status !== "paid" ? (
-                          <div
-                            className="inline-flex items-center justify-center rounded-md text-xs font-semibold h-8 px-3 bg-muted text-foreground border  cursor-not-allowed shadow-none select-none"
+                      </div>
+                    </TableCell>
+
+                    {/* Amount */}
+                    <TableCell className="py-3.5 px-4 font-extrabold text-[15px] text-foreground tabular-nums text-left">
+                      ₹{fee.amount.toLocaleString("en-IN")}
+                    </TableCell>
+
+                    {/* Due date with optional Overdue / Due soon badge */}
+                    <TableCell className="py-3.5 px-4 text-left">
+                      <span className="text-[14px] text-muted-foreground block">
+                        {formatDate(fee.dueDate)}
+                      </span>
+                      {isOverdue && (
+                        <span className="block text-[12px] font-bold text-[#c42f3b] dark:text-red-400 mt-0.5">
+                          Overdue
+                        </span>
+                      )}
+                      {isPending && (
+                        <span className="block text-[12px] font-bold text-[#a16200] dark:text-amber-500 mt-0.5">
+                          Due soon
+                        </span>
+                      )}
+                    </TableCell>
+
+                    {/* Paid Amount */}
+                    <TableCell className="py-3.5 px-4 text-left tabular-nums text-[15px]">
+                      {fee.paidAmount > 0 ? (
+                        <span className="font-extrabold text-[#0b8a5f] dark:text-emerald-400">
+                          ₹{fee.paidAmount.toLocaleString("en-IN")}
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-muted-foreground">
+                          ₹0
+                        </span>
+                      )}
+                    </TableCell>
+
+                    {/* Status Pill Chip */}
+                    <TableCell className="py-3.5 px-4 text-left">
+                      <span className={cn(
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[13px] font-bold",
+                        config.bg
+                      )}>
+                        {config.icon}
+                        <span>{config.text}</span>
+                      </span>
+                    </TableCell>
+
+                    {/* Action Button: Only Receipt (with Lock if no sub) or Pay at School (NO success text) */}
+                    <TableCell className="py-3.5 px-4 text-right">
+                      <div className="flex justify-end">
+                        {isPaid ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isPremium) onPrintClick(fee);
+                            }}
+                            disabled={!isPremium}
+                            title={isPremium ? "Download receipt" : "Subscription required to download receipt"}
+                            className={cn(
+                              "inline-flex items-center justify-center gap-1.5 min-h-[36px] px-3.5 rounded-[10px] font-bold text-[13px] transition-colors border",
+                              isPremium
+                                ? "border-[#0b8a5f] text-[#0b8a5f] dark:text-emerald-400 hover:bg-[#dcf5ea]/40 dark:hover:bg-emerald-950/30 cursor-pointer"
+                                : "opacity-40 cursor-not-allowed border-border text-muted-foreground bg-muted"
+                            )}
                           >
-                            Pay at School
-                          </div>
+                            {isPremium ? (
+                              <ArrowDownToLine className="size-3.5 stroke-[2.2]" />
+                            ) : (
+                              <Lock className="size-3.5 stroke-[2.2]" />
+                            )}
+                            Receipt
+                          </button>
                         ) : (
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">
-                              ✓ Success
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className={`h-7 px-2 text-[10px] gap-1 font-bold transition-all ${
-                                isPremium 
-                                  ? "border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800/50 dark:text-emerald-400 dark:hover:bg-emerald-900/20" 
-                                  : " text-muted-foreground opacity-60 cursor-not-allowed grayscale"
-                              }`}
-                              onClick={() => onPrintClick(fee)}
-                            >
-                              {isPremium ? (
-                                <Printer className="size-3" />
-                              ) : (
-                                <Lock className="size-2.5" />
-                              )}
-                              {isPremium ? "Receipt" : "Upgrade"}
-                            </Button>
+                          <div
+                            className="inline-flex items-center justify-center gap-1.5 min-h-[36px] px-3.5 rounded-[10px] border border-border text-foreground font-bold text-[13px] bg-transparent select-none cursor-default"
+                          >
+                            <School className="size-3.5 text-muted-foreground stroke-[2]" />
+                            Pay at school
                           </div>
                         )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ import {
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import type { ParentInfo } from "./types";
 
 interface EditParentDialogProps {
@@ -55,6 +56,20 @@ export function EditParentDialog({
 }: EditParentDialogProps) {
   // Track initial snapshot for reset functionality
   const [initialSnapshot, setInitialSnapshot] = useState<any>(editForm);
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      setEditForm({ ...editForm, avatar: dataUrl });
+      toast.success("Photo attached");
+    } catch {
+      toast.error("Failed to process photo");
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -121,34 +136,39 @@ export function EditParentDialog({
           {/* ────────────────────────────────────────────────────────── */}
           {/* SECTION 0: Profile Photo                                   */}
           {/* ────────────────────────────────────────────────────────── */}
-          <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-3">
-            <div className="flex items-center gap-2 text-foreground font-semibold text-sm sm:text-base">
-              <Camera className="size-4 text-emerald-600" />
-              <div>
-                <span>Profile Photo</span>
-                <p className="text-[11px] font-normal text-muted-foreground">
-                  Parent account avatar (Optional)
-                </p>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-5">
+            <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+            <button
+              type="button"
+              onClick={() => photoRef.current?.click()}
+              className="group size-28 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1.5 transition-colors cursor-pointer overflow-hidden"
+            >
+              {editForm.avatar ? (
+                <img src={editForm.avatar} alt="" className="size-full object-cover" />
+              ) : (
+                <>
+                  <Camera className="size-5 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                  <span className="text-xs font-semibold text-foreground">Upload photo</span>
+                  <span className="text-[10px] text-muted-foreground">JPG or PNG</span>
+                </>
+              )}
+            </button>
 
-            <div className="flex items-center gap-4 pt-1">
-              <div className="size-16 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xl flex items-center justify-center shrink-0">
-                {editForm.name ? editForm.name.slice(0, 2).toUpperCase() : <User className="size-7 text-emerald-600/70" />}
-              </div>
-              <div className="space-y-1">
-                <Button
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-semibold text-foreground">Parent Photo</p>
+              <p className="text-xs text-muted-foreground">Upload a clear photo of the parent. Click the square tile to browse or change photo.</p>
+              {editForm.avatar && (
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
-                  onClick={() => toast.info("Photo upload will be saved with profile")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditForm({ ...editForm, avatar: "" });
+                  }}
+                  className="text-xs text-rose-500 hover:underline pt-1 cursor-pointer block"
                 >
-                  <Upload className="size-3.5 text-emerald-600" />
-                  Upload Photo
-                </Button>
-                <p className="text-[10px] text-muted-foreground">JPG, PNG up to 5MB</p>
-              </div>
+                  Remove photo
+                </button>
+              )}
             </div>
           </div>
 

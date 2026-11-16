@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Award } from "lucide-react";
-import { gradeBadgeClasses } from "./utils";
 import type { GradeRecord } from "@/types";
 
 interface GradesTableProps {
@@ -21,54 +20,58 @@ interface GradesTableProps {
 
 export function GradesTable({ studentName, grades }: GradesTableProps) {
   return (
-    <Card className="rounded-xl shadow-sm shadow-none  h-full">
-      <CardHeader className="p-4 pb-2 text-left">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Award className="size-4 text-amber-600" />
-          Detailed Grades
-        </CardTitle>
-        <CardDescription>
-          All exam results for {studentName}
-        </CardDescription>
+    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden h-full flex flex-col">
+      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0 text-left">
+        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+          <Award className="size-4" />
+        </div>
+        <div>
+          <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+            Detailed Grades
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
+            All exam results for {studentName}
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-0 flex-1">
         <div className="max-h-[340px] overflow-y-auto">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-xs text-left">Subject</TableHead>
-                <TableHead className="text-xs text-left">Exam Type</TableHead>
-                <TableHead className="text-xs text-right">Marks</TableHead>
-                <TableHead className="text-xs text-center">Score</TableHead>
-                <TableHead className="text-xs text-center">Grade</TableHead>
+            <TableHeader className="bg-muted/40 sticky top-0">
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-xs font-semibold h-9 text-muted-foreground text-left pl-5">Subject</TableHead>
+                <TableHead className="text-xs font-semibold h-9 text-muted-foreground text-left">Exam Type</TableHead>
+                <TableHead className="text-xs font-semibold h-9 text-muted-foreground text-right">Marks</TableHead>
+                <TableHead className="text-xs font-semibold h-9 text-muted-foreground text-center">Score</TableHead>
+                <TableHead className="text-xs font-semibold h-9 text-muted-foreground text-center pr-5">Grade</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {grades.map((g, i) => {
                 const pct = Math.round((g.marks / g.maxMarks) * 100);
                 return (
-                  <TableRow key={`${g.id}-${i}`}>
-                    <TableCell className="text-sm py-2 font-medium text-left">
+                  <TableRow key={`${g.id}-${i}`} className="border-border hover:bg-muted/40">
+                    <TableCell className="text-sm py-3 font-medium text-left pl-5 text-foreground">
                       {g.subjectName}
                     </TableCell>
-                    <TableCell className="text-sm py-2 text-muted-foreground capitalize text-left">
-                      <Badge variant="outline" className="text-[10px] mr-1 shadow-none">
-                        {g.examType}
+                    <TableCell className="text-sm py-3 text-left">
+                      <Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border font-medium capitalize">
+                        {g.examType.replace(/_/g, " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm py-2 text-right font-medium">
+                    <TableCell className="text-sm py-3 text-right font-medium tabular-nums text-foreground">
                       {Number(g.marks).toFixed(2).replace(/\.00$/, "")}
-                      <span className="text-muted-foreground">/{g.maxMarks}</span>
+                      <span className="text-xs text-muted-foreground font-normal">/{g.maxMarks}</span>
                     </TableCell>
-                    <TableCell className="text-sm py-2 text-center">
-                      <span className={`font-semibold ${pct >= 80 ? "text-emerald-600 dark:text-emerald-400" : pct >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+                    <TableCell className="text-sm py-3 text-center">
+                      <span className="font-semibold text-foreground tabular-nums">
                         {pct}%
                       </span>
                     </TableCell>
-                    <TableCell className="text-center py-2">
+                    <TableCell className="text-center py-3 pr-5">
                       <Badge
                         variant="outline"
-                        className={`text-[10px] font-bold shadow-none ${gradeBadgeClasses(g.grade)}`}
+                        className="text-[10px] font-semibold rounded-full px-2.5 py-0.5 bg-muted text-foreground border-border"
                       >
                         {g.grade || "N/A"}
                       </Badge>
@@ -78,7 +81,7 @@ export function GradesTable({ studentName, grades }: GradesTableProps) {
               })}
               {grades.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">
+                  <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-12">
                     No grades available
                   </TableCell>
                 </TableRow>

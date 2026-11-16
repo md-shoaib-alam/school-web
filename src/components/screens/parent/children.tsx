@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState } from "react";
 import { useAppStore } from "@/store/use-app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { useParentDashboard } from "@/lib/graphql/hooks";
@@ -7,15 +9,7 @@ import {
   Award, 
   UserCheck, 
   BookOpen, 
-  Calendar, 
-  Hash, 
-  User, 
-  Sparkles,
-  TrendingUp,
   BookmarkCheck,
-  ChevronRight,
-  ArrowUpRight,
-  ChevronDown
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -42,21 +36,6 @@ export function ParentChildren() {
 
   const students = data?.children || [];
 
-  useEffect(() => {
-    if (students.length > 0) {
-      const savedTab = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("lastSelectedStudent="))
-        ?.split("=")[1];
-      
-      if (savedTab && students.some(s => s.id === savedTab)) {
-        setActiveTab(savedTab);
-      } else if (!activeTab) {
-        setActiveTab(students[0].id);
-      }
-    }
-  }, [students, activeTab]);
-
   const handleTabChange = (val: string) => {
     setActiveTab(val);
     document.cookie = `lastSelectedStudent=${val}; path=/; max-age=31536000`;
@@ -66,19 +45,26 @@ export function ParentChildren() {
 
   if (students.length === 0) {
     return (
-      <Card className="rounded-3xl border  bg-card shadow-sm">
+      <Card className="rounded-2xl border border-border bg-card shadow-xs">
         <CardContent className="p-16 text-center">
-          <div className="size-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400">
-            <GraduationCap className="size-8" />
+          <div className="size-14 rounded-2xl bg-muted flex items-center justify-center mx-auto text-foreground">
+            <GraduationCap className="size-7" />
           </div>
-          <h3 className="text-xl font-semibold text-foreground mt-6">No children found</h3>
-          <p className="text-sm text-muted-foreground mt-2 max-w-sm mx-auto">No student profiles are currently linked to your parental account. Please contact administrative staff to link your children.</p>
+          <h3 className="text-lg font-semibold text-foreground mt-5">No children found</h3>
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-sm mx-auto">
+            No student profiles are currently linked to your parental account. Please contact administrative staff to link your children.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
-  const selectedStudent = students.find((s) => s.id === activeTab) || students[0];
+  const effectiveActiveTab = activeTab || (typeof document !== "undefined" ? document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("lastSelectedStudent="))
+    ?.split("=")[1] : "") || students[0]?.id || "";
+
+  const selectedStudent = students.find((s) => s.id === effectiveActiveTab) || students[0];
 
   const att = selectedStudent ? getAttendanceForStudent(selectedStudent.id, selectedStudent.attendance || []) : { percentage: 0, present: 0, absent: 0, total: 0 };
   const subjectPerf = selectedStudent ? getSubjectPerformance(selectedStudent.id, selectedStudent.grades || []) : [];
@@ -87,18 +73,20 @@ export function ParentChildren() {
 
   return (
     <div className="space-y-8 pb-12 select-none animate-fade-in">
-      {/* Page Header */}
-      <div className="border-b  pb-5">
-        <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex items-center gap-4 min-w-fit">
-            <ChildSelector 
-              students={students} 
-              selectedStudentId={selectedStudent.id} 
-              onSelect={handleTabChange} 
-            />
+      {/* Page Header (Only show student switcher when parent has multiple children) */}
+      {students.length > 1 && (
+        <div className="border-b border-border pb-5">
+          <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-4 min-w-fit">
+              <ChildSelector 
+                students={students} 
+                selectedStudentId={selectedStudent.id} 
+                onSelect={handleTabChange} 
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Workspace Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -106,23 +94,31 @@ export function ParentChildren() {
         <div className="space-y-6">
           <StudentProfileCard student={selectedStudent} />
           
-          {/* Quick Actions Card - Moved here from main row */}
-          <div className="rounded-3xl border  bg-card p-5 flex flex-col shadow-xs">
-            <h4 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-4">Quick Actions</h4>
+          {/* Quick Actions Card */}
+          <div className="rounded-2xl border border-border bg-card p-5 flex flex-col shadow-xs">
+            <h4 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-3.5">
+              Quick Actions
+            </h4>
             <div className="grid grid-cols-2 gap-3">
-              <a href="attendance" className="p-3 rounded-2xl bg-muted border-2  hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex items-center justify-center gap-2 group shadow-sm hover:shadow-md active:scale-[0.98]">
-                <div className="p-1.5 rounded-lg bg-white border  group-hover:scale-110 transition-transform">
-                  <UserCheck className="size-3.5 text-emerald-600 dark:text-emerald-500" />
+              <a 
+                href="attendance" 
+                className="h-11 px-3.5 rounded-full bg-muted/60 hover:bg-muted border border-border text-foreground transition-colors flex items-center justify-center gap-2.5 shadow-2xs active:scale-[0.98] cursor-pointer"
+              >
+                <div className="size-7 rounded-lg bg-background border border-border/50 flex items-center justify-center text-foreground shadow-2xs shrink-0">
+                  <UserCheck className="size-3.5" />
                 </div>
-                <span className="text-[10px] font-bold text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                <span className="text-xs font-semibold text-foreground whitespace-nowrap">
                   Attendance
                 </span>
               </a>
-              <a href="school-exams" className="p-3 rounded-2xl bg-muted border-2  hover:border-amber-500/40 hover:bg-amber-50/30 dark:hover:bg-amber-500/5 transition-all flex items-center justify-center gap-2 group shadow-sm hover:shadow-md active:scale-[0.98]">
-                <div className="p-1.5 rounded-lg bg-white border  group-hover:scale-110 transition-transform">
-                  <Award className="size-3.5 text-violet-600 dark:text-violet-500" />
+              <a 
+                href="school-exams" 
+                className="h-11 px-3.5 rounded-full bg-muted/60 hover:bg-muted border border-border text-foreground transition-colors flex items-center justify-center gap-2.5 shadow-2xs active:scale-[0.98] cursor-pointer"
+              >
+                <div className="size-7 rounded-lg bg-background border border-border/50 flex items-center justify-center text-foreground shadow-2xs shrink-0">
+                  <Award className="size-3.5" />
                 </div>
-                <span className="text-[10px] font-bold text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                <span className="text-xs font-semibold text-foreground whitespace-nowrap">
                   Grades
                 </span>
               </a>
@@ -132,22 +128,22 @@ export function ParentChildren() {
 
         {/* Center/Right Column: Main Dashboard Content (Spans 2 columns on desktop) */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Top Row: Metrics (Now full width of center column) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {/* Top Row: Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {/* Attendance Stat Card */}
-            <div className="relative overflow-hidden rounded-3xl border  bg-card p-6 flex flex-col justify-between min-h-[140px] shadow-xs hover:border-emerald-500/20 transition-all group">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 flex flex-col justify-between min-h-[140px] shadow-xs hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
-                <div className="p-3 rounded-2xl bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                <div className="size-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <UserCheck className="size-5" />
                 </div>
-                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <Badge variant="outline" className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                   Live
-                </span>
+                </Badge>
               </div>
               <div className="mt-4 text-left">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold block">Attendance Rate</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-xl font-semibold text-foreground tracking-tight">
+                  <span className="text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums">
                     {att.percentage}%
                   </span>
                   <span className="text-[10px] text-muted-foreground font-medium">({att.present}/{att.total} days)</span>
@@ -157,47 +153,47 @@ export function ParentChildren() {
             </div>
 
             {/* GPA Stat Card */}
-            <div className="relative overflow-hidden rounded-3xl border  bg-card p-6 flex flex-col justify-between min-h-[140px] shadow-xs hover:border-violet-500/20 transition-all group">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 flex flex-col justify-between min-h-[140px] shadow-xs hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
-                <div className="p-3 rounded-2xl bg-violet-500/5 text-violet-600 dark:text-violet-400 group-hover:scale-105 transition-transform">
+                <div className="size-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <Award className="size-5" />
                 </div>
-                <Badge variant="outline" className="bg-violet-500/10 text-violet-700 dark:text-violet-400 border border-violet-500/20 font-semibold text-[10px] uppercase rounded-full px-2.5 py-0.5">
+                <Badge variant="outline" className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
                   {overall.grade} Grade
                 </Badge>
               </div>
               <div className="mt-4 text-left">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold block">Average Grade</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-xl font-semibold text-foreground tracking-tight">
+                  <span className="text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums">
                     {overall.avg}%
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-medium">Overall GPA</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">Overall Avg</span>
                 </div>
-                <Progress value={overall.avg} className="h-1.5 mt-3 bg-muted [&>div]:bg-violet-500" />
+                <Progress value={overall.avg} className="h-1.5 mt-3 bg-muted [&>div]:bg-blue-600 dark:[&>div]:bg-blue-500" />
               </div>
             </div>
 
             {/* Total Courses Card */}
-            <div className="relative overflow-hidden rounded-3xl border  bg-card p-6 flex flex-col justify-between min-h-[140px] shadow-xs hover:border-amber-500/20 transition-all group">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 flex flex-col justify-between min-h-[140px] shadow-xs hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
-                <div className="p-3 rounded-2xl bg-amber-500/5 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
+                <div className="size-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <BookOpen className="size-5" />
                 </div>
-                <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                <Badge variant="outline" className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
                   Academic
-                </span>
+                </Badge>
               </div>
               <div className="mt-4 text-left">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold block">Active Courses</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-xl font-semibold text-foreground tracking-tight">
+                  <span className="text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums">
                     {subjectPerf.length}
                   </span>
                   <span className="text-[10px] text-muted-foreground font-medium">Subjects</span>
                 </div>
-                <div className="text-[9px] text-muted-foreground font-medium mt-3 uppercase tracking-wider flex items-center gap-1">
-                  <BookmarkCheck className="size-3 text-amber-500" /> Syllabus aligned
+                <div className="text-[10px] text-muted-foreground font-medium mt-3 uppercase tracking-wider flex items-center gap-1.5">
+                  <BookmarkCheck className="size-3 text-blue-600 dark:text-blue-400" /> Syllabus aligned
                 </div>
               </div>
             </div>
@@ -213,4 +209,3 @@ export function ParentChildren() {
     </div>
   );
 }
-

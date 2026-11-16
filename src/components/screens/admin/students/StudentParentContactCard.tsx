@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ParentSelect, type ParentOption } from "./ParentSelect";
 import type { StudentInfo } from "./types";
 
 interface StudentParentContactCardProps {
@@ -20,15 +21,16 @@ interface StudentParentContactCardProps {
   canEdit?: boolean;
   dimmed?: boolean;
   currentStudent: StudentInfo;
+  parents: ParentOption[];
+  parentsLoading?: boolean;
+  parentId: string;
   parentName: string;
   parentRelationship: string;
   parentPhone: string;
   parentEmail: string;
   email: string;
   address: string;
-  onParentNameChange: (value: string) => void;
-  onParentPhoneChange: (value: string) => void;
-  onParentEmailChange: (value: string) => void;
+  onParentChange: (id: string) => void;
   onEmailChange: (value: string) => void;
   onAddressChange: (value: string) => void;
   onEditSection: (section: string) => void;
@@ -44,15 +46,16 @@ export function StudentParentContactCard({
   canEdit,
   dimmed,
   currentStudent,
+  parents,
+  parentsLoading,
+  parentId,
   parentName,
   parentRelationship,
   parentPhone,
   parentEmail,
   email,
   address,
-  onParentNameChange,
-  onParentPhoneChange,
-  onParentEmailChange,
+  onParentChange,
   onEmailChange,
   onAddressChange,
   onEditSection,
@@ -117,30 +120,26 @@ export function StudentParentContactCard({
       form={
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Parent / Guardian */}
+            {/* Parent / Guardian — search & select an existing parent */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">
                 Parent / Guardian <span className="text-red-500">*</span>
               </Label>
-              <Input
-                data-travel="parentName"
-                value={parentName}
-                onChange={(e) => onParentNameChange(e.target.value)}
-                placeholder="Parent Name"
-                className="h-9 text-xs rounded-xl bg-muted "
+              <ParentSelect
+                parents={parents}
+                value={parentId}
+                onChange={onParentChange}
+                loading={parentsLoading}
               />
             </div>
 
-            {/* Relationship (Fixed to Parent on server) */}
+            {/* Relationship (fixed to Parent on server) */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">
                 Relationship <span className="text-[10px] text-muted-foreground font-normal">(Parent)</span>
               </Label>
-              <Select
-                value="Parent"
-                disabled
-              >
-                <SelectTrigger className="h-9 text-xs rounded-xl bg-muted  text-muted-foreground cursor-not-allowed">
+              <Select value="Parent" disabled>
+                <SelectTrigger className="h-9 text-xs rounded-xl bg-muted text-muted-foreground cursor-not-allowed">
                   <SelectValue placeholder="Parent" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,40 +148,38 @@ export function StudentParentContactCard({
               </Select>
             </div>
 
-            {/* Phone Number with +91 */}
+            {/* Parent Phone — read-only, managed in Parents */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">Parent Phone</Label>
-              <div
-                data-travel="parentPhone"
-                className="flex rounded-xl overflow-hidden border  bg-muted focus-within:ring-1 focus-within:ring-emerald-500"
-              >
-                <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r  font-medium">
+              <div className="flex rounded-xl overflow-hidden border bg-muted opacity-70">
+                <span className="inline-flex items-center px-2.5 text-xs text-muted-foreground bg-muted border-r font-medium">
                   +91
                 </span>
                 <input
                   type="tel"
                   value={parentPhone}
-                  onChange={(e) => onParentPhoneChange(e.target.value)}
-                  placeholder="Enter phone number"
-                  className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
+                  disabled
+                  readOnly
+                  placeholder="Managed in Parents"
+                  className="w-full h-9 px-3 text-xs bg-transparent text-muted-foreground cursor-not-allowed focus:outline-none"
                 />
               </div>
             </div>
 
-            {/* Parent Email */}
+            {/* Parent Email — read-only, managed in Parents */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">Parent Email</Label>
               <Input
-                data-travel="parentEmail"
                 type="email"
                 value={parentEmail}
-                onChange={(e) => onParentEmailChange(e.target.value)}
-                placeholder="parent@email.com"
-                className="h-9 text-xs rounded-xl bg-muted "
+                disabled
+                readOnly
+                placeholder="Managed in Parents"
+                className="h-9 text-xs rounded-xl bg-muted opacity-70 cursor-not-allowed"
               />
             </div>
 
-            {/* Student Email */}
+            {/* Student Email — editable */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">Student Email</Label>
               <Input
@@ -191,11 +188,11 @@ export function StudentParentContactCard({
                 value={email}
                 onChange={(e) => onEmailChange(e.target.value)}
                 placeholder="student@school.com"
-                className="h-9 text-xs rounded-xl bg-muted "
+                className="h-9 text-xs rounded-xl bg-muted"
               />
             </div>
 
-            {/* Address */}
+            {/* Address — editable */}
             <div className="space-y-1.5">
               <Label data-fade className="text-xs font-semibold text-foreground">Address</Label>
               <Input
@@ -203,10 +200,14 @@ export function StudentParentContactCard({
                 value={address}
                 onChange={(e) => onAddressChange(e.target.value)}
                 placeholder="Enter address"
-                className="h-9 text-xs rounded-xl bg-muted "
+                className="h-9 text-xs rounded-xl bg-muted"
               />
             </div>
           </div>
+
+          <p className="text-[11px] text-muted-foreground">
+            Parent name, phone and email are managed in the Parents section. Selecting a parent here only links them to this student.
+          </p>
         </div>
       }
     />
