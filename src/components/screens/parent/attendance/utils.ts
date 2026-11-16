@@ -97,12 +97,16 @@ export function getTodayAttendance(records: AttendanceRecord[]) {
     return {
       status: record.status,
       date: record.date,
+      remarks: record.remarks,
+      createdAt: record.createdAt,
     };
   }
 
   return {
     status: "not_marked",
     date: todayStr,
+    remarks: undefined,
+    createdAt: undefined,
   };
 }
 
