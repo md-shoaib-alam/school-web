@@ -113,9 +113,9 @@ export const PARENT_DASHBOARD = `
   query ParentDashboard($parentName: String!) {
     parentDashboard(parentName: $parentName) {
       children { 
-        id userId name email className classId rollNumber gender dateOfBirth admissionDate
+        id userId name email avatar className classId teacherName teacherPhone rollNumber gender dateOfBirth admissionDate
         grades { id studentId studentName subjectName examType marks maxMarks grade createdAt }
-        attendance { id studentId studentName className date status remarks }
+        attendance { id studentId studentName className date status remarks createdAt }
       }
       notices { id title content authorName priority createdAt targetRole }
       fees { id studentName type amount status dueDate paidAmount }

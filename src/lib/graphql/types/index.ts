@@ -99,9 +99,21 @@ export interface StudentDashboardData {
 
 export interface ParentDashboardData {
   children: { 
-    id: string; userId: string; name: string; email: string; className: string; classId: string; rollNumber: string; gender: string; dateOfBirth: string; admissionDate: string 
-    grades: { id: string; studentId: string; studentName: string; subjectName: string; examType: string; marks: number; maxMarks: number; grade: string; createdAt: string }[]
-    attendance: { id: string; studentId: string; studentName: string; className: string; date: string; status: string; remarks?: string }[]
+    id: string; 
+    userId: string; 
+    name: string; 
+    email: string; 
+    avatar?: string | null;
+    className: string; 
+    classId: string; 
+    teacherName?: string | null;
+    teacherPhone?: string | null;
+    rollNumber: string; 
+    gender: string; 
+    dateOfBirth: string; 
+    admissionDate: string;
+    grades: { id: string; studentId: string; studentName: string; subjectName: string; examType: string; marks: number; maxMarks: number; grade: string; createdAt: string }[];
+    attendance: { id: string; studentId: string; studentName: string; className: string; date: string; status: string; remarks?: string; createdAt?: string | null }[];
   }[];
   notices: { id: string; title: string; content: string; authorName: string; priority: string; createdAt: string; targetRole: string }[];
   fees: { id: string; studentName: string; type: string; amount: number; status: string; dueDate: string; paidAmount: number }[];

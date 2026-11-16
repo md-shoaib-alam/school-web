@@ -25,6 +25,7 @@ export interface StudentInfo {
   admissionDate: string;
   phone?: string;
   academicYear?: string;
+  avatar?: string | null;
 }
 
 export interface TeacherInfo {
@@ -67,7 +68,8 @@ export interface AttendanceRecord {
   className: string;
   date: string;
   status: string;
-  createdAt?: string;
+  remarks?: string;
+  createdAt?: string | null;
 }
 
 export interface GradeRecord {
