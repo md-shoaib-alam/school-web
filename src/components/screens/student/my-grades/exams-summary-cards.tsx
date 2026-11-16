@@ -21,67 +21,74 @@ export function ExamsSummaryCards({
   uniqueExamTypesCount,
   highGradesCount,
   gradeDistribution,
-  gradeColorMap,
 }: ExamsSummaryCardsProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-      <Card className="col-span-2 sm:col-span-1 rounded-xl shadow-sm border-violet-100 dark:border-violet-950/30 bg-gradient-to-tr from-white to-violet-50/20 dark:from-background dark:to-violet-950/10">
-        <CardContent className="p-4 sm:p-5 text-center">
-          <div className="inline-flex p-2.5 rounded-xl bg-violet-600 dark:bg-violet-500 text-white mb-2 sm:mb-3">
-            <TrendingUp className="size-4 sm:size-5" />
+      <Card className="col-span-2 sm:col-span-1 rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+        <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+                <TrendingUp className="size-4" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+                {overallAvg}%
+              </p>
+            </div>
+            <p className="text-xs font-medium text-muted-foreground mt-3">
+              Average Score
+            </p>
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-foreground">
-            {overallAvg}%
-          </p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
-            Avg Score
-          </p>
-          <Progress value={overallAvg} className="mt-2 sm:mt-3 h-1.5" />
+          <Progress value={overallAvg} className="mt-3 h-1.5 bg-muted [&>div]:bg-foreground" />
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-sm border-emerald-100 dark:border-emerald-950/30 bg-gradient-to-tr from-white to-emerald-50/20 dark:from-background dark:to-emerald-950/10">
-        <CardContent className="p-4 sm:p-5 text-center">
-          <div className="inline-flex p-2.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white mb-2 sm:mb-3">
-            <Award className="size-4 sm:size-5" />
+      <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+        <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+              <Award className="size-4" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+              {totalRecords}
+            </p>
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-foreground">
-            {totalRecords}
-          </p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
-            Total Results
-          </p>
-          <div className="flex items-center justify-center gap-1 mt-2 text-[10px] text-muted-foreground font-medium line-clamp-1">
-            <span>{uniqueSubjectsCount} Sub.</span>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground mt-3">
+              Total Results
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Across {uniqueSubjectsCount} subjects ({uniqueExamTypesCount} exams)
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-sm border-amber-100 dark:border-amber-950/30 bg-gradient-to-tr from-white to-amber-50/20 dark:from-background dark:to-amber-950/10">
-        <CardContent className="p-4 sm:p-5 text-center">
-          <div className="inline-flex p-2.5 rounded-xl bg-amber-600 dark:bg-amber-500 text-white mb-2 sm:mb-3">
-            <Star className="size-4 sm:size-5" />
+      <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+        <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+              <Star className="size-4" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+              {highGradesCount}
+            </p>
           </div>
-          <p className="text-lg sm:text-3xl font-bold text-foreground">
-            {highGradesCount}
-          </p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">
-            Top Grades
-          </p>
-          <div className="flex items-center justify-center gap-1 mt-2">
-            {gradeDistribution.slice(0, 2).map((g) => (
-              <Badge
-                key={g.grade}
-                variant="secondary"
-                className="text-[9px] px-1 py-0"
-                style={{
-                  backgroundColor: (gradeColorMap[g.grade] || "#9ca3af") + "20",
-                  color: gradeColorMap[g.grade] || "#9ca3af",
-                }}
-              >
-                {g.grade}:{g.count}
-              </Badge>
-            ))}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground mt-3">
+              Top Grades
+            </p>
+            <div className="flex items-center gap-1.5 mt-1.5">
+              {gradeDistribution.slice(0, 3).map((g) => (
+                <Badge
+                  key={g.grade}
+                  variant="outline"
+                  className="text-[10px] font-semibold bg-muted text-foreground border-border px-2 py-0.5"
+                >
+                  {g.grade}: {g.count}
+                </Badge>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>

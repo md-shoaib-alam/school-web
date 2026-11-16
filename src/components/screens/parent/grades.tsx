@@ -174,15 +174,17 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
   return (
     <div className="space-y-6 pb-10 animate-fade-in select-none">
-      <div className="flex flex-col gap-4 border-b  pb-5">
+      <div className="flex flex-col gap-4 border-b border-border pb-5">
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
-            {topLevelTab === "exams" ? (
-              <GraduationCap className="size-5 text-amber-600" />
-            ) : (
-              <ClipboardList className="size-5 text-violet-600" />
-            )}
-            <h2 className="text-lg font-semibold text-foreground uppercase tracking-tight">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-muted text-foreground flex items-center justify-center">
+              {topLevelTab === "exams" ? (
+                <GraduationCap className="size-4" />
+              ) : (
+                <ClipboardList className="size-4" />
+              )}
+            </div>
+            <h2 className="text-xl font-semibold text-foreground tracking-tight">
               {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
             </h2>
           </div>
@@ -192,23 +194,25 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
             <Button
               size="sm"
               variant="outline"
-              className="h-8 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-950/20 shadow-sm"
+              className="h-8 gap-1.5 text-xs font-medium rounded-xl border-border bg-card text-foreground hover:bg-muted/70 shadow-xs cursor-pointer"
               onClick={handleViewMarksheet}
             >
-              <FileText className="size-3.5" />
+              <FileText className="size-3.5 text-muted-foreground" />
               View Marksheet
             </Button>
           )}
         </div>
 
-        <div className="text-left">
-          {/* Children Switcher Dropdown */}
-          <ChildSelector 
-            students={students}
-            selectedStudentId={selectedStudent.id}
-            onSelect={handleTabChange}
-          />
-        </div>
+        {students.length > 1 && (
+          <div className="text-left">
+            {/* Children Switcher Dropdown */}
+            <ChildSelector 
+              students={students}
+              selectedStudentId={selectedStudent.id}
+              onSelect={handleTabChange}
+            />
+          </div>
+        )}
       </div>
 
       {topLevelTab === "exams" && (
@@ -242,41 +246,59 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
             {loadingAssessments ? (
               <div className="space-y-6 py-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[...Array(3)].map((_, i) => <div key={i} className="h-28 bg-muted/40 animate-pulse rounded-xl" />)}
+                  {[...Array(3)].map((_, i) => <div key={i} className="h-28 bg-muted animate-pulse rounded-2xl" />)}
                 </div>
-                <div className="h-80 bg-muted/30 animate-pulse rounded-xl" />
+                <div className="h-80 bg-muted animate-pulse rounded-3xl" />
               </div>
             ) : (
               <>
                 {/* Assessment Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Card className="rounded-xl shadow-none ">
-                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
-                      <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
-                        <TrendingUp className="size-5" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+                    <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+                      <div className="flex items-center justify-between">
+                        <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+                          <TrendingUp className="size-4" />
+                        </div>
+                        <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+                          {assessmentStats.avg}%
+                        </span>
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.avg}%</p>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Average Score</p>
+                      <p className="text-xs font-medium text-muted-foreground mt-3">
+                        Average Score
+                      </p>
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-xl shadow-none ">
-                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
-                      <div className="inline-flex p-2.5 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 mb-2">
-                        <Award className="size-5" />
+                  <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+                    <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+                      <div className="flex items-center justify-between">
+                        <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+                          <Award className="size-4" />
+                        </div>
+                        <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+                          {assessmentStats.total}
+                        </span>
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.total}</p>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Assessments</p>
+                      <p className="text-xs font-medium text-muted-foreground mt-3">
+                        Total Assessments
+                      </p>
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-xl shadow-none ">
-                    <CardContent className="p-5 flex flex-col items-center justify-center text-center">
-                      <div className="inline-flex p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
-                        <CheckCircle2 className="size-5" />
+                  <Card className="rounded-2xl border border-border bg-card shadow-xs transition-colors hover:border-border">
+                    <CardContent className="p-4 sm:p-5 text-left flex flex-col justify-between h-full">
+                      <div className="flex items-center justify-between">
+                        <div className="p-2.5 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+                          <CheckCircle2 className="size-4" />
+                        </div>
+                        <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground tabular-nums">
+                          {assessmentStats.passCount}
+                        </span>
                       </div>
-                      <p className="text-3xl font-extrabold tracking-tight text-foreground">{assessmentStats.passCount}</p>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Passed Assessments</p>
+                      <p className="text-xs font-medium text-muted-foreground mt-3">
+                        Passed Assessments
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -289,10 +311,12 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
 
                   {/* List Assessments */}
                   <div className="lg:col-span-3">
-                    <Card className="rounded-xl shadow-none  h-full">
-                      <CardHeader className="p-4 border-b ">
-                        <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
-                          <ClipboardList className="size-4 text-violet-500" />
+                    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden h-full">
+                      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0">
+                        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+                          <ClipboardList className="size-4" />
+                        </div>
+                        <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
                           {selectedStudent.name}&apos;s Assessments
                         </CardTitle>
                       </CardHeader>
@@ -305,12 +329,12 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                             </div>
                           ) : (
                             <Table>
-                              <TableHeader className="bg-muted/20 sticky top-0">
-                                <TableRow className="">
-                                  <TableHead className="text-xs font-semibold h-9">Subject/Title</TableHead>
-                                  <TableHead className="text-xs font-semibold h-9">Type</TableHead>
-                                  <TableHead className="text-center text-xs font-semibold h-9">Score</TableHead>
-                                  <TableHead className="text-center text-xs font-semibold h-9">Status</TableHead>
+                              <TableHeader className="bg-muted/40 sticky top-0">
+                                <TableRow className="border-border hover:bg-transparent">
+                                  <TableHead className="text-xs font-semibold h-9 text-muted-foreground">Subject/Title</TableHead>
+                                  <TableHead className="text-xs font-semibold h-9 text-muted-foreground">Type</TableHead>
+                                  <TableHead className="text-center text-xs font-semibold h-9 text-muted-foreground">Score</TableHead>
+                                  <TableHead className="text-center text-xs font-semibold h-9 text-muted-foreground">Status</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -318,7 +342,7 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                                   const pct = Math.round((g.marksObtained / g.totalMarks) * 100);
                                   const isPass = g.marksObtained >= g.passingMarks;
                                   return (
-                                    <TableRow key={g.id} className="">
+                                    <TableRow key={g.id} className="border-border hover:bg-muted/40">
                                       <TableCell className="py-2.5 text-left">
                                         <div className="flex flex-col text-left">
                                           <span className="text-xs font-semibold text-foreground">{g.title}</span>
@@ -326,19 +350,21 @@ export function ParentGrades({ initialTab = "exams" }: { initialTab?: "exams" | 
                                         </div>
                                       </TableCell>
                                       <TableCell className="py-2.5">
-                                        <Badge variant="outline" className="text-[9px] bg-muted/30 px-1.5 font-bold uppercase tracking-wide border-none">
+                                        <Badge variant="outline" className="text-[9px] bg-muted text-muted-foreground px-2 py-0.5 font-medium uppercase tracking-wide border-border">
                                           {g.type.replace(/_/g, " ")}
                                         </Badge>
                                       </TableCell>
                                       <TableCell className="py-2.5 text-center">
-                                        <span className="text-xs font-bold">
+                                        <span className="text-xs font-semibold text-foreground tabular-nums">
                                           {Number(g.marksObtained).toFixed(2).replace(/\.00$/, "")}
                                         </span>
                                         <span className="text-[10px] text-muted-foreground">/{g.totalMarks}</span>
                                       </TableCell>
                                       <TableCell className="py-2.5 text-center">
-                                        <Badge className={`text-[9px] border-none font-bold shadow-none px-1.5 py-0.5 ${
-                                          isPass ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" : "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                                        <Badge variant="outline" className={`text-[10px] font-semibold px-2 py-0.5 ${
+                                          isPass 
+                                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
+                                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                                         }`}>
                                           {isPass ? "PASS" : "FAIL"}
                                         </Badge>

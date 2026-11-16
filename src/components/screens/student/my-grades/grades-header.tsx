@@ -27,10 +27,13 @@ export function GradesHeader({
   const slug = typeof params?.slug === "string" ? params.slug : "";
 
   return (
-    <div className="flex flex-col gap-4 border-b  pb-5">
+    <div className="flex flex-col gap-4 border-b border-border pb-5">
       <div className="flex items-center justify-between w-full">
-        <div>
-          <h2 className="text-xl font-semibold text-foreground">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-muted text-foreground flex items-center justify-center">
+            <FileText className="size-4" />
+          </div>
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">
             {topLevelTab === "exams" ? "School Exams" : "Class Assessments"}
           </h2>
         </div>
@@ -39,10 +42,10 @@ export function GradesHeader({
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1.5 text-xs font-semibold border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-400 dark:hover:bg-violet-950/30 shadow-sm"
+            className="h-8 gap-1.5 text-xs font-medium rounded-xl border-border bg-card text-foreground hover:bg-muted/70 shadow-xs cursor-pointer"
             onClick={() => push(`/${slug}/view-marksheet`)}
           >
-            <FileText className="size-3.5" />
+            <FileText className="size-3.5 text-muted-foreground" />
             View Marksheet
           </Button>
         )}

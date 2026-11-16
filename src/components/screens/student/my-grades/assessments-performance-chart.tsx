@@ -11,7 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart3, Star } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 
 interface AssessmentsPerformanceChartProps {
   recharts: typeof import("recharts") | null;
@@ -28,27 +28,30 @@ export function AssessmentsPerformanceChart({
   recharts,
   latestAssessmentChartData,
   chartConfig,
-  assessmentAvg,
 }: AssessmentsPerformanceChartProps) {
   return (
-    <Card className="rounded-xl shadow-sm  w-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2 font-semibold">
-          <BarChart3 className="size-4 text-violet-500" />
-          Assessment Performance by Subject
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Running averages of periodic class assessments
-        </CardDescription>
+    <Card className="rounded-3xl border border-border bg-card shadow-xs py-0 gap-0 overflow-hidden w-full">
+      <CardHeader className="px-5 py-4 border-b border-border flex flex-row items-center gap-3 space-y-0 text-left">
+        <div className="size-8 rounded-lg bg-muted text-foreground flex items-center justify-center shrink-0">
+          <BarChart3 className="size-4" />
+        </div>
+        <div>
+          <CardTitle className="text-sm sm:text-base font-semibold text-foreground tracking-tight">
+            Assessment Performance by Subject
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
+            Running averages of periodic class assessments
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-5">
         {latestAssessmentChartData.length > 0 ? (
           !recharts ? (
-            <Skeleton className="h-[260px] w-full" />
+            <Skeleton className="h-[260px] w-full rounded-xl" />
           ) : (
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
               {(() => {
-                const { BarChart, Bar, XAxis, YAxis, Cell } = recharts;
+                const { BarChart, Bar, XAxis, YAxis } = recharts;
                 return (
                   <BarChart
                     data={latestAssessmentChartData}
@@ -69,19 +72,20 @@ export function AssessmentsPerformanceChart({
                       tickFormatter={(v) => `${v}%`}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="marks" radius={[4, 4, 0, 0]} barSize={32}>
-                      {latestAssessmentChartData.map((entry) => (
-                        <Cell key={entry.subject} fill={entry.fill} />
-                      ))}
-                    </Bar>
+                    <Bar
+                      dataKey="marks"
+                      fill="var(--color-brand, #0A61EE)"
+                      radius={[6, 6, 0, 0]}
+                      barSize={32}
+                    />
                   </BarChart>
                 );
               })()}
             </ChartContainer>
           )
         ) : (
-          <div className="h-[260px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl ">
-            <p className="text-sm">No continuous assessment data available</p>
+          <div className="h-[260px] flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-2xl">
+            <p className="text-sm font-medium">No assessment chart data available</p>
           </div>
         )}
       </CardContent>
