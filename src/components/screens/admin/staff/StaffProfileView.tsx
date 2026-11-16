@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PillTabs } from "@/components/ui/pill-tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -17,10 +18,12 @@ import {
   ChevronLeft, Printer, Pencil, MoreVertical,
   User, Phone, Mail, Briefcase, Calendar,
   Building2, FileText, StickyNote, Droplets, Users, Globe, Star,
-  CreditCard, ShieldCheck, CheckCircle2, XCircle, Clock, Upload, Download, Trash2, Loader2, Shield,
+  CreditCard, ShieldCheck, CheckCircle2, XCircle, Clock, Upload, Download, Trash2, Loader2, Shield, Camera,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CopyButton } from "@/components/ui/copy-button";
 import { apiFetch } from "@/lib/api";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import { ProfileSection } from "@/components/ui/profile-section";
 import { useQueryClient } from "@tanstack/react-query";
 import type { StaffMember, CustomRole } from "./types";
@@ -121,6 +124,35 @@ export function StaffProfileView({
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [savingSection, setSavingSection] = useState<string | null>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [photoSaving, setPhotoSaving] = useState(false);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoSaving(true);
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      const res = await apiFetch("/api/staff", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: currentMember.id, avatar: dataUrl }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save photo");
+      }
+      setCurrentMember((prev) => ({ ...prev, avatar: dataUrl }));
+      setFormData((prev) => ({ ...prev, avatar: dataUrl }));
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save photo");
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
 
   const [formData, setFormData] = useState(initFormData(member));
 
@@ -311,13 +343,27 @@ export function StaffProfileView({
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-4 flex-1 min-w-0">
             <div className="flex items-center gap-4">
-              <div className="size-16 sm:size-[72px] rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-200/60 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-xl sm:text-2xl font-bold shadow-xs shrink-0 overflow-hidden">
+              {/* Avatar — the tile itself opens the picker, matching the student profile */}
+              <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+              <button
+                type="button"
+                onClick={() => photoRef.current?.click()}
+                disabled={!canEdit || photoSaving}
+                aria-label="Change staff photo"
+                title={canEdit ? "Click to change photo" : undefined}
+                className="group relative size-16 sm:size-[72px] rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-xl sm:text-2xl font-bold shadow-xs shrink-0 overflow-hidden transition-colors enabled:cursor-pointer enabled:hover:border-emerald-500/60"
+              >
                 {currentMember.avatar ? (
                   <img src={currentMember.avatar} alt={currentMember.name} className="size-full object-cover" />
                 ) : (
                   initials
                 )}
-              </div>
+                {canEdit && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                    {photoSaving ? <Loader2 className="size-5 animate-spin" /> : <Camera className="size-5" />}
+                  </span>
+                )}
+              </button>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight truncate">{currentMember.name}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-1.5">
@@ -348,29 +394,56 @@ export function StaffProfileView({
             </div>
           </div>
         </div>
+
+        {/* Horizontal info row with copy functionality */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 pt-4 mt-3 border-t border-border">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-muted text-foreground">
+              <User className="size-3.5" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Staff Login ID</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-bold text-foreground font-mono">{displayStaffId}</p>
+                {displayStaffId && displayStaffId !== "—" && (
+                  <CopyButton value={displayStaffId} toastSubject="Login ID" size="sm" />
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-muted text-foreground">
+              <Mail className="size-3.5" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Email Address</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-bold text-foreground break-all">{currentMember.email || "—"}</p>
+                {currentMember.email && (
+                  <CopyButton value={currentMember.email} toastSubject="Email" size="sm" className="shrink-0" />
+                )}
+              </div>
+            </div>
+          </div>
+          {currentMember.phone && (
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-muted text-foreground">
+                <Phone className="size-3.5" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Phone Number</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs font-bold text-foreground">{currentMember.phone}</p>
+                  <CopyButton value={currentMember.phone} toastSubject="Phone" size="sm" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tab Bar */}
-      <div className="bg-card rounded-xl border px-2 py-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all ${
-                  isActive ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30" : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:text-muted-foreground"
-                }`}
-              >
-                <Icon className={`size-4 shrink-0 ${isActive ? "text-white stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <PillTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
       {/* Overview Tab */}
       {activeTab === "overview" && (
@@ -513,11 +586,21 @@ export function StaffProfileView({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
                 <div>
                   <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Email Address</p>
-                  <p data-travel="email" className="text-sm font-semibold text-foreground truncate">{currentMember.email}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p data-travel="email" className="text-sm font-semibold text-foreground truncate">{currentMember.email}</p>
+                    {currentMember.email && (
+                      <CopyButton value={currentMember.email} toastSubject="Email" size="sm" />
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Phone Number</p>
-                  <p data-travel="phone" className="text-sm font-semibold text-foreground truncate">{currentMember.phone || "—"}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p data-travel="phone" className="text-sm font-semibold text-foreground truncate">{currentMember.phone || "—"}</p>
+                    {currentMember.phone && (
+                      <CopyButton value={currentMember.phone} toastSubject="Phone" size="sm" />
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Alternate Phone</p>
@@ -547,23 +630,44 @@ export function StaffProfileView({
                   <Label data-fade className="text-xs font-semibold text-foreground">Residential Address</Label>
                   <Input data-travel="address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="City, State / Full Address" className="h-9 text-xs rounded-xl bg-muted" />
                 </div>
-                <div className="space-y-1.5" data-fade>
+                <div className="space-y-1.5 sm:col-span-2" data-fade>
                   <Label className="text-xs font-semibold text-foreground">Staff Photo</Label>
-                  <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0 overflow-hidden">
-                      {formData.avatar ? <img src={formData.avatar} alt="" className="size-full object-cover" /> : getInitials(formData.name)}
-                    </div>
-                    <input ref={fileRef} type="file" accept="image/*" onChange={(e) => {
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <input ref={fileRef} type="file" accept="image/png,image/jpeg" onChange={async (e) => {
                       const file = e.target.files?.[0]; e.target.value = "";
                       if (!file) return;
-                      if (file.size > 2 * 1024 * 1024) { toast.error("Photo must be under 2MB"); return; }
-                      const reader = new FileReader();
-                      reader.onloadend = () => { setFormData({ ...formData, avatar: reader.result as string }); toast.success("Photo attached — save to apply"); };
-                      reader.readAsDataURL(file);
+                      try {
+                        const dataUrl = await toSquareDataUrl(file);
+                        setFormData({ ...formData, avatar: dataUrl });
+                        toast.success("Photo attached — save to apply");
+                      } catch {
+                        toast.error("Failed to process photo");
+                      }
                     }} className="hidden" />
-                    <Button type="button" variant="outline" size="sm" className="h-9 px-3 text-xs rounded-xl font-medium gap-1.5 hover:bg-muted" onClick={() => fileRef.current?.click()}>
-                      <Upload className="size-3.5" /> Upload Photo
-                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="group size-24 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer overflow-hidden"
+                    >
+                      {formData.avatar ? (
+                        <img src={formData.avatar} alt="" className="size-full object-cover" />
+                      ) : (
+                        <>
+                          <Camera className="size-4 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                          <span className="text-[11px] font-semibold text-foreground">Upload photo</span>
+                          <span className="text-[9px] text-muted-foreground">JPG or PNG</span>
+                        </>
+                      )}
+                    </button>
+                    {formData.avatar && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, avatar: "" })}
+                        className="text-xs text-rose-500 hover:underline cursor-pointer"
+                      >
+                        Remove photo
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -647,7 +751,12 @@ export function StaffProfileView({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
                 <div>
                   <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Employee ID</p>
-                  <p data-travel="employeeId" className="text-sm font-semibold text-foreground font-mono">{currentMember.employeeId || "—"}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p data-travel="employeeId" className="text-sm font-semibold text-foreground font-mono">{currentMember.employeeId || "—"}</p>
+                    {currentMember.employeeId && (
+                      <CopyButton value={currentMember.employeeId} toastSubject="Employee ID" size="sm" />
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p data-fade className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mb-1">Department</p>

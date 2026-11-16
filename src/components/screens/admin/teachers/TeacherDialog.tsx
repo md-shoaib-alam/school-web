@@ -38,6 +38,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import type { TeacherInfo } from "./types";
 
 interface TeacherDialogProps {
@@ -67,20 +68,17 @@ export function TeacherDialog({
   const [initialSnapshot, setInitialSnapshot] = useState<any>(formData);
   const photoRef = useRef<HTMLInputElement>(null);
 
-  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Photo must be under 2MB");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({ ...formData, avatar: reader.result });
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      setFormData({ ...formData, avatar: dataUrl });
       toast.success("Photo attached — save to apply");
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      toast.error("Failed to process photo");
+    }
   };
 
   useEffect(() => {
@@ -191,41 +189,39 @@ export function TeacherDialog({
             {/* ────────────────────────────────────────────────────────── */}
             {/* SECTION 0: Profile Photo                                   */}
             {/* ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl border  bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
-                  <Camera className="size-4 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Profile Photo</p>
-                  <p className="text-[11px] text-muted-foreground">Upload a clear photo of the teacher (Optional)</p>
-                </div>
-              </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center gap-5">
+              <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+              <button
+                type="button"
+                onClick={() => photoRef.current?.click()}
+                className="group size-28 shrink-0 rounded-2xl border-2 border-dashed border-border hover:border-emerald-500/60 bg-muted/30 flex flex-col items-center justify-center gap-1.5 transition-colors cursor-pointer overflow-hidden"
+              >
+                {formData.avatar ? (
+                  <img src={formData.avatar} alt="" className="size-full object-cover" />
+                ) : (
+                  <>
+                    <Camera className="size-5 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
+                    <span className="text-xs font-semibold text-foreground">Upload photo</span>
+                    <span className="text-[10px] text-muted-foreground">JPG or PNG</span>
+                  </>
+                )}
+              </button>
 
-              <div className="flex items-center gap-3">
-                <div className="size-14 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
-                  {formData.avatar ? (
-                    <img src={formData.avatar} alt="" className="size-full object-cover" />
-                  ) : formData.name ? (
-                    formData.name.slice(0, 2).toUpperCase()
-                  ) : (
-                    <User className="size-6 text-emerald-600/70" />
-                  )}
-                </div>
-                <div className="space-y-1.5">
-                  <input ref={photoRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
-                  <Button
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-semibold text-foreground">Profile Photo</p>
+                <p className="text-xs text-muted-foreground">Upload a clear photo of the teacher. Click the square tile to browse or change photo.</p>
+                {formData.avatar && (
+                  <button
                     type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-9 px-4 text-xs font-semibold rounded-xl  text-foreground hover:bg-muted gap-2"
-                    onClick={() => photoRef.current?.click()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFormData({ ...formData, avatar: "" });
+                    }}
+                    className="text-xs text-rose-500 hover:underline pt-1 cursor-pointer block"
                   >
-                    <Upload className="size-3.5 text-emerald-600" />
-                    Upload Photo
-                  </Button>
-                  <p className="text-[10px] text-muted-foreground">JPG, PNG up to 2MB</p>
-                </div>
+                    Remove photo
+                  </button>
+                )}
               </div>
             </div>
 

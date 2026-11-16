@@ -1,8 +1,7 @@
 "use client";
 
-import { User, Upload } from "lucide-react";
+import { User } from "lucide-react";
 import { ProfileSection } from "@/components/ui/profile-section";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -38,7 +37,6 @@ interface StudentPersonalInfoCardProps {
   onToggleCollapse: (section: string) => void;
   onCancel: () => void;
   onSave: (sectionName?: string) => void;
-  onUploadPhotoClick: () => void;
   formatDate: (dateStr: string | null | undefined) => string;
   calculateAge: (dateStr: string | null | undefined) => string;
 }
@@ -66,7 +64,6 @@ export function StudentPersonalInfoCard({
   onToggleCollapse,
   onCancel,
   onSave,
-  onUploadPhotoClick,
   formatDate,
   calculateAge,
 }: StudentPersonalInfoCardProps) {
@@ -151,6 +148,7 @@ export function StudentPersonalInfoCard({
                 <SelectContent>
                   <SelectItem value="male">Male</SelectItem>
                   <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -217,8 +215,10 @@ export function StudentPersonalInfoCard({
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => onPhoneChange(e.target.value)}
-                  placeholder="Enter phone number"
+                  onChange={(e) => onPhoneChange(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="10-digit number"
+                  inputMode="numeric"
+                  maxLength={10}
                   className="w-full h-9 px-3 text-xs bg-transparent focus:outline-none text-foreground"
                 />
               </div>
@@ -233,25 +233,6 @@ export function StudentPersonalInfoCard({
                 placeholder="student@school.com"
                 className="h-9 text-xs rounded-xl bg-muted "
               />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label data-fade className="text-xs font-semibold text-foreground">Student Photo</Label>
-              <div className="flex items-center gap-3">
-                <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0">
-                  {name ? name.slice(0, 2).toUpperCase() : "ST"}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-9 px-3 text-xs rounded-xl  font-medium gap-1.5 hover:bg-muted"
-                  onClick={onUploadPhotoClick}
-                >
-                  <Upload className="size-3.5" />
-                  Upload Photo
-                </Button>
-              </div>
             </div>
           </div>
         </div>

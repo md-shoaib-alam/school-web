@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { PillTabs } from "@/components/ui/pill-tabs";
 import {
   ChevronLeft,
   GraduationCap,
@@ -28,13 +30,17 @@ import {
   XCircle,
   Clock,
   Loader2,
+  Camera,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/ui/copy-button";
+import { DownloadButton, type DownloadState } from "@/components/ui/download-button";
 import type { StudentInfo } from "./types";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import { StudentOverviewTab } from "./StudentOverviewTab";
+import { StudentProfileSkeleton } from "./StudentProfileSkeleton";
 
 const DOC_CATEGORIES = [
   { value: "identity", label: "Identity Proof" },
@@ -94,9 +100,84 @@ export function StudentProfileView({
   const [uploading, setUploading] = useState(false);
   const [docCategory, setDocCategory] = useState("other");
   const fileRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [photoSaving, setPhotoSaving] = useState(false);
 
-  const handlePrint = () => {
-    window.print();
+  const { slug } = useParams<{ slug: string }>();
+  const admissionFormHref = `/admission-form/${encodeURIComponent(slug)}/${encodeURIComponent(student.id)}`;
+
+  const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+  const downloadTimerRef = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(downloadTimerRef.current);
+    };
+  }, []);
+
+  const handleDirectDownload = async () => {
+    if (downloadState === "downloading") return;
+
+    return new Promise<void>((resolve) => {
+      setDownloadState("downloading");
+      window.clearTimeout(downloadTimerRef.current);
+
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.left = "-10000px";
+      iframe.style.top = "0";
+      iframe.style.width = "820px";
+      iframe.style.height = "1200px";
+      iframe.style.border = "0";
+      iframe.style.opacity = "0";
+      iframe.style.pointerEvents = "none";
+
+      let settled = false;
+      const settle = (success: boolean) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        window.removeEventListener("message", onMessage);
+        try {
+          iframe.remove();
+        } catch {}
+
+        if (success) {
+          setDownloadState("downloaded");
+          toast.success("Admission form downloaded");
+          downloadTimerRef.current = window.setTimeout(() => {
+            setDownloadState("idle");
+          }, 2000);
+        } else {
+          setDownloadState("failed");
+          toast.error("Could not generate the PDF. Use Print / Save as PDF instead.");
+          downloadTimerRef.current = window.setTimeout(() => {
+            setDownloadState("idle");
+          }, 2000);
+        }
+        resolve();
+      };
+
+      const onMessage = (event: MessageEvent) => {
+        if (event.data?.type === "ADMISSION_FORM_DOWNLOAD_COMPLETE") {
+          settle(event.data.success !== false);
+        }
+      };
+
+      window.addEventListener("message", onMessage);
+
+      // Safety timeout: in case rendering takes long or message fails to bubble, settle after 7s
+      const timeoutId = window.setTimeout(() => {
+        settle(true);
+      }, 7000);
+
+      iframe.onerror = () => {
+        settle(false);
+      };
+
+      iframe.src = `${admissionFormHref}?download=1`;
+      document.body.appendChild(iframe);
+    });
   };
 
   // Fetch full student details via REST API
@@ -161,6 +242,28 @@ export function StudentProfileView({
   };
 
   const currentStudent = studentDetails || student;
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoSaving(true);
+    try {
+      const res = await apiFetch("/api/students", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: currentStudent.id, avatar: await toSquareDataUrl(file) }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || "Failed to save photo");
+      queryClient.invalidateQueries({ queryKey: ["student-detail", currentStudent.id] });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save photo");
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
   const transportRoute = studentDetails?.transport
     ? routes.find((r: any) => r?.id === studentDetails.transport.routeId)
     : null;
@@ -242,32 +345,7 @@ export function StudentProfileView({
   ] as const;
 
   if (isLoading || isDetailsLoading) {
-    return (
-      <div className="min-h-[460px] flex flex-col items-center justify-center py-16 px-4">
-        <div className="w-full max-w-sm rounded-3xl bg-white border  p-8 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
-          <div className="relative w-40 h-28 mb-5 flex items-center justify-center">
-            <Image
-              src="/assets/admin/table.avif"
-              alt="Loading student details"
-              width={160}
-              height={112}
-              className="object-contain drop-shadow-sm"
-              priority
-            />
-          </div>
-          <div className="relative size-12 mb-4 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-[3.5px] " />
-            <div className="absolute inset-0 rounded-full border-[3.5px] border-emerald-600 dark:border-emerald-400 border-t-transparent border-r-transparent animate-spin" />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
-            Loading Student Profile...
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Please wait a moment
-          </p>
-        </div>
-      </div>
-    );
+    return <StudentProfileSkeleton />;
   }
 
   return (
@@ -309,14 +387,24 @@ export function StudentProfileView({
           )}
 
           <Button
+            asChild
             variant="outline"
             size="sm"
-            onClick={handlePrint}
-            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-foreground  rounded-xl hover:bg-accent"
+            className="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-foreground rounded-xl hover:bg-accent"
           >
-            <Printer className="size-3.5" />
-            Print
+            <a href={admissionFormHref} target="_blank" rel="noopener noreferrer" title="Open admission form in a new tab">
+              <Printer className="size-3.5" />
+              Print
+            </a>
           </Button>
+
+          <DownloadButton
+            state={downloadState}
+            onDownload={handleDirectDownload}
+            aria-label="Download admission form PDF"
+            title="Download PDF"
+            className="size-9 rounded-xl"
+          />
 
           {/* More actions menu button */}
           <button
@@ -332,10 +420,27 @@ export function StudentProfileView({
       <div className="relative rounded-2xl border  bg-card p-5 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex flex-row items-center gap-4 sm:gap-5 w-full">
-            {/* Avatar Circle */}
-            <div className="size-20 sm:size-24 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2  flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
-              {getInitials(currentStudent.name)}
-            </div>
+            {/* Avatar — the tile itself opens the picker, the way the add-student form does */}
+            <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+            <button
+              type="button"
+              onClick={() => photoRef.current?.click()}
+              disabled={!canEdit || photoSaving}
+              aria-label="Change student photo"
+              title={canEdit ? "Click to change photo" : undefined}
+              className="group relative size-20 sm:size-24 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2  flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden transition-colors enabled:cursor-pointer enabled:hover:border-emerald-500/60"
+            >
+              {currentStudent.avatar ? (
+                <img src={currentStudent.avatar} alt={currentStudent.name} className="size-full object-cover" />
+              ) : (
+                getInitials(currentStudent.name)
+              )}
+              {canEdit && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {photoSaving ? <Loader2 className="size-5 animate-spin" /> : <Camera className="size-5" />}
+                </span>
+              )}
+            </button>
 
             {/* Profile Info Details */}
             <div className="space-y-1.5 flex-1 min-w-0">
@@ -396,30 +501,14 @@ export function StudentProfileView({
       </div>
 
       {/* Tab Navigation Bar — horizontally scrollable pill row */}
-      <div className="bg-card rounded-xl border  px-2 py-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => { setActiveTab(tab.id); setEditingSection(null); }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:text-muted-foreground"
-                }`}
-              >
-                <Icon className={`size-4 shrink-0 ${
-                  isActive ? "text-white stroke-[2.2]" : "text-muted-foreground stroke-[1.8]"
-                }`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <PillTabs
+        tabs={tabs}
+        active={activeTab}
+        onChange={(id) => {
+          setActiveTab(id);
+          setEditingSection(null);
+        }}
+      />
 
       {/* Tab Content Section */}
       {activeTab === "overview" ? (

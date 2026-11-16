@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Link as LinkIcon, Eye, MoreVertical } from "lucide-react";
@@ -81,6 +81,7 @@ export function ParentsTableView({
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8 shrink-0">
+                          {parent.avatar && <AvatarImage src={parent.avatar} alt={parent.name} className="object-cover" />}
                           <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold">
                             {initials}
                           </AvatarFallback>

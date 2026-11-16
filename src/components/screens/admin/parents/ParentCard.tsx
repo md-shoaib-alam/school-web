@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
@@ -58,6 +58,7 @@ export function ParentCard({
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <Avatar className="size-11 shrink-0">
+              {parent.avatar && <AvatarImage src={parent.avatar} alt={parent.name} className="object-cover" />}
               <AvatarFallback
                 className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold"
               >

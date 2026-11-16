@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PillTabs } from "@/components/ui/pill-tabs";
 import {
   Mail,
   User,
+  Phone,
   GraduationCap,
   School,
   Printer,
@@ -24,9 +26,12 @@ import {
   XCircle,
   Clock,
   Loader2,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CopyButton } from "@/components/ui/copy-button";
 import { apiFetch } from "@/lib/api";
+import { toSquareDataUrl } from "@/lib/image-utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import type { TeacherInfo, TeacherDocumentInfo } from "./types";
@@ -122,6 +127,35 @@ export function TeacherProfileView({
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [savingSection, setSavingSection] = useState<string | null>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [photoSaving, setPhotoSaving] = useState(false);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoSaving(true);
+    try {
+      const dataUrl = await toSquareDataUrl(file);
+      const res = await apiFetch("/api/teachers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: currentTeacher.id, avatar: dataUrl }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save photo");
+      }
+      setCurrentTeacher((prev) => ({ ...prev, avatar: dataUrl }));
+      setFormData((prev) => ({ ...prev, avatar: dataUrl }));
+      queryClient.invalidateQueries({ queryKey: queryKeys.teachers });
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save photo");
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     basic: false,
@@ -304,7 +338,7 @@ export function TeacherProfileView({
     { id: "notes", label: "Notes", icon: StickyNote },
   ] as const;
 
-  const displayTeacherId = currentTeacher.employeeId || "Not assigned";
+  const displayTeacherId = currentTeacher.employeeId || currentTeacher.teacherId || (currentTeacher.id ? currentTeacher.id.slice(-6).toUpperCase() : "—");
   const displayDepartment = currentTeacher.department || "—";
   const displayAddress = currentTeacher.address || "—";
   const displayRole = currentTeacher.designation || currentTeacher.role || "Faculty Member";
@@ -368,13 +402,27 @@ export function TeacherProfileView({
       <div className="relative rounded-2xl border bg-card p-5 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex flex-row items-center gap-4 sm:gap-5 w-full">
-            <div className="size-20 sm:size-24 rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60 flex items-center justify-center text-teal-800 dark:text-teal-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden">
+            {/* Avatar — the tile itself opens the picker, matching the student profile */}
+            <input ref={photoRef} type="file" accept="image/png,image/jpeg" onChange={handlePhoto} className="hidden" />
+            <button
+              type="button"
+              onClick={() => photoRef.current?.click()}
+              disabled={!canEdit || photoSaving}
+              aria-label="Change teacher photo"
+              title={canEdit ? "Click to change photo" : undefined}
+              className="group relative size-20 sm:size-24 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-800 dark:text-emerald-300 text-2xl sm:text-3xl font-bold shadow-xs shrink-0 overflow-hidden transition-colors enabled:cursor-pointer enabled:hover:border-emerald-500/60"
+            >
               {currentTeacher.avatar ? (
                 <img src={currentTeacher.avatar} alt={currentTeacher.name} className="size-full object-cover" />
               ) : (
                 getInitials(currentTeacher.name)
               )}
-            </div>
+              {canEdit && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {photoSaving ? <Loader2 className="size-5 animate-spin" /> : <Camera className="size-5" />}
+                </span>
+              )}
+            </button>
 
             <div className="space-y-1.5 flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight truncate">
@@ -382,20 +430,33 @@ export function TeacherProfileView({
               </h1>
 
               <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border/80">
-                  <span className="font-mono text-muted-foreground/70">#</span>
-                  {displayTeacherId}
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200/80 dark:border-teal-800/80">
-                  <GraduationCap className="size-3" />
+                {currentTeacher.classes && currentTeacher.classes.length > 0 ? (
+                  currentTeacher.classes.map((cls) => (
+                    <span
+                      key={cls}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground border border-border"
+                    >
+                      <School className="size-3 text-muted-foreground" />
+                      {cls}
+                    </span>
+                  ))
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                    <School className="size-3 text-muted-foreground" />
+                    No Class Assigned
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground border border-border">
+                  <GraduationCap className="size-3 text-muted-foreground" />
                   Teacher
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />
                   {currentTeacher.status ? currentTeacher.status.charAt(0).toUpperCase() + currentTeacher.status.slice(1) : "Active"}
                 </span>
               </div>
 
-              <p className="text-xs text-muted-foreground pt-0.5">
+              <p className="text-xs text-muted-foreground pt-2.5">
                 Session: {currentSession || "—"}
               </p>
             </div>
@@ -416,31 +477,56 @@ export function TeacherProfileView({
             </div>
           </div>
         </div>
+
+        {/* Horizontal info row with copy functionality */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 pt-4 mt-3 border-t border-border">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-muted text-foreground">
+              <User className="size-3.5" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Teacher Login ID</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-bold text-foreground font-mono">{displayTeacherId}</p>
+                {displayTeacherId && displayTeacherId !== "—" && (
+                  <CopyButton value={displayTeacherId} toastSubject="Login ID" size="sm" />
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-muted text-foreground">
+              <Mail className="size-3.5" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Email Address</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-bold text-foreground break-all">{currentTeacher.email || "—"}</p>
+                {currentTeacher.email && (
+                  <CopyButton value={currentTeacher.email} toastSubject="Email" size="sm" className="shrink-0" />
+                )}
+              </div>
+            </div>
+          </div>
+          {currentTeacher.phone && (
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-muted text-foreground">
+                <Phone className="size-3.5" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">Phone Number</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs font-bold text-foreground">{currentTeacher.phone}</p>
+                  <CopyButton value={currentTeacher.phone} toastSubject="Phone" size="sm" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation Bar */}
-      <div className="bg-card rounded-xl border px-2 py-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1.5 min-w-max sm:min-w-0">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={"flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all " + (
-                  isActive
-                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:text-muted-foreground"
-                )}
-              >
-                <Icon className={"size-4 shrink-0 " + (isActive ? "text-white stroke-[2.2]" : "text-muted-foreground stroke-[1.8]")} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <PillTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
       {/* Tab Content Section */}
       {activeTab === "overview" ? (
@@ -594,7 +680,7 @@ export function TeacherProfileView({
               {docs.map((doc) => (
                 <div key={doc.id} className="p-4 rounded-xl border border-border bg-muted/40 hover:bg-muted/70 transition-colors flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="size-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200/50">
+                    <div className="size-10 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0 border border-border">
                       <FileText className="size-5" />
                     </div>
                     <div className="min-w-0">

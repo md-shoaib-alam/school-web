@@ -15,7 +15,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Mail, GraduationCap, BookOpen, Pencil, Trash2, Eye } from "lucide-react";
+import { Mail, Pencil, Trash2 } from "lucide-react";
 import { TeacherInfo } from "./types";
 
 interface TeacherCardProps {
@@ -45,8 +45,9 @@ export function TeacherCard({
     .join("")
     .slice(0, 2)
     .toUpperCase();
-  const subjects = teacher.subjects ?? [];
-  const classes = teacher.classes ?? [];
+  // Deduplicate subjects and classes to prevent repeated items
+  const subjects = Array.from(new Set(teacher.subjects ?? []));
+  const classes = Array.from(new Set(teacher.classes ?? []));
 
   return (
     <Card 
@@ -57,13 +58,13 @@ export function TeacherCard({
         {/* Header */}
         <div className="flex items-start gap-4">
           <Avatar className="size-14 shrink-0 ring-2 ring-white dark:ring-border shadow-sm">
-            <AvatarFallback className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-bold">
+            <AvatarFallback className="bg-muted text-foreground border border-border text-sm font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <h3 
-              className="font-semibold text-foreground truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors hover:underline"
+              className="font-semibold text-foreground truncate group-hover:underline transition-colors"
             >
               {teacher.name}
             </h3>
@@ -82,7 +83,7 @@ export function TeacherCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 text-muted-foreground hover:text-emerald-600"
+                className="size-8 text-muted-foreground hover:text-foreground"
                 onClick={() => onEdit(teacher)}
               >
                 <Pencil className="size-4" />
@@ -130,7 +131,7 @@ export function TeacherCard({
           </div>
         </div>
 
-        {/* The two facts the table's columns carry, up front */}
+        {/* Experience & Qualification */}
         <div className="mt-4 grid grid-cols-2 gap-4 border-t pt-3">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-0.5">Experience</p>
@@ -142,23 +143,23 @@ export function TeacherCard({
           </div>
         </div>
 
-        <div className="mt-4 space-y-3">
-          {/* Subjects: three chips, then what is hidden */}
+        {/* Subjects & Classes */}
+        <div className="mt-3.5 space-y-3">
           {subjects.length > 0 && (
-            <div className="flex items-start gap-2">
-              <BookOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-1.5">Subjects</p>
               <div className="flex flex-wrap gap-1.5">
                 {subjects.slice(0, 3).map((subject, idx) => (
                   <Badge
                     key={`${subject}-${idx}`}
-                    variant="secondary"
-                    className="text-xs font-normal bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                    variant="outline"
+                    className="text-xs font-normal bg-muted/60 text-foreground border-border"
                   >
                     {subject}
                   </Badge>
                 ))}
                 {subjects.length > 3 && (
-                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-border">
                     +{subjects.length - 3} more
                   </Badge>
                 )}
@@ -166,19 +167,22 @@ export function TeacherCard({
             </div>
           )}
 
-          {/* Classes taught */}
           {classes.length > 0 && (
-            <div className="flex items-start gap-2">
-              <GraduationCap className="size-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium mb-1.5">Classes</p>
               <div className="flex flex-wrap gap-1.5">
-                {classes.slice(0, 2).map((cls) => (
-                  <Badge key={cls} variant="outline" className="text-xs font-normal">
+                {classes.slice(0, 3).map((cls) => (
+                  <Badge
+                    key={cls}
+                    variant="outline"
+                    className="text-xs font-normal bg-muted/60 text-foreground border-border"
+                  >
                     {cls}
                   </Badge>
                 ))}
-                {classes.length > 2 && (
-                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
-                    +{classes.length - 2} more
+                {classes.length > 3 && (
+                  <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-border">
+                    +{classes.length - 3} more
                   </Badge>
                 )}
               </div>
