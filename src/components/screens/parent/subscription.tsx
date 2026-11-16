@@ -1,21 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
+import { useParams } from "next/navigation";
 import Script from "next/script";
 import { apiFetch } from "@/lib/api";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Crown,
-  Shield,
-  Clock,
-  TrendingUp,
-  Receipt,
-  Loader2,
-  Users as UsersIcon,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { usePillSlider } from "@/lib/pill-slider";
+import { Shield, Clock, TrendingUp, Users, TriangleAlert } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,51 +24,64 @@ import { toast } from "sonner";
 import { useAppStore } from "@/store/use-app-store";
 
 // Sub-components
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { PlanCard } from "./subscription/PlanCard";
 import { HistoryTable } from "./subscription/HistoryTable";
 import { PurchaseDialog } from "./subscription/PurchaseDialog";
-import { CurrentPlanBanner } from "./subscription/CurrentPlanBanner";
 
 // Types & Constants
 import { Plan, SubscriptionRecord } from "./subscription/types";
 import { PLANS } from "./subscription/constants";
 
+const formatSubscriptionDate = (dateStr?: string | null) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 export function ParentSubscription() {
   const { currentUser } = useAppStore();
+  const params = useParams();
+  const slug = (params?.slug as string) || currentUser?.tenantSlug || "demo-academy";
+
   const [loading, setLoading] = useState(true);
   const [parentId, setParentId] = useState<string | null>(null);
   const [activeSubscription, setActiveSubscription] = useState<SubscriptionRecord | null>(null);
   const [allSubscriptions, setAllSubscriptions] = useState<SubscriptionRecord[]>([]);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "quarterly" | "yearly">("quarterly");
-  
+
+  // Pill slider animation (exact same spring mechanism as the sidebar)
+  const cycleContainerRef = useRef<HTMLDivElement>(null);
+  const activePill = useRef<HTMLDivElement>(null);
+  const hoverPill = useRef<HTMLDivElement>(null);
+  const isFirstMount = useRef(true);
+  const place = usePillSlider(cycleContainerRef);
+
+  useLayoutEffect(() => {
+    if (loading || !cycleContainerRef.current) return;
+    const target = cycleContainerRef.current.querySelector<HTMLElement>(`[data-cycle="${billingCycle}"]`);
+    place(activePill.current, target, isFirstMount.current);
+    if (isFirstMount.current) isFirstMount.current = false;
+  }, [billingCycle, place, loading]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (!cycleContainerRef.current) return;
+      const target = cycleContainerRef.current.querySelector<HTMLElement>(`[data-cycle="${billingCycle}"]`);
+      place(activePill.current, target, true);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [billingCycle, place]);
+
   // Dialog States
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [purchasingPlan, setPurchasingPlan] = useState<Plan | null>(null);
   const [processing, setProcessing] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [subToCancel, setSubToCancel] = useState<string | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!loading && carouselRef.current && typeof window !== "undefined" && window.innerWidth < 768) {
-      const container = carouselRef.current;
-      // Use a small timeout to ensure layout is calculated
-      const timer = setTimeout(() => {
-        const secondCard = container.children[1] as HTMLElement;
-        if (secondCard) {
-          const scrollAmount = secondCard.offsetLeft - (container.offsetWidth / 2) + (secondCard.offsetWidth / 2);
-          container.scrollLeft = scrollAmount;
-        }
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
-
 
   const fetchSubscriptions = useCallback(async () => {
     try {
@@ -110,11 +117,11 @@ export function ParentSubscription() {
     if (!purchasingPlan || !parentId) return;
     setProcessing(true);
     try {
-      // 🚀 UPGRADE/DOWNGRADE LOGIC
-      if (activeSubscription && activeSubscription.transactionId?.startsWith('sub_')) {
+      // 1. Upgrade/Downgrade if active Razorpay subscription exists
+      if (activeSubscription && activeSubscription.transactionId?.startsWith("sub_")) {
         const currentPrice = activeSubscription.amount;
         const newPrice = purchasingPlan.pricing[billingCycle].price;
-        const immediate = newPrice > currentPrice; // Upgrade = immediate, Downgrade = next cycle
+        const immediate = newPrice > currentPrice;
 
         const res = await apiFetch("/api/subscriptions/razorpay/update-subscription", {
           method: "POST",
@@ -123,7 +130,7 @@ export function ParentSubscription() {
             subscriptionId: activeSubscription.transactionId,
             planId: purchasingPlan.id,
             period: billingCycle,
-            immediate
+            immediate,
           }),
         });
 
@@ -131,42 +138,41 @@ export function ParentSubscription() {
         if (!res.ok) throw new Error(updateData.error || "Failed to update subscription");
 
         toast.success(immediate ? "Plan Upgraded!" : "Plan Downgrade Scheduled", {
-          description: immediate 
-            ? `Your ${purchasingPlan.name} features are now active.` 
-            : `Your downgrade to ${purchasingPlan.name} will happen after this month.`
+          description: immediate
+            ? `Your ${purchasingPlan.name} features are now active.`
+            : `Your downgrade to ${purchasingPlan.name} will take effect after this cycle.`,
         });
-        
+
         setPurchaseDialogOpen(false);
         fetchSubscriptions();
         setProcessing(false);
         return;
       }
 
-      // 1. Create New Subscription Order on Backend
+      // 2. Create New Subscription Order on Backend
       const res = await apiFetch("/api/subscriptions/razorpay/create-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           planId: purchasingPlan.id,
           period: billingCycle,
-          parentId
+          parentId,
         }),
       });
-      
+
       const orderData = await res.json();
       if (!res.ok) throw new Error(orderData.error || "Failed to initiate subscription");
 
-      // 2. Open Razorpay Checkout for Subscriptions
+      // 3. Open Razorpay Checkout for Subscriptions
       const options = {
         key: orderData.keyId,
         subscription_id: orderData.subscriptionId,
-        name: currentUser?.tenantName ? `${currentUser.tenantName} - Premium` : "Eylisia Premium",
+        name: currentUser?.tenantName ? `${currentUser.tenantName} - Premium` : "Parent Premium",
         description: `Unlocking ${purchasingPlan.name} Access`,
         image: currentUser?.tenantLogo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
         handler: async (response: any) => {
           setProcessing(true);
           try {
-            // 3. Verify Payment and Activate
             const verifyRes = await apiFetch("/api/subscriptions/razorpay/verify-subscription", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -178,21 +184,21 @@ export function ParentSubscription() {
                 planId: purchasingPlan.id,
                 planName: purchasingPlan.name,
                 amount: purchasingPlan.pricing[billingCycle].price,
-                period: billingCycle
+                period: billingCycle,
               }),
             });
 
             if (!verifyRes.ok) throw new Error("Verification failed");
 
             toast.success("Welcome to Premium!", {
-              description: `Your ${purchasingPlan.name} features are now active.`
+              description: `Your ${purchasingPlan.name} features are now active.`,
             });
-            
+
             setPurchaseDialogOpen(false);
             fetchSubscriptions();
-          } catch (err: any) {
+          } catch {
             toast.error("Activation Failed", {
-              description: "We could not verify your payment. Please contact support."
+              description: "We could not verify your payment. Please contact support.",
             });
           } finally {
             setProcessing(false);
@@ -201,25 +207,25 @@ export function ParentSubscription() {
         prefill: {
           name: currentUser?.name || "",
           email: currentUser?.email || "",
-          contact: (currentUser as any)?.phone || ""
+          contact: (currentUser as any)?.phone || "",
         },
         theme: {
-          color: "#f59e0b",
+          color: "#4f46e5",
           backdrop_color: "#0f172a",
-          hide_topbar: false
+          hide_topbar: false,
         },
         modal: {
           ondismiss: () => setProcessing(false),
           backdrop_close: false,
-          confirm_close: true
-        }
+          confirm_close: true,
+        },
       };
 
       const rzp = new (window as any).Razorpay(options);
       rzp.open();
     } catch (error: any) {
       toast.error("Purchase failed", {
-        description: error.message || "Could not connect to payment gateway."
+        description: error.message || "Could not connect to payment gateway.",
       });
       setProcessing(false);
     }
@@ -232,10 +238,10 @@ export function ParentSubscription() {
 
   const confirmCancellation = async () => {
     if (!subToCancel) return;
-    
+
     setProcessing(true);
     try {
-      const targetSub = allSubscriptions.find(s => s.id === subToCancel);
+      const targetSub = allSubscriptions.find((s) => s.id === subToCancel);
       const rzpSubId = targetSub?.transactionId || subToCancel;
 
       const res = await apiFetch("/api/subscriptions/razorpay/cancel-subscription", {
@@ -245,8 +251,8 @@ export function ParentSubscription() {
       });
 
       if (!res.ok) throw new Error("Cancel failed");
-      toast.success("Cancelled at period end", {
-        description: "Auto-pay is now off. Your access remains for now."
+      toast.success("Subscription Cancelled", {
+        description: "Auto-renew is turned off. Your premium access remains until period end.",
       });
       await fetchSubscriptions();
     } catch (error: any) {
@@ -258,118 +264,183 @@ export function ParentSubscription() {
     }
   };
 
-
-  const currentPlanId = (activeSubscription?.planId || activeSubscription?.planName?.toLowerCase().replace(" plan", "") || "basic").toLowerCase();
+  const currentPlanId = (
+    activeSubscription?.planId ||
+    activeSubscription?.planName?.toLowerCase().replace(" plan", "") ||
+    "basic"
+  ).toLowerCase();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="size-8 animate-spin text-amber-500" />
-        <span className="ml-3 text-muted-foreground">Loading subscriptions...</span>
-      </div>
-    );
+    return <ParentSubscriptionSkeleton />;
   }
 
   return (
-    <div className="relative space-y-8 pb-12">
+    <div className="mx-auto max-w-5xl space-y-8 pb-12">
       <Script
         id="razorpay-checkout"
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="lazyOnload"
       />
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto px-4 relative">
-        <div className="inline-flex items-center justify-center size-12 sm:size-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-4 shadow-lg shadow-amber-200 dark:shadow-amber-900/30">
-          <Crown className="size-6 sm:size-8" />
+
+      {/* Page Header */}
+      <div className="flex flex-wrap items-end justify-between gap-4 pb-6 border-b border-border">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Parent Subscription</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Choose a plan to track attendance, grades, report cards, and parent tools.
+          </p>
         </div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">Premium Subscriptions</h2>
-        <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
-          Unlock advanced analytics, AI-powered insights, and real-time parent-teacher engagement tools.
-        </p>
       </div>
 
-      {/* Current Plan Banner */}
-      {activeSubscription && currentPlanId !== "basic" && (
-        <div className="px-4">
-          <CurrentPlanBanner 
-            subscription={activeSubscription} 
-            onCancel={handleCancelSubscription} 
-          />
-        </div>
-      )}
-
-      {/* Cycle Switcher */}
-      <div className="flex justify-center px-4">
-        <Tabs 
-          value={billingCycle} 
-          onValueChange={(v) => setBillingCycle(v as any)} 
-          className="bg-muted p-1.5 rounded-2xl shadow-sm w-full max-w-md border "
+      {/* Billing Cycle Switcher with Sidebar Pill Slider Animation */}
+      <div className="flex justify-center">
+        <div
+          ref={cycleContainerRef}
+          className="relative flex items-center p-1 rounded-xl bg-muted/80 border border-border/70 w-full max-w-md select-none"
+          onPointerOver={(event) => {
+            const target = (event.target as HTMLElement).closest<HTMLElement>("[data-cycle]");
+            place(hoverPill.current, target && target.dataset.cycle !== billingCycle ? target : null);
+          }}
+          onPointerLeave={() => {
+            place(hoverPill.current, null);
+          }}
         >
-          <TabsList className="bg-transparent h-10 sm:h-12 flex w-full gap-1 p-0">
-            <TabsTrigger 
-              value="monthly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
-            >
-              Monthly
-            </TabsTrigger>
-            <TabsTrigger 
-              value="quarterly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
-            >
-              Quarterly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 23%</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="yearly" 
-              className="flex-1 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:shadow-sm data-[state=active]:text-amber-600 transition-all font-semibold text-xs sm:text-sm"
-            >
-              Yearly <span className="hidden sm:inline ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Save 50%</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+          {/* Hover Pill (subtle accent from sidebar) */}
+          <div
+            ref={hoverPill}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-accent/60 opacity-0 will-change-transform"
+          />
+
+          {/* Active Pill (the exact sliding spring animation as the sidebar) */}
+          <div
+            ref={activePill}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-card text-foreground shadow-sm opacity-0 will-change-transform border border-border/80"
+          />
+
+          {/* Monthly */}
+          <button
+            type="button"
+            data-cycle="monthly"
+            onClick={() => setBillingCycle("monthly")}
+            className={cn(
+              "relative z-10 flex-1 py-1.5 px-3 text-xs sm:text-sm font-medium transition-colors text-center rounded-lg cursor-pointer",
+              billingCycle === "monthly"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Monthly
+          </button>
+
+          {/* Quarterly */}
+          <button
+            type="button"
+            data-cycle="quarterly"
+            onClick={() => setBillingCycle("quarterly")}
+            className={cn(
+              "relative z-10 flex-1 py-1.5 px-3 text-xs sm:text-sm font-medium transition-colors text-center rounded-lg inline-flex items-center justify-center gap-1.5 cursor-pointer",
+              billingCycle === "quarterly"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span>Quarterly</span>
+            <span className="text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/20">
+              Save 23%
+            </span>
+          </button>
+
+          {/* Yearly */}
+          <button
+            type="button"
+            data-cycle="yearly"
+            onClick={() => setBillingCycle("yearly")}
+            className={cn(
+              "relative z-10 flex-1 py-1.5 px-3 text-xs sm:text-sm font-medium transition-colors text-center rounded-lg inline-flex items-center justify-center gap-1.5 cursor-pointer",
+              billingCycle === "yearly"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span>Yearly</span>
+            <span className="text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/20">
+              Save 50%
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* Plan Cards */}
-      <div 
-        ref={carouselRef}
-        className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 px-4 pt-4 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory"
-      >
+      {/* Plan Cards Grid (Content from test-app) */}
+      <div className="grid gap-6 md:grid-cols-3">
         {PLANS.map((plan) => (
-          <div 
-            key={plan.id} 
-            id={`plan-${plan.id}`}
-            className="min-w-[85%] sm:min-w-0 snap-center"
-          >
-            <PlanCard
-              plan={plan}
-              isActive={currentPlanId === plan.id}
-              cycle={billingCycle}
-              onPurchase={handlePurchase}
-            />
-          </div>
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            isActive={currentPlanId === plan.id}
+            cycle={billingCycle}
+            onPurchase={handlePurchase}
+            processing={processing}
+          />
         ))}
       </div>
 
-
-      {/* Trust Badges */}
-      <div className="flex flex-wrap justify-center gap-6 py-4 text-sm text-muted-foreground border-y ">
-        <div className="flex items-center gap-1.5"><Shield className="size-4" /><span>Secure Payment</span></div>
-        <div className="flex items-center gap-1.5"><Clock className="size-4" /><span>Cancel Anytime</span></div>
-        <div className="flex items-center gap-1.5"><TrendingUp className="size-4" /><span>Upgrade Anytime</span></div>
-        <div className="flex items-center gap-1.5"><UsersIcon className="size-4" /><span>5000+ Parents Trust Us</span></div>
-      </div>
-
-      {/* Payment History */}
-      <div className="space-y-4">
+      {/* Trust Badges Bar */}
+      <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 py-4 text-xs sm:text-sm text-muted-foreground border-y border-border">
         <div className="flex items-center gap-2">
-          <Receipt className="size-5 text-foreground" />
-          <h3 className="text-xl font-semibold text-foreground">Payment History</h3>
+          <Shield className="size-4 shrink-0" aria-hidden />
+          <span>Secure Payment</span>
         </div>
-        <Card className="rounded-xl  shadow-none overflow-hidden">
-          <CardContent className="p-0">
-            <HistoryTable subscriptions={allSubscriptions} />
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-2">
+          <Clock className="size-4 shrink-0" aria-hidden />
+          <span>Cancel Anytime</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <TrendingUp className="size-4 shrink-0" aria-hidden />
+          <span>Upgrade Anytime</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Users className="size-4 shrink-0" aria-hidden />
+          <span>5000+ Parents Trust Us</span>
+        </div>
       </div>
+
+      {/* Invoices Section (Exact match with school admin manage-plan.tsx) */}
+      <section className="border border-border rounded-2xl p-6 bg-card">
+        <h2 className="text-base font-semibold mb-4">Invoices</h2>
+        <HistoryTable subscriptions={allSubscriptions} slug={slug} />
+      </section>
+
+      {/* Cancel Subscription Section (Exact match with school admin manage-plan.tsx) */}
+      {activeSubscription && currentPlanId !== "basic" && (
+        <section className="border border-border rounded-2xl p-6 bg-card flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="font-medium">Cancel subscription</p>
+            <p className="text-sm text-muted-foreground mt-0.5" suppressHydrationWarning>
+              {activeSubscription.endDate
+                ? `Your portal keeps premium access until ${formatSubscriptionDate(activeSubscription.endDate)}.`
+                : "Your portal keeps premium access for the current period."}
+            </p>
+          </div>
+          {activeSubscription.status === "cancelled" ? (
+            <Badge variant="secondary" className="font-medium">
+              Cancelling — access until{" "}
+              {activeSubscription.endDate
+                ? formatSubscriptionDate(activeSubscription.endDate)
+                : "period end"}
+            </Badge>
+          ) : (
+            <Button
+              variant="outline"
+              className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => handleCancelSubscription(activeSubscription.id)}
+            >
+              Cancel plan
+            </Button>
+          )}
+        </section>
+      )}
 
       {/* Purchase Confirmation Dialog */}
       <PurchaseDialog
@@ -384,30 +455,61 @@ export function ParentSubscription() {
 
       {/* Cancellation Confirmation Dialog */}
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent className="rounded-2xl border-amber-100 dark:border-amber-900/30 shadow-2xl">
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
-              <span className="size-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">⚠️</span>
-              Cancel Subscription?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-foreground py-2">
-              Your premium features will remain active until the end of the current billing cycle. 
-              After that, you will be moved to the free plan and auto-payments will stop.
+            <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive dark:bg-destructive/20 mb-1">
+              <TriangleAlert className="size-6" />
+            </div>
+            <AlertDialogTitle>Cancel subscription?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your premium features will remain active until the end of the current billing cycle.
+              After that, your account will revert to the free plan and automatic renewals will stop.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-end gap-3">
-            <AlertDialogCancel className="rounded-xl  hover:bg-accent transition-colors">
-              Keep Premium
-            </AlertDialogCancel>
-            <AlertDialogAction 
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+            <AlertDialogAction
               onClick={confirmCancellation}
-              className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white shadow-md transition-all active:scale-95"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             >
               Confirm Cancellation
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function ParentSubscriptionSkeleton() {
+  return (
+    <div className="mx-auto max-w-5xl space-y-8 pb-12">
+      <div className="space-y-2 pb-6 border-b border-border">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="flex justify-center">
+        <Skeleton className="h-10 w-full max-w-md rounded-xl" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="border border-border rounded-2xl p-5 pt-10 flex flex-col gap-4">
+            <Skeleton className="h-5 w-28" />
+            <Skeleton className="h-7 w-24" />
+            <div className="border-t border-border pt-4 grid gap-2">
+              {[0, 1, 2, 3].map((j) => (
+                <Skeleton key={j} className="h-4 w-full" />
+              ))}
+            </div>
+            <Skeleton className="h-9 w-full rounded-md mt-auto" />
+          </div>
+        ))}
+      </div>
+      <div className="border border-border rounded-2xl p-6 space-y-4">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
     </div>
   );
 }

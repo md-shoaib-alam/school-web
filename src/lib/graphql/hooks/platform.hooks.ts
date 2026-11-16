@@ -18,7 +18,11 @@ export function useTenantResolution(slug?: string) {
     queryKey: ['tenant-resolution', slug],
     queryFn: () => api.get(`/tenants/resolve/${slug}`),
     enabled: !!slug && !['profile', 'dashboard', 'tenants', 'billing', 'users', 'audit-logs', 'platform-analytics', 'settings', 'subscriptions', 'deleted-tenants', 'bulk-attendance-import', 'roadmap', 'integrations', 'roles', 'staff', 'manage-admins', 'school-subscriptions', 'platform-notices', 'reports'].includes(slug),
-    staleTime: Infinity,
+    // Subscription/status must reflect renewals immediately: always refetch on
+    // mount/focus and never serve a stale persisted copy.
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   })
 }
 
