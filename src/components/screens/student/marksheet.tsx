@@ -1,28 +1,5 @@
 'use client';
 
-import { Cinzel, Montserrat, Inter } from 'next/font/google';
-
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  weight: ['600', '700', '800', '900'],
-  variable: '--font-cinzel',
-  display: 'swap',
-});
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
 import { useEffect, useReducer, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';

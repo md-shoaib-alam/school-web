@@ -1,30 +1,8 @@
 'use client';
 
-import { Cinzel, Montserrat, Inter } from 'next/font/google';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { ExamRecord } from '../types';
-
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  weight: ['600', '700', '800', '900'],
-  variable: '--font-cinzel',
-  display: 'swap',
-});
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 interface MarksheetSheetsPreviewProps {
   loading: boolean;
@@ -87,7 +65,7 @@ export function MarksheetSheetsPreview({
     const visibleSheets = selectedStudentId === 'all' ? previewStudents.slice(0, 5) : previewStudents;
 
     return (
-      <div className={`flex flex-col items-center gap-8 py-10 w-full animate-in fade-in duration-300 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
+      <div className="flex flex-col items-center gap-8 py-10 w-full animate-in fade-in duration-300 font-inter">
         {visibleSheets.map((sheet) => (
           <div 
             key={sheet.id}
@@ -152,7 +130,7 @@ export function MarksheetSheetsPreview({
           <p className="text-xs">No student records available</p>
         </div>
       ) : (
-        <div className={`w-full max-w-4xl mx-auto space-y-4 ${cinzel.className} ${montserrat.className} ${inter.className}`}>
+        <div className="w-full max-w-4xl mx-auto space-y-4 font-inter">
           {selectedStudentId === 'all' && (
             <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/50 dark:border-emerald-800/40 p-4 rounded-xl text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-3 font-medium shadow-sm animate-in slide-in-from-top-2 duration-300">
               <CheckCircle2 className="size-5 shrink-0 text-emerald-500" />
