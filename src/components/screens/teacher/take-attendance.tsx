@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/use-app-store";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -93,6 +94,9 @@ const studentsKey = (classId: string) => ["teacher-students", classId] as const;
 const attendanceKey = (classId: string, date: string) =>
   ["teacher-attendance", classId, date] as const;
 
+const DAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+const DEFAULT_WORKING_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
 // ─── Component ────────────────────────────────────────────────
 
 export function TeacherAttendance() {
@@ -104,6 +108,17 @@ export function TeacherAttendance() {
     const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   });
+  const currentTenantId = useAppStore((s) => s.currentTenantId);
+  const { data: workingDays = DEFAULT_WORKING_DAYS } = useQuery<string[]>({
+    queryKey: ["working-days", currentTenantId],
+    queryFn: async () => {
+      const res = await api.get<any>(`/tenant-settings?tenantId=${currentTenantId}`);
+      return res.workingDays || DEFAULT_WORKING_DAYS;
+    },
+    enabled: !!currentTenantId,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const disableFutureDates = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -111,9 +126,15 @@ export function TeacherAttendance() {
     return (candidate: Date) => {
       const day = new Date(candidate);
       day.setHours(0, 0, 0, 0);
-      return day > today;
+      if (day > today) return true;
+      return !workingDays.includes(DAY_NAMES[day.getDay()]);
     };
-  }, []);
+  }, [workingDays]);
+
+  const isWorkingDay = useMemo(
+    () => workingDays.includes(DAY_NAMES[new Date(`${date}T00:00:00Z`).getUTCDay()]),
+    [date, workingDays]
+  );
 
   // ── Fetch classes ──────────────────────────────────────────
 
@@ -324,6 +345,7 @@ export function TeacherAttendance() {
   // 2. Either has unsaved changes OR attendance has not been recorded yet for the day
   // 3. Online, not pending save, and class has students
   const canSubmit =
+    isWorkingDay &&
     unmarkedCount === 0 &&
     (hasUnsavedChanges || (!hasExistingAttendance && !saved)) &&
     isOnline &&
@@ -419,6 +441,12 @@ export function TeacherAttendance() {
           />
         </div>
       </div>
+
+      {!isWorkingDay && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/30 dark:text-amber-200">
+          {date} is not a working day for this school. Attendance can only be marked on the working days configured in School Settings.
+        </div>
+      )}
 
       {/* Stats */}
       {students.length > 0 && (
