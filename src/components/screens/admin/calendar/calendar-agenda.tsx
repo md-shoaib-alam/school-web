@@ -39,7 +39,7 @@ export function CalendarAgenda({
 }: CalendarAgendaProps) {
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   
-  const todayStr = useMemo(() => formatDateISO(new Date()), []);
+  const todayStr = formatDateISO(new Date());
 
   // Determine date string for top view
   const displayDate = selectedDate || todayStr;
@@ -51,11 +51,11 @@ export function CalendarAgenda({
     return allEvents.filter(ev => ev.date === todayStr || (ev.endDate && ev.endDate >= todayStr && ev.date <= todayStr));
   }, [selectedDate, selectedDayEvents, allEvents, todayStr]);
 
-  // Compute Upcoming Events (strictly tomorrow up to the end of the current month)
+  // Compute Upcoming Events (strictly after today, up to 30 days ahead)
   const upcomingEventsList = useMemo(() => {
-    const todayObj = new Date();
-    const endOfMonth = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
-    const maxDateStr = formatDateISO(endOfMonth);
+    const thirtyDaysAhead = new Date();
+    thirtyDaysAhead.setDate(thirtyDaysAhead.getDate() + 30);
+    const maxDateStr = formatDateISO(thirtyDaysAhead);
 
     return allEvents
       .filter(ev => ev.date > todayStr && ev.date <= maxDateStr)

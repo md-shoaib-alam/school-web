@@ -274,6 +274,11 @@ export function AdminCalendar() {
             selectedDate={selectedDate}
             setSelectedDate={(v) => dispatch({ type: 'SET_SELECTED_DATE', payload: v })}
             isCurrentMonthDay={isCurrentMonthDay}
+            currentYear={currentYear}
+            currentMonth={currentMonth}
+            goToPrevMonth={goToPrevMonth}
+            goToNextMonth={goToNextMonth}
+            goToToday={goToToday}
           />
         </div>
 

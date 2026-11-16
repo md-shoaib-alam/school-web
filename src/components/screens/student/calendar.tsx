@@ -77,8 +77,22 @@ export function StudentCalendar() {
   }, [filteredEvents]);
 
   // --- Navigation ---
-  const goToPrevMonth = () => setCurrentMonth(prev => prev === 0 ? (setCurrentYear(y => y-1), 11) : prev - 1);
-  const goToNextMonth = () => setCurrentMonth(prev => prev === 11 ? (setCurrentYear(y => y+1), 0) : prev + 1);
+  const goToPrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentYear(y => y - 1);
+      setCurrentMonth(11);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+  const goToNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentYear(y => y + 1);
+      setCurrentMonth(0);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
   const goToToday = () => { const n = new Date(); setCurrentYear(n.getFullYear()); setCurrentMonth(n.getMonth()); setSelectedDate(formatDateISO(n)); };
 
   const isCurrentMonthDay = (dateStr: string) => {
@@ -116,6 +130,11 @@ export function StudentCalendar() {
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             isCurrentMonthDay={isCurrentMonthDay}
+            currentYear={currentYear}
+            currentMonth={currentMonth}
+            goToPrevMonth={goToPrevMonth}
+            goToNextMonth={goToNextMonth}
+            goToToday={goToToday}
           />
         </div>
 

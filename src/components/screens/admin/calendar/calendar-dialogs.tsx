@@ -76,7 +76,7 @@ export function CalendarDialogs({
                    date={startDateVal} 
                    onChange={(d) => {
                      const formatted = d ? formatDateISO(d) : "";
-                     const newEnd = d && endDateVal && d > endDateVal ? formatted : form.endDate;
+                     const newEnd = !d ? "" : (endDateVal && d > endDateVal ? formatted : form.endDate);
                      updateForm("date", formatted);
                      updateForm("endDate", newEnd);
                    }}
