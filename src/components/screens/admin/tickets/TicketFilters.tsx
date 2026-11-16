@@ -36,40 +36,40 @@ export function TicketFilters({
   return (
     <div className="space-y-4">
       <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList className="bg-muted p-1 border  h-10">
+        <TabsList className="bg-muted/70 p-1 border border-border rounded-xl h-10">
           <TabsTrigger 
             value="all" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             All
           </TabsTrigger>
           <TabsTrigger 
             value="open" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             Open
           </TabsTrigger>
           <TabsTrigger 
             value="in_progress" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             In Progress
           </TabsTrigger>
           <TabsTrigger 
             value="on_hold" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             On Hold
           </TabsTrigger>
           <TabsTrigger 
             value="resolved" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             Resolved
           </TabsTrigger>
           <TabsTrigger 
             value="closed" 
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-900 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-[0_4px_12px_rgba(16,185,129,0.12)] dark:data-[state=active]:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:bg-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold cursor-pointer transition-all px-3"
+            className="rounded-lg data-[state=active]:bg-card data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-xs hover:text-foreground font-semibold cursor-pointer transition-all px-3.5 text-xs"
           >
             Closed
           </TabsTrigger>
@@ -81,16 +81,16 @@ export function TicketFilters({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by title..."
-            className="pl-9"
+            className="pl-9 rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="w-full sm:w-40 rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl border-border bg-popover">
             <SelectItem value="all">All Priorities</SelectItem>
             <SelectItem value="urgent">Urgent</SelectItem>
             <SelectItem value="high">High</SelectItem>
@@ -99,10 +99,10 @@ export function TicketFilters({
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-44">
+          <SelectTrigger className="w-full sm:w-44 rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl border-border bg-popover">
             <SelectItem value="all">All Categories</SelectItem>
             {TICKET_CATEGORIES.map((cat) => (
               <SelectItem key={cat.value} value={cat.value}>

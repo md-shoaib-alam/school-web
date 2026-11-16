@@ -86,7 +86,7 @@ export function TicketDetailSheet({
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="size-8 animate-spin text-emerald-500" />
+            <Loader2 className="size-8 animate-spin text-blue-500" />
           </div>
         ) : ticket ? (
           <div className="flex-1 flex flex-col min-h-0">
@@ -104,19 +104,19 @@ export function TicketDetailSheet({
               <div className="flex flex-wrap gap-2">
                 <Badge
                   variant="outline"
-                  className={`text-[10px] font-medium ${STATUS_COLORS[ticket.status] || ""}`}
+                  className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${STATUS_COLORS[ticket.status] || ""}`}
                 >
                   {STATUS_LABELS[ticket.status]}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className={`text-[10px] font-medium ${PRIORITY_COLORS[ticket.priority] || ""}`}
+                  className={`text-[10px] font-semibold rounded-lg px-2 py-0.5 ${PRIORITY_COLORS[ticket.priority] || ""}`}
                 >
                   {PRIORITY_LABELS[ticket.priority]}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-[10px] font-medium bg-muted text-foreground"
+                  className="text-[10px] font-medium rounded-lg px-2 py-0.5 bg-muted text-foreground"
                 >
                   {getCategoryLabel(ticket.category)}
                 </Badge>
@@ -130,12 +130,12 @@ export function TicketDetailSheet({
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="grid gap-1.5">
-                    <Label className="text-xs">Status</Label>
+                    <Label className="text-xs font-medium">Status</Label>
                     <Select value={editStatus} onValueChange={setEditStatus}>
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl border-border bg-popover">
                         {TICKET_STATUSES.map((s) => (
                           <SelectItem key={s} value={s}>
                             {STATUS_LABELS[s]}
@@ -145,15 +145,15 @@ export function TicketDetailSheet({
                     </Select>
                   </div>
                   <div className="grid gap-1.5">
-                    <Label className="text-xs">Priority</Label>
+                    <Label className="text-xs font-medium">Priority</Label>
                     <Select
                       value={editPriority}
                       onValueChange={setEditPriority}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl border-border bg-popover">
                         <SelectItem value="low">Low</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="high">High</SelectItem>
@@ -162,15 +162,15 @@ export function TicketDetailSheet({
                     </Select>
                   </div>
                   <div className="grid gap-1.5">
-                    <Label className="text-xs">Assignee</Label>
+                    <Label className="text-xs font-medium">Assignee</Label>
                     <Select
                       value={editAssignee}
                       onValueChange={setEditAssignee}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl border-border bg-popover">
                         <SelectItem value="unassigned">Unassigned</SelectItem>
                         {staffList.map((s) => (
                           <SelectItem key={s.id} value={s.id}>
@@ -183,7 +183,7 @@ export function TicketDetailSheet({
                 </div>
                 <Button
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-xl shadow-xs shadow-blue-500/20 cursor-pointer font-medium"
                   onClick={onUpdateTicket}
                   disabled={updatingTicket}
                 >
@@ -261,7 +261,7 @@ export function TicketDetailSheet({
                       placeholder="Type your reply..."
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
-                      className="min-h-[60px] max-h-[120px] resize-none text-sm"
+                      className="min-h-[60px] max-h-[120px] resize-none text-sm rounded-xl border-border bg-card shadow-xs focus-visible:ring-blue-500/30 focus-visible:border-blue-500"
                       rows={2}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -276,7 +276,7 @@ export function TicketDetailSheet({
                     </span>
                     <Button
                       size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-xl shadow-xs shadow-blue-500/20 cursor-pointer font-medium"
                       onClick={onReply}
                       disabled={sendingReply || !replyMessage.trim()}
                     >

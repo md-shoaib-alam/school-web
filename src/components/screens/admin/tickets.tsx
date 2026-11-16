@@ -203,7 +203,7 @@ export function AdminTickets() {
           <p className="text-sm text-muted-foreground">{tickets.length} total tickets</p>
         </div>
         <Button 
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_4px_14px_rgba(16,185,129,0.35)] dark:shadow-[0_4px_14px_rgba(16,185,129,0.2)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.45)] dark:hover:shadow-[0_6px_20px_rgba(16,185,129,0.3)] transition-all duration-200 cursor-pointer" 
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-xl shadow-xs shadow-blue-500/20 hover:shadow-sm transition-all duration-200 cursor-pointer px-4 h-9.5 font-medium" 
           onClick={() => dispatch({ type: "SET_CREATE_OPEN", open: true })}
         >
           <Plus className="size-4 mr-2" />New Ticket
@@ -223,7 +223,7 @@ export function AdminTickets() {
         setCategoryFilter={(v) => dispatch({ type: "SET_CATEGORY_FILTER", category: v })}
       />
 
-      <Card>
+      <Card className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
         <CardContent className="p-0">
           <TicketTable
             tickets={filteredTickets}
