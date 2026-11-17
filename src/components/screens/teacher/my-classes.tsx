@@ -1,7 +1,7 @@
 "use client";
 
 
-import { apiFetch, api } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,7 +35,6 @@ interface ClassInfo {
   section: string;
   grade: string;
   studentCount: number;
-  classTeacher: string;
 }
 
 interface StudentInfo {
@@ -52,51 +51,13 @@ interface StudentInfo {
 
 export function TeacherClasses() {
   const { data: classData, isLoading: classesLoading } = useQuery<ClassInfo[]>({
-    queryKey: ["teacher-classes"],
+    // "classes" prefix: triggerGlobalRefresh() invalidates it on any class write
+    queryKey: ["classes", "teacher-assigned"],
     queryFn: async () => {
-      const [resClasses, resTimetable] = await Promise.all([
-        api.get("/classes?mode=min").catch(() => []),
-        api.get("/timetable?mine=true").catch(() => [])
-      ]);
-
-      const assignedClasses = Array.isArray(resClasses) ? resClasses : [];
-      const timetableList = Array.isArray(resTimetable) ? resTimetable : [];
-
-      // Extract unique classes from timetable slots
-      const timetableClasses: ClassInfo[] = [];
-      const seen = new Set<string>();
-      timetableList.forEach((t: any) => {
-        if (t.classId && t.className) {
-          const key = t.classId;
-          if (!seen.has(key)) {
-            seen.add(key);
-            const parts = t.className.split('-');
-            timetableClasses.push({
-              id: t.classId,
-              name: parts[0] || t.className,
-              section: parts[1] || 'A',
-              grade: parts[0] || t.className,
-              studentCount: 0, // Fallback placeholder
-              classTeacher: t.teacherName || '',
-            });
-          }
-        }
-      });
-
-      // Combine lists
-      const combined = [...assignedClasses];
-      const seenCombined = new Set(assignedClasses.map(c => c.id));
-      
-      timetableClasses.forEach((tc) => {
-        if (!seenCombined.has(tc.id)) {
-          seenCombined.add(tc.id);
-          combined.push(tc);
-        }
-      });
-
-      return combined;
+      const res = await api.get("/classes?scope=assigned").catch(() => []);
+      return Array.isArray(res) ? res : [];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000,
   });
 
   const classes = [...(Array.isArray(classData) ? classData : [])].sort((a, b) => {
