@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import api from '@/lib/axios';
+import { api } from '@/lib/api';
 import { useAppStore } from '@/store/use-app-store';
 import { AttendanceStatus, StaffAttendanceItem, AttendanceStatsData } from './types';
 
@@ -65,7 +65,7 @@ export function useStaffAttendance(initialTab?: string) {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.error || 'Failed to save attendance');
+      toast.error(err?.response?.data?.error || err?.message || 'Failed to save attendance');
     },
   });
 

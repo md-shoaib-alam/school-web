@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tag, Layers, CircleDollarSign, Plus } from 'lucide-react';
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/axios';
+import { api } from '@/lib/api';
 import { useFeeCategories, useFeeStructures, useCreateFeeStructure, useFeeAssignment } from '@/hooks/use-fees';
 import { useAcademicYears } from '@/hooks/use-academic-years';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -200,7 +200,7 @@ export function SetFeesTab({ canCreate, canEdit, canDelete }: SetFeesTabProps) {
   const handleDelete = async (id: string) => {
     dispatch({ type: 'SET_DELETING', payload: true });
     try {
-      await api.delete(`/fee-structures?id=${id}`);
+      await api.del(`/fee-structures?id=${id}`);
       toast.success('Fee structure deleted!');
       queryClient.invalidateQueries({ queryKey: ['fee-structures'] });
     } catch { toast.error('Error deleting'); }

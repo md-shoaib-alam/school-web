@@ -4,7 +4,7 @@ import { useReducer, useEffect, useMemo, useRef, useState } from "react";
 import { useViewMode } from "@/hooks/use-view-mode";
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
-import api from "@/lib/axios";
+import { api } from "@/lib/api";
 import { useAppStore } from "@/store/use-app-store";
 import {
   useParents,
@@ -269,7 +269,7 @@ export function AdminParents() {
   const { parents: rawParents = [], total: totalItems = 0, totalPages = 1 } = parentsData || {};
 
   const parents = useMemo(() => {
-    return [...rawParents].sort((a, b) => 
+    return rawParents.toSorted((a, b) => 
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
   }, [rawParents]);
@@ -519,7 +519,7 @@ export function AdminParents() {
   const handleDelete = async (id: string) => {
     toast.promise(
       (async () => {
-        await api.delete(`/parents?id=${id}`);
+        await api.del(`/parents?id=${id}`);
         queryClient.invalidateQueries({ queryKey: queryKeys.parents });
         return "Parent record removed";
       })(),

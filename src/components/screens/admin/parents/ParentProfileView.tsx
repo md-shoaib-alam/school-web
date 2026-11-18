@@ -25,7 +25,7 @@ import {
 import { toast } from "sonner";
 import { CopyButton } from "@/components/ui/copy-button";
 import { ProfileSection } from "@/components/ui/profile-section";
-import api from "@/lib/axios";
+import { api } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/graphql/keys";
 import { toSquareDataUrl } from "@/lib/image-utils";
