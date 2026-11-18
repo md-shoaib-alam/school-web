@@ -152,7 +152,7 @@ export const SUBJECTS = `
 export const CLASSES = `
   query Classes($tenantId: String, $page: Int, $limit: Int) {
     classes(tenantId: $tenantId, page: $page, limit: $limit) {
-      classes { id name section grade capacity studentCount classTeacher }
+      classes { id name section grade capacity studentCount classTeacher classTeacherId }
       total page totalPages
     }
   }

@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PrintSheetModePreview } from "./print-sheet-preview";
 import { StatusToggle } from "./status-toggle";
 import { Printer } from "lucide-react";
 
@@ -26,33 +25,19 @@ export function PrintSheetSettingsCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-7">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border  w-full gap-4">
-              <div className="space-y-0.5">
-                <h4 className="text-sm font-semibold text-foreground">
-                  Print Sheet Mode
-                </h4>
-                <p className="text-xs text-muted-foreground">
-                  Open print sheets in a popup modal
-                </p>
-              </div>
-              
-              <StatusToggle 
-                enabled={enableModalTabulationPreview} 
-                onToggle={onToggleTabulationPreview} 
-              />
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted rounded-lg border border-border gap-3">
+          <div className="space-y-0.5">
+            <h4 className="text-sm font-semibold text-foreground">
+              Print Sheet Mode
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              Open print sheets in a popup modal
+            </p>
           </div>
-
-          {/* Right Column: Previews - Desktop Only */}
-          <div className="hidden lg:block lg:col-span-5 pl-6 border-l ">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Interactive Preview Demonstration
-            </div>
-            <PrintSheetModePreview isEnabled={enableModalTabulationPreview} />
-          </div>
+          <StatusToggle
+            enabled={enableModalTabulationPreview}
+            onToggle={onToggleTabulationPreview}
+          />
         </div>
       </CardContent>
     </Card>

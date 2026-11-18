@@ -39,7 +39,7 @@ export function TeachersGridView({
     <LazyMotion features={domMax}>
       <m.div 
         layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+        className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
       >
         <AnimatePresence mode="popLayout">
           {teachers.map((teacher, index) => (
@@ -47,6 +47,7 @@ export function TeachersGridView({
               key={teacher.id}
               id={`teacher-item-${teacher.id}`}
               layoutId={`teacher-${teacher.id}`}
+              className="h-full"
               initial={enter ? { y: 6 } : undefined}
               animate={{ y: 0 }}
               transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}

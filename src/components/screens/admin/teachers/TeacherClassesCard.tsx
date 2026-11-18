@@ -1,10 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { ProfileSection } from "@/components/ui/profile-section";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { TeacherInfo } from "./types";
+
+interface SchoolClass {
+  id: string;
+  name: string;
+  section: string;
+}
 
 interface ClassesCardProps {
   currentTeacher: TeacherInfo;
@@ -35,6 +50,24 @@ export function TeacherClassesCard({
   onCancelEdit,
   onSave,
 }: ClassesCardProps) {
+  const { data: schoolClasses } = useQuery<SchoolClass[]>({
+    queryKey: ["school-classes-for-teacher"],
+    queryFn: () => api.get("/classes?mode=min"),
+    staleTime: 5 * 60 * 1000,
+  });
+  const [selectedClass, setSelectedClass] = useState("");
+
+  const addSelected = () => {
+    if (!selectedClass || formData.classes.includes(selectedClass)) return;
+    setFormData({ ...formData, classes: [...formData.classes, selectedClass] });
+    setSelectedClass("");
+  };
+
+  const available = (Array.isArray(schoolClasses) ? schoolClasses : [])
+    .map((c) => ({ ...c, label: `${c.name}-${c.section}` }))
+    .filter((c) => !formData.classes.includes(c.label))
+    .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
+
   return (
     <ProfileSection
       icon={Users}
@@ -51,34 +84,27 @@ export function TeacherClassesCard({
       form={
         <div className="space-y-3 pt-1">
           <div className="flex gap-2">
-            <Input
-              value={formData.newClassInput}
-              onChange={(e) => setFormData({ ...formData, newClassInput: e.target.value })}
-              placeholder="Add class (e.g. Class 1-B)"
-              className="h-9 text-xs rounded-xl bg-muted "
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && formData.newClassInput.trim()) {
-                  e.preventDefault();
-                  setFormData({
-                    ...formData,
-                    classes: [...formData.classes, formData.newClassInput.trim()],
-                    newClassInput: "",
-                  });
-                }
-              }}
-            />
+            <Select value={selectedClass} onValueChange={setSelectedClass}>
+              <SelectTrigger
+                size="sm"
+                className="h-9 flex-1 text-xs rounded-xl bg-muted border-border"
+                aria-label="Select class"
+              >
+                <SelectValue placeholder={available.length === 0 ? "No classes available" : "Select a class..."} />
+              </SelectTrigger>
+              <SelectContent>
+                {available.map((c) => (
+                  <SelectItem key={c.id} value={c.label} className="text-xs">
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button
               type="button"
               size="sm"
-              onClick={() => {
-                if (formData.newClassInput.trim()) {
-                  setFormData({
-                    ...formData,
-                    classes: [...formData.classes, formData.newClassInput.trim()],
-                    newClassInput: "",
-                  });
-                }
-              }}
+              onClick={addSelected}
+              disabled={!selectedClass}
               className="h-9 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
             >
               Add

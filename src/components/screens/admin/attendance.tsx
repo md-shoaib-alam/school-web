@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, UserX } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { api, apiFetch } from "@/lib/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AttendanceRecord } from "@/types";
 import { useModulePermissions } from "@/hooks/use-permissions";
 import { useAppStore } from "@/store/use-app-store";
@@ -52,9 +53,16 @@ export function AdminAttendance() {
   const [isHistoryMode, setIsHistoryMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
+  const [selectedPeriod, setSelectedPeriod] = useState("daily");
+  const { data: attendanceSettings } = useQuery({
+    queryKey: ["attendance-settings", currentTenantId],
+    queryFn: () => api.get<{ mode: "daily" | "period"; periodCount: number; teacherClassScope: "assigned" | "all" }>("/period-attendance/settings"),
+    enabled: !!currentTenantId,
+  });
+  const showPeriods = selectedPeriod !== "daily";
 
-  const { data: attendanceData, isLoading: recordsLoading } = useQuery({
-    queryKey: ['attendance', selectedDate, selectedClass, isHistoryMode, currentPage],
+  const { data: attendanceData, isLoading: recordsLoading, error: recordsError } = useQuery({
+    queryKey: ['attendance', currentTenantId, selectedDate, selectedClass, isHistoryMode, currentPage, showPeriods ? selectedPeriod : 'daily'],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (!isHistoryMode && selectedDate) params.set('date', selectedDate);
@@ -62,8 +70,9 @@ export function AdminAttendance() {
       params.set('page', currentPage.toString());
       params.set('limit', '50');
       
-      const res = await apiFetch(`/api/attendance?${params.toString()}`);
-      if (!res.ok) return { records: [], total: 0, totalPages: 0 };
+      if (showPeriods && selectedPeriod !== 'all') params.set('periodNumber', selectedPeriod);
+      const res = await apiFetch(`/api/${showPeriods ? 'period-attendance' : 'attendance'}?${params.toString()}`);
+      if (!res.ok) throw new Error('Failed to load attendance records');
       return res.json();
     },
     enabled: !!selectedClass
@@ -86,9 +95,9 @@ export function AdminAttendance() {
     !debouncedSearch || r.studentName.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
-  const presentCount = records.filter((r) => r.status === "present").length;
-  const absentCount = records.filter((r) => r.status === "absent").length;
-  const total = records.length;
+  const presentCount = showPeriods ? Number(attendanceData?.summary?.present ?? 0) : records.filter((r) => r.status === "present").length;
+  const absentCount = showPeriods ? Number(attendanceData?.summary?.absent ?? 0) : records.filter((r) => r.status === "absent").length;
+  const total = showPeriods ? Number(attendanceData?.total ?? 0) : records.length;
   const presentRate = total > 0 ? ((presentCount / total) * 100).toFixed(1) : "0";
 
   const summaryCards = [
@@ -132,8 +141,23 @@ export function AdminAttendance() {
     return date < cutoff;
   };
 
+  const selectedClassObj = classes.find((c: any) => c.id === selectedClass);
+  const selectedClassName =
+    selectedClass === "all"
+      ? "All Classes"
+      : selectedClassObj
+      ? `${selectedClassObj.name}${selectedClassObj.section ? `-${selectedClassObj.section}` : ""}`
+      : null;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile Sticky Class Header - stays pinned throughout entire page scroll */}
+      <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background/95 backdrop-blur-md border-b border-border/40 sm:hidden flex items-center justify-center">
+        <h2 className="text-xl font-bold tracking-tight text-foreground text-center">
+          {selectedClassName || "Attendance Management"}
+        </h2>
+      </div>
+
       <AttendanceHeader 
         selectedClass={selectedClass}
         onClassChange={(val) => { setSelectedClass(val); setCurrentPage(1); }}
@@ -150,9 +174,12 @@ export function AdminAttendance() {
         isHistoryMode={isHistoryMode}
         onToggleHistory={() => { if (isPremiumOrEnterprise) { setIsHistoryMode(!isHistoryMode); setCurrentPage(1); } }}
         isPremiumOrEnterprise={isPremiumOrEnterprise}
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={(value) => { setSelectedPeriod(value); setCurrentPage(1); }}
+        periodCount={isHistoryMode ? 20 : (attendanceSettings?.periodCount ?? 8)}
       />
 
-      {!isSelectionMade ? (
+      {recordsError ? <p role="alert" className="text-sm text-destructive">Could not load attendance records. Reload the page to retry.</p> : !isSelectionMade ? (
         <AttendanceEmptyState />
       ) : (
         <>
@@ -160,9 +187,14 @@ export function AdminAttendance() {
             summaryCards={summaryCards}
             loading={loading}
             statusConfig={statusConfig}
+            total={total}
+            presentCount={presentCount}
+            absentCount={absentCount}
+            presentRate={presentRate}
           />
 
           <AttendanceTable 
+            showPeriods={showPeriods}
             selectedClass={selectedClass}
             classes={classes}
             search={search}

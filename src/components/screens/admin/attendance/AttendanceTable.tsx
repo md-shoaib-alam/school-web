@@ -10,6 +10,7 @@ import { Search } from "lucide-react";
 import { Pagination } from "@/components/shared/pagination";
 
 interface AttendanceTableProps {
+  showPeriods?: boolean;
   selectedClass: string;
   classes: any[];
   search: string;
@@ -26,6 +27,7 @@ interface AttendanceTableProps {
 }
 
 export function AttendanceTable({
+  showPeriods = false,
   selectedClass,
   classes,
   search,
@@ -43,22 +45,22 @@ export function AttendanceTable({
   return (
     <>
       <Card className="shadow-lg ">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 pb-3 sm:pb-4">
           <div>
-            <CardTitle className="text-xl font-bold">
+            <CardTitle className="text-lg sm:text-xl font-bold">
               Students List
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="hidden sm:block text-xs sm:text-sm">
               {selectedClass === "all"
                 ? "Showing attendance for all school students"
-                : `Showing attendance records for Class ${classes.find((c) => c.id === selectedClass)?.name}-${classes.find((c) => c.id === selectedClass)?.section}`}
+                : `Showing attendance records for ${classes.find((c) => c.id === selectedClass)?.name || "Class"} - ${classes.find((c) => c.id === selectedClass)?.section || ""}`}
             </CardDescription>
           </div>
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input 
               placeholder="Search students…" 
-              className="pl-9" 
+              className="pl-9 w-full h-9 bg-background" 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -68,14 +70,15 @@ export function AttendanceTable({
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead className="font-bold pl-6">Student Name</TableHead>
-                <TableHead className="font-bold w-[150px]">Class</TableHead>
+                <TableHead className="font-bold pl-4 sm:pl-6">Student Name</TableHead>
+                <TableHead className="hidden sm:table-cell font-bold w-[150px]">Class</TableHead>
                 {isHistoryMode && (
-                  <TableHead className="font-bold w-[150px]">Date</TableHead>
+                  <TableHead className="hidden sm:table-cell font-bold w-[150px]">Date</TableHead>
                 )}
-                <TableHead className="font-bold w-[180px]">Status</TableHead>
-                <TableHead className="font-bold w-[120px]">Time</TableHead>
-                <TableHead className="text-right font-bold pr-6 w-[140px]">
+                {showPeriods && <TableHead className="hidden sm:table-cell">Period</TableHead>}
+                <TableHead className="font-bold w-[110px] sm:w-[180px]">Status</TableHead>
+                <TableHead className="hidden sm:table-cell font-bold w-[120px]">Time</TableHead>
+                <TableHead className="text-right font-bold pr-4 sm:pr-6 w-[80px] sm:w-[140px]">
                   Action
                 </TableHead>
               </TableRow>
@@ -98,7 +101,7 @@ export function AttendanceTable({
               ) : records.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={isHistoryMode ? 6 : 5}
+                    colSpan={5 + Number(isHistoryMode) + Number(showPeriods)}
                     className="h-32 text-center text-muted-foreground italic"
                   >
                     No attendance records found for this selection.
@@ -110,10 +113,10 @@ export function AttendanceTable({
                     key={record.id}
                     className="hover:bg-muted group transition-colors"
                   >
-                    <TableCell className="font-medium pl-6">
+                    <TableCell className="font-medium pl-4 sm:pl-6">
                       {record.studentName}
                     </TableCell>
-                    <TableCell className="w-[150px]">
+                    <TableCell className="hidden sm:table-cell w-[150px]">
                       <Badge
                         variant="outline"
                         className="font-semibold bg-muted"
@@ -122,7 +125,7 @@ export function AttendanceTable({
                       </Badge>
                     </TableCell>
                     {isHistoryMode && (
-                      <TableCell className="font-medium w-[150px]" suppressHydrationWarning>
+                      <TableCell className="hidden sm:table-cell font-medium w-[150px]" suppressHydrationWarning>
                         {new Date(record.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -130,17 +133,22 @@ export function AttendanceTable({
                         })}
                       </TableCell>
                     )}
-                    <TableCell className="w-[180px]">
+                    {showPeriods && <TableCell className="hidden sm:table-cell">
+                      <span className="whitespace-nowrap">Period {record.periodNumber}</span>
+                      {record.subjectName && <p className="text-xs text-muted-foreground">{record.subjectName}</p>}
+                      {record.startTime && <p className="text-xs text-muted-foreground">{record.startTime}–{record.endTime}</p>}
+                    </TableCell>}
+                    <TableCell className="w-[110px] sm:w-[180px]">
                       <Badge
-                        className={`${statusConfig[record.status]?.bg} border shadow-sm`}
+                        className={`${statusConfig[record.status]?.bg} border shadow-sm px-2 py-0.5 text-xs`}
                       >
-                        <span className="flex items-center gap-1.5 pt-0.5">
+                        <span className="flex items-center gap-1 sm:gap-1.5 pt-0.5">
                           {statusConfig[record.status]?.icon}
                           {statusConfig[record.status]?.text}
                         </span>
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm w-[120px]" suppressHydrationWarning>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground text-sm w-[120px]" suppressHydrationWarning>
                       {record.createdAt
                         ? new Date(record.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -153,14 +161,15 @@ export function AttendanceTable({
                           })
                         : "08:30 AM"}
                     </TableCell>
-                    <td className="text-right pr-6 w-[140px]">
+                    <td className="text-right pr-4 sm:pr-6 w-[80px] sm:w-[140px]">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="font-semibold"
+                        className="font-semibold h-8 px-2.5 sm:px-3 text-xs"
                         onClick={() => onViewProfile(record)}
                       >
-                        View Profile
+                        <span className="sm:hidden">View</span>
+                        <span className="hidden sm:inline">View Profile</span>
                       </Button>
                     </td>
                   </TableRow>

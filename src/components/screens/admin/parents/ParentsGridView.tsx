@@ -35,12 +35,13 @@ export function ParentsGridView({
 }: ParentsGridViewProps) {
   return (
     <LazyMotion features={domMax}>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-5">
         {parents.map((parent, index) => (
           <m.div
             key={parent.id}
             id={`parent-item-${parent.id}`}
             layoutId={`parent-${parent.id}`}
+            className="h-full"
             initial={enter ? { y: 6 } : undefined}
             animate={{ y: 0 }}
             transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}

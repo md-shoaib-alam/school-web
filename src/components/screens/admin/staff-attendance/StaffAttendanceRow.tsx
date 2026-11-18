@@ -3,6 +3,7 @@
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserCheck, UserX } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { AttendanceStatus, StaffAttendanceItem } from './types';
 
 interface StaffAttendanceRowProps {
@@ -16,11 +17,11 @@ interface StaffAttendanceRowProps {
 const getStatusBg = (status: string) => {
   switch (status) {
     case 'present':
-      return 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
+      return 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-900/30';
     case 'absent':
-      return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+      return 'bg-red-50/40 dark:bg-red-950/20 border-red-200/50 dark:border-red-900/30';
     default:
-      return '';
+      return 'bg-card border-border';
   }
 };
 
@@ -74,25 +75,29 @@ export function StaffAttendanceRow({
       </div>
 
       <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto">
-        {(['present', 'absent'] as AttendanceStatus[]).map((status) => (
-          <button
-            key={status}
-            type="button"
-            onClick={() => onStatusChange(staff.id, status)}
-            className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border cursor-pointer ${
-              currentStatus === status
-                ? `${getStatusBg(status)} ${
-                    status === 'present'
-                      ? 'bg-emerald-500 dark:bg-emerald-500 text-white'
-                      : 'bg-red-500 dark:bg-red-500 text-white'
-                  } border-transparent shadow-sm ring-1 ring-white/10`
-                : ' text-muted-foreground hover: dark:hover: bg-card'
-            }`}
-          >
-            {getStatusIcon(status)}
-            <span className="sm:inline capitalize">{status}</span>
-          </button>
-        ))}
+        {(['present', 'absent'] as AttendanceStatus[]).map((status) => {
+          const isSelected = currentStatus === status;
+          return (
+            <button
+              key={status}
+              type="button"
+              onClick={() => onStatusChange(staff.id, status)}
+              className={cn(
+                "flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer",
+                isSelected && status === 'present' && "bg-emerald-500/15 hover:bg-emerald-500/25 dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 dark:border-emerald-500/40 shadow-xs",
+                isSelected && status === 'absent' && "bg-red-500/15 hover:bg-red-500/25 dark:bg-red-500/20 dark:hover:bg-red-500/30 text-red-700 dark:text-red-300 border-red-500/30 dark:border-red-500/40 shadow-xs",
+                !isSelected && "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
+              )}
+            >
+              {status === 'present' ? (
+                <UserCheck className={cn("size-3.5", isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")} />
+              ) : (
+                <UserX className={cn("size-3.5", isSelected ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} />
+              )}
+              <span className="sm:inline capitalize">{status}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

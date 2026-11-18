@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Eye, Award } from "lucide-react";
 import { handleMarksheetPreview } from "./marksheet-preview";
-import { MarksheetTemplatePreviewWidget } from "./marksheet-preview-widget";
 import { StatusToggle } from "./status-toggle";
 
 interface MarksheetSettingsCardProps {
@@ -24,7 +23,7 @@ export function MarksheetSettingsCard({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
+          <div className="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
             <Award className="size-5" />
           </div>
           <div>
@@ -33,17 +32,17 @@ export function MarksheetSettingsCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-7 space-y-5">
+        <div className="space-y-3">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
               <div className="flex-1">
                 <Select
                   value={defaultMarksheetTemplateId}
                   onValueChange={onTemplateChange}
                 >
-                  <SelectTrigger className="w-full h-10 border-violet-200 dark:border-violet-900/50 bg-background text-xs font-medium">
+                  <SelectTrigger aria-label="Default marksheet template"
+                    className="w-full h-10 border-border bg-card text-xs font-medium">
                     <div className="flex items-center gap-2">
-                      <Settings className="size-4 text-violet-500" />
+                      <Settings className="size-4 text-muted-foreground" />
                       <SelectValue placeholder="Choose default marksheet…" />
                     </div>
                   </SelectTrigger>
@@ -61,7 +60,7 @@ export function MarksheetSettingsCard({
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 border-violet-200 dark:border-violet-900/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 text-violet-700 dark:text-violet-400 gap-1.5 font-semibold text-xs shrink-0"
+                className="h-10 border-border bg-card hover:bg-muted text-foreground gap-1.5 font-semibold text-xs shrink-0"
                 onClick={() => handleMarksheetPreview(defaultMarksheetTemplateId)}
               >
                 <Eye className="size-4" />
@@ -69,7 +68,7 @@ export function MarksheetSettingsCard({
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border  w-full gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted rounded-lg border border-border gap-3">
               <div className="space-y-0.5">
                 <h4 className="text-sm font-semibold text-foreground">
                   Marksheet Preview Mode
@@ -84,16 +83,6 @@ export function MarksheetSettingsCard({
                 onToggle={onToggleMarksheetPreview} 
               />
             </div>
-          </div>
-
-          {/* Right Column: Previews - Desktop Only */}
-          <div className="hidden lg:block lg:col-span-5 pl-6 border-l ">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
-              Template Preview
-            </div>
-            <MarksheetTemplatePreviewWidget templateId={defaultMarksheetTemplateId} isEnabled={enableModalMarksheetPreview} />
-          </div>
         </div>
       </CardContent>
     </Card>

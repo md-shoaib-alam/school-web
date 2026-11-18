@@ -36,7 +36,7 @@ export function StaffAttendance({ initialTab }: StaffAttendanceProps) {
   const [qrModalOpen, setQrModalOpen] = useState(false);
 
   return (
-    <div className="space-y-6 md:pb-18 pb-26">
+    <div className="space-y-6 pb-24">
       <AttendanceHeader
         activeTab={activeTab}
         selectedDate={selectedDate}

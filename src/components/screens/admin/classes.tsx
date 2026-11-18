@@ -1,11 +1,13 @@
 "use client";
 
 import { apiFetch } from "@/lib/api";
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { School } from "lucide-react";
+import { School, Search, Plus } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import type { ClassInfo } from "@/types";
@@ -17,6 +19,7 @@ import { useViewMode } from "@/hooks/use-view-mode";
 // Sub-components
 import { ReadOnlyBanner } from "./classes/ReadOnlyBanner";
 import { ClassesHeader } from "./classes/ClassesHeader";
+import { ClassesFilterBar } from "./classes/ClassesFilterBar";
 import { ClassesTableView } from "./classes/ClassesTableView";
 import { ClassesGridView } from "./classes/ClassesGridView";
 import { ClassDialogs } from "./classes/ClassDialogs";
@@ -138,15 +141,31 @@ export function AdminClasses() {
   const enableGradeSelection = settingsData?.enableGradeSelection ?? false;
 
   // Fetch all teachers in the tenant to populate the assign class teacher dropdown
-  const { data: teachersData } = useTeachers(currentTenantId || undefined);
+  const { data: teachersData } = useTeachers(currentTenantId || undefined, undefined, undefined, 100);
   const teachers = teachersData?.teachers || [];
 
-  const classes = useMemo(() => {
+  const [classSearch, setClassSearch] = useState("");
+  const [sectionFilter, setSectionFilter] = useState("all");
+
+  const allSections = useMemo(() => {
     const list = classesData?.classes || [];
+    return [...new Set(list.map((c: ClassInfo) => c.section))].sort();
+  }, [classesData]);
+
+  const classes = useMemo(() => {
+    let list = classesData?.classes || [];
+    if (sectionFilter !== "all") list = list.filter((c: ClassInfo) => c.section === sectionFilter);
+    const s = classSearch.trim().toLowerCase();
+    if (s) {
+      list = list.filter(
+        (c: ClassInfo) =>
+          c.name.toLowerCase().includes(s) || (c.classTeacher || "").toLowerCase().includes(s),
+      );
+    }
     return [...list].sort((a, b) => 
       a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
     );
-  }, [classesData]);
+  }, [classesData, sectionFilter, classSearch]);
 
   const [viewMode, setViewMode] = useViewMode("classes", "grid");
 
@@ -309,7 +328,7 @@ export function AdminClasses() {
   const openDeleteDialog = (cls: ClassInfo) => dispatch({ type: "OPEN_DELETE", payload: cls });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <ReadOnlyBanner isVisible={!canCreate && !canEdit && !canDelete} />
 
       <ClassesHeader 
@@ -320,8 +339,41 @@ export function AdminClasses() {
         onAddClick={() => dispatch({ type: "TOGGLE_ADD", payload: true })}
       />
 
+      {/* Mobile Sticky Search Bar + Add Class (Direct child of page container -> stays sticky for all cards) */}
+      <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 sm:hidden flex items-center gap-2.5">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={classSearch}
+            onChange={(e) => setClassSearch(e.target.value)}
+            placeholder="Search class or teacher..."
+            className="h-9 rounded-xl bg-muted pl-9 text-sm"
+            aria-label="Search class or teacher"
+          />
+        </div>
+        {canCreate && (
+          <Button
+            className="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs shrink-0 flex items-center gap-1.5"
+            onClick={() => dispatch({ type: "TOGGLE_ADD", payload: true })}
+          >
+            <Plus className="size-3.5" />
+            <span>Add Class</span>
+          </Button>
+        )}
+      </div>
+
+      {!loading && (
+        <ClassesFilterBar
+          search={classSearch}
+          onSearchChange={setClassSearch}
+          sections={allSections}
+          activeSection={sectionFilter}
+          onSectionChange={setSectionFilter}
+        />
+      )}
+
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4">
           {[...Array(8)].map((_, i) => (
             <Card key={i} className="border-0 shadow-sm">
               <CardContent className="p-6">
@@ -340,23 +392,31 @@ export function AdminClasses() {
           <CardContent className="py-20 text-center text-muted-foreground">
             <School className="size-12 mx-auto mb-4 opacity-20" />
             <p className="text-lg font-medium">No classes found</p>
-            <p className="text-sm text-muted-foreground">Create your first class to get started</p>
+            <p className="text-sm text-muted-foreground">
+              {classSearch || sectionFilter !== "all"
+                ? "Try a different search or section filter"
+                : "Create your first class to get started"}
+            </p>
           </CardContent>
         </Card>
       ) : (
         <LayoutGroup id="classes">
           {viewMode === "table" ? (
-            <ClassesTableView 
-              classes={classes}
-              enter={enter}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              onViewStudents={handleViewStudents}
-              onEdit={openEditDialog}
-              onDelete={openDeleteDialog}
-              getProgressColor={getProgressColor}
-            />
-          ) : (
+            <div className="hidden sm:block">
+              <ClassesTableView 
+                classes={classes}
+                enter={enter}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                onViewStudents={handleViewStudents}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+                getProgressColor={getProgressColor}
+              />
+            </div>
+          ) : null}
+
+          <div className={viewMode === "table" ? "sm:hidden" : "block"}>
             <ClassesGridView 
               classes={classes}
               enter={enter}
@@ -367,7 +427,7 @@ export function AdminClasses() {
               onDelete={openDeleteDialog}
               getProgressColor={getProgressColor}
             />
-          )}
+          </div>
         </LayoutGroup>
       )}
 

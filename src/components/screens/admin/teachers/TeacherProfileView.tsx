@@ -30,6 +30,16 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/ui/copy-button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { apiFetch } from "@/lib/api";
 import { toSquareDataUrl } from "@/lib/image-utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,6 +51,7 @@ import { TeacherProfessionalCard } from "./TeacherProfessionalCard";
 import { TeacherSubjectsCard } from "./TeacherSubjectsCard";
 import { TeacherClassesCard } from "./TeacherClassesCard";
 import { TeacherProfileSkeleton } from "@/components/screens/profile/TeacherProfileSkeleton";
+import { FixedDock } from "@/components/shared/fixed-dock";
 
 interface TeacherProfileViewProps {
   teacher: TeacherInfo;
@@ -121,6 +132,7 @@ export function TeacherProfileView({
   const [activeTab, setActiveTab] = useState<"overview" | "academics" | "attendance" | "classes" | "documents" | "notes">("overview");
 
   const [currentTeacher, setCurrentTeacher] = useState<TeacherInfo>(teacher);
+  const [pendingClassRemoval, setPendingClassRemoval] = useState<string[] | null>(null);
   useEffect(() => {
     setCurrentTeacher(teacher);
   }, [teacher]);
@@ -295,6 +307,18 @@ export function TeacherProfileView({
       return;
     }
 
+    if (sectionName === "classes") {
+      const removed = (currentTeacher.classes || []).filter((c) => !formData.classes.includes(c));
+      if (removed.length > 0) {
+        setPendingClassRemoval(removed);
+        return;
+      }
+    }
+
+    await persistSection(sectionName, title);
+  };
+
+  const persistSection = async (sectionName: string, title: string) => {
     setSavingSection(sectionName);
     try {
       const { newSubjectInput, newClassInput, role, ...fields } = formData;
@@ -351,7 +375,7 @@ export function TeacherProfileView({
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200 pb-6">
+    <div className="space-y-5 animate-in fade-in duration-200 pb-24 sm:pb-6">
       {/* Top Breadcrumbs & Action Row */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -760,18 +784,49 @@ export function TeacherProfileView({
         </div>
       )}
 
-      {/* Mobile Sticky Edit Profile Button */}
+      {/* Mobile Sticky Bottom Edit Profile Button */}
       {canEdit && editingSection === null && activeTab === "overview" && (
-        <div className="sm:hidden sticky bottom-4 z-10 pt-2">
-          <Button
-            onClick={() => startEdit("all")}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl py-3 gap-2 shadow-lg shadow-emerald-600/20"
-          >
-            <Pencil className="size-4" />
-            Edit Profile
-          </Button>
-        </div>
+        <FixedDock className="fixed bottom-6 left-0 right-0 z-40 pointer-events-none px-4 sm:hidden">
+          <div className="pointer-events-auto mx-auto w-full max-w-[420px]">
+            <Button
+              onClick={() => startEdit("all")}
+              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-full py-3 gap-2 shadow-xl shadow-emerald-950/25 active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <Pencil className="size-4" />
+              Edit Profile
+            </Button>
+          </div>
+        </FixedDock>
       )}
+
+      <AlertDialog open={pendingClassRemoval !== null} onOpenChange={(open) => !open && setPendingClassRemoval(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2.5">
+              <span className="size-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                <School className="size-4.5 text-amber-600 dark:text-amber-400" />
+              </span>
+              Remove class teacher assignment?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              {(pendingClassRemoval || []).join(", ")} {(pendingClassRemoval || []).length === 1 ? "is" : "are"} currently assigned to {currentTeacher.name} as class teacher. Saving will remove {(pendingClassRemoval || []).length === 1 ? "it" : "them"}, and those classes will show as Unassigned until you pick another teacher.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:space-x-2">
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={async () => {
+                setPendingClassRemoval(null);
+                await persistSection("classes", "Classes Taught");
+              }}
+            >
+              <Check className="size-3.5" />
+              Yes, remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

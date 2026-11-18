@@ -68,7 +68,7 @@ export function ParentsHeader({
         onChange={onSearchChange}
         placeholder="Search parents or children..."
         delay={400}
-        className="w-full sm:max-w-md"
+        className="hidden sm:block w-full sm:max-w-md"
       />
     </div>
   );

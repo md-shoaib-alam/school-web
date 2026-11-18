@@ -10,6 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ClassSelect } from "@/components/ui/class-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AttendancePicker } from "./take-attendance/picker";
+import { FixedDock } from "@/components/shared/fixed-dock";
 import {
   CalendarDays,
   Save,
@@ -24,6 +27,7 @@ import {
   WifiOff,
   Send,
   Check,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -60,9 +64,9 @@ interface AttendanceRecord {
 const getStatusBg = (status: AttendanceStatus) => {
   switch (status) {
     case "present":
-      return "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60";
+      return "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-900/30";
     case "absent":
-      return "bg-red-50/60 dark:bg-red-950/20 border-red-200 dark:border-red-800/60";
+      return "bg-red-50/40 dark:bg-red-950/20 border-red-200/50 dark:border-red-900/30";
     default:
       return "bg-card border-border hover:bg-muted/30";
   }
@@ -89,10 +93,8 @@ const getInitials = (name: string) =>
 
 // ─── Query keys ───────────────────────────────────────────────
 
-const classesKey = () => ["teacher-classes"] as const;
 const studentsKey = (classId: string) => ["teacher-students", classId] as const;
-const attendanceKey = (classId: string, date: string) =>
-  ["teacher-attendance", classId, date] as const;
+type PeriodSlot = { periodNumber: number; timetableId: string | null; subjectName: string | null; teacherName: string | null; startTime: string | null; endTime: string | null };
 
 const DAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 const DEFAULT_WORKING_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -109,6 +111,16 @@ export function TeacherAttendance() {
     return `${y}-${m}-${d}`;
   });
   const currentTenantId = useAppStore((s) => s.currentTenantId);
+  const sidebarOpen = useAppStore((s) => s.sidebarOpen);
+  const [selectedPeriod, setSelectedPeriod] = useState(1);
+  const [mode, setMode] = useState<"pick" | "mark">("pick");
+  const { data: attendanceSettings, error: settingsError } = useQuery({
+    queryKey: ["attendance-settings", currentTenantId],
+    queryFn: () => api.get<{ mode: "daily" | "period"; periodCount: number; teacherClassScope: "assigned" | "all" }>("/period-attendance/settings"),
+    enabled: !!currentTenantId,
+  });
+  const isPeriodMode = attendanceSettings?.mode === "period";
+  const periodNumber = isPeriodMode ? Math.min(selectedPeriod, attendanceSettings.periodCount) : 0;
   const { data: workingDays = DEFAULT_WORKING_DAYS } = useQuery<string[]>({
     queryKey: ["working-days", currentTenantId],
     queryFn: async () => {
@@ -139,9 +151,11 @@ export function TeacherAttendance() {
   // ── Fetch classes ──────────────────────────────────────────
 
   const { data: rawClasses, isLoading: classesLoading } = useQuery({
-    queryKey: classesKey(),
+    queryKey: ["teacher-classes", attendanceSettings?.teacherClassScope],
     queryFn: async () => {
-      const data = await api.get<any>("/classes?all=true");
+      // Both branches follow the school's assignment rule; /classes/teaching
+      // counts class-teacher, subject and timetable assignments.
+      const data = await api.get<any>(attendanceSettings?.teacherClassScope === "all" ? "/classes?all=true" : "/classes/teaching");
       return (Array.isArray(data) ? data : (data?.items ?? [])) as ClassInfo[];
     },
     staleTime: 5 * 60 * 1000,
@@ -150,6 +164,14 @@ export function TeacherAttendance() {
 
   const classes = useMemo(() => (Array.isArray(rawClasses) ? rawClasses : (rawClasses as any)?.items ?? []), [rawClasses]);
   const activeClassId = selectedClassId || classes[0]?.id || "";
+  const activeAttendanceKey = ["teacher-attendance", currentTenantId, activeClassId, date, periodNumber] as const;
+  const viewKey = JSON.stringify(activeAttendanceKey);
+  const { data: slotData } = useQuery({
+    queryKey: ["attendance-slots", currentTenantId, activeClassId, date],
+    queryFn: () => api.get<{ periods: PeriodSlot[] }>(`/period-attendance/slots?classId=${encodeURIComponent(activeClassId)}&date=${date}`),
+    enabled: isPeriodMode && !!activeClassId && mode === "mark",
+  });
+  const selectedSlot = slotData?.periods.find(slot => slot.periodNumber === periodNumber);
 
   // ── Fetch students for selected class ─────────────────────
 
@@ -160,19 +182,20 @@ export function TeacherAttendance() {
       const data = await fetchAllStudents({ classId: activeClassId });
       return data as StudentInfo[];
     },
-    enabled: !!activeClassId,
+    enabled: !!activeClassId && mode === "mark",
     staleTime: 5 * 60 * 1000,
   });
 
   // ── Fetch existing attendance for class + date ─────────────
 
-  const { data: existingAttendance = [] } = useQuery({
-    queryKey: attendanceKey(activeClassId, date),
+  const { data: existingAttendance = [], isPending: attendanceLoading, error: attendanceError } = useQuery({
+    queryKey: activeAttendanceKey,
     queryFn: async () => {
-      const res = await api.get<any>(`/attendance?classId=${activeClassId}&date=${date}&limit=1000`);
-      return Array.isArray(res?.records) ? res.records : [];
+      const endpoint = isPeriodMode ? `/period-attendance?periodNumber=${periodNumber}&` : "/attendance?";
+      const res = await api.get<{ records: AttendanceRecord[] }>(`${endpoint}classId=${encodeURIComponent(activeClassId)}&date=${date}&limit=1000`);
+      return res.records;
     },
-    enabled: !!activeClassId,
+    enabled: !!activeClassId && !!attendanceSettings && mode === "mark",
     staleTime: 30 * 1000, // 30 s - background refresh keeps it fresh
   });
 
@@ -236,12 +259,12 @@ export function TeacherAttendance() {
   }, [lastSavedTime]);
 
   // Adjust/Reset overrides when class or date changes during rendering (prevents set-state-in-effect and extra cycles)
-  const [prevClassAndDate, setPrevClassAndDate] = useState({ classId: activeClassId, date });
-  if (prevClassAndDate.classId !== activeClassId || prevClassAndDate.date !== date) {
+  const [previousViewKey, setPreviousViewKey] = useState(viewKey);
+  if (previousViewKey !== viewKey) {
     setLocalOverrides({});
     setSaved(false);
     setSubmitted(false);
-    setPrevClassAndDate({ classId: activeClassId, date });
+    setPreviousViewKey(viewKey);
   }
 
   // Combine server record truth with user pending interactions
@@ -271,55 +294,31 @@ export function TeacherAttendance() {
   // ── Save mutation ──────────────────────────────────────────
 
   const saveMutation = useMutation({
-    mutationFn: () => {
-      const payloadRecords = records.map((r) => ({
-        studentId: r.studentId,
-        status: r.status === "absent" ? "absent" : "present",
-      }));
-      return api.post("/attendance", {
+    mutationFn: async () => {
+      const payloadRecords = records.map(r => ({ studentId: r.studentId, status: r.status }));
+      await api.post(isPeriodMode ? "/period-attendance" : "/attendance", {
         classId: activeClassId,
         date,
         records: payloadRecords,
+        ...(isPeriodMode ? { periodNumber, timetableId: selectedSlot?.timetableId ?? null } : {}),
       });
+      return { queryKey: activeAttendanceKey, viewKey, records: payloadRecords };
     },
-    onMutate: async () => {
-      // Optimistically update the cache so the UI reflects saved state instantly
-      await queryClient.cancelQueries({
-        queryKey: attendanceKey(activeClassId, date),
-      });
-
-      const snapshot = queryClient.getQueryData<any[]>(
-        attendanceKey(activeClassId, date)
-      );
-
-      queryClient.setQueryData(
-        attendanceKey(activeClassId, date),
-        records.map((r) => ({ studentId: r.studentId, status: r.status }))
-      );
-
-      return { snapshot };
-    },
-    onSuccess: () => {
-      setSaved(true);
-      setSubmitted(true);
-      setLastSavedTime(Date.now());
-      setLocalOverrides({});
-      toast.success("Attendance saved!");
-
-      // Background refetch to sync with server truth
-      queryClient.invalidateQueries({
-        queryKey: attendanceKey(activeClassId, date),
-      });
-    },
-    onError: (_err, _vars, ctx) => {
-      // Roll back optimistic update
-      if (ctx?.snapshot) {
-        queryClient.setQueryData(
-          attendanceKey(activeClassId, date),
-          ctx.snapshot
-        );
+    onSuccess: (result) => {
+      queryClient.setQueryData(result.queryKey, result.records);
+      queryClient.invalidateQueries({ queryKey: result.queryKey });
+      queryClient.invalidateQueries({ queryKey: ["attendance"] });
+      if (result.viewKey === viewKey) {
+        setSaved(true);
+        setSubmitted(true);
+        setLastSavedTime(Date.now());
+        setLocalOverrides({});
       }
-      toast.error("Failed to save attendance. Please try again.");
+      toast.success("Attendance saved!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to save attendance. Please try again.");
+      queryClient.invalidateQueries({ queryKey: ["attendance-settings", currentTenantId] });
     },
   });
 
@@ -345,6 +344,7 @@ export function TeacherAttendance() {
   // 2. Either has unsaved changes OR attendance has not been recorded yet for the day
   // 3. Online, not pending save, and class has students
   const canSubmit =
+    !!attendanceSettings && !settingsError && !attendanceError && !attendanceLoading && !studentsLoading &&
     isWorkingDay &&
     unmarkedCount === 0 &&
     (hasUnsavedChanges || (!hasExistingAttendance && !saved)) &&
@@ -376,6 +376,23 @@ export function TeacherAttendance() {
 
   // ── Loading skeleton ───────────────────────────────────────
 
+  // ── Picker screen ──────────────────────────────────────────
+
+  if (mode === "pick") {
+    return (
+      <AttendancePicker
+        tenantId={currentTenantId}
+        initialDate={date}
+        disableDates={disableFutureDates}
+        onPick={(pickedClassId, pickedDate) => {
+          setSelectedClassId(pickedClassId);
+          setDate(pickedDate);
+          setMode("mark");
+        }}
+      />
+    );
+  }
+
   if (classesLoading) {
     return (
       <div className="space-y-6">
@@ -396,19 +413,34 @@ export function TeacherAttendance() {
   // ── Render ─────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 pb-2 sm:pb-4">
+    <div className="space-y-4 pb-28 sm:space-y-6 sm:pb-6">
       {/* Title */}
-      <div>
-        <h2 className="text-2xl font-semibold text-foreground">
-          Take Attendance
-        </h2>
-        <p className="text-muted-foreground mt-1">
-          Record daily attendance for your classes.
-        </p>
+      <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 flex items-center justify-center sm:static sm:top-auto sm:z-auto sm:mx-0 sm:px-0 sm:py-0 sm:bg-transparent sm:border-b-0 sm:justify-start sm:gap-3">
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-4 top-1/2 -translate-y-1/2 size-9 shrink-0 rounded-xl sm:static sm:top-auto sm:translate-y-0 sm:left-auto"
+          aria-label="Back"
+          onClick={() => setMode("pick")}
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+        <div className="text-center sm:text-left px-12 sm:px-0">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+            {selectedClass ? `${/^class\b/i.test(selectedClass.name) ? selectedClass.name : `Class ${selectedClass.name}`}-${selectedClass.section}` : "Take Attendance"}
+          </h2>
+          <p className="text-muted-foreground mt-1 hidden sm:block">
+            {isPeriodMode
+              ? `Period ${periodNumber}${selectedSlot?.subjectName ? ` · ${selectedSlot.subjectName}` : ""} · Period 1 supplies the daily summary`
+              : "Daily attendance for your classes."}
+          </p>
+        </div>
       </div>
 
+      {(settingsError || attendanceError) && <p role="alert" className="text-sm text-destructive">Could not load attendance settings or records. Reload the page before marking attendance.</p>}
+
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="hidden sm:flex sm:flex-row sm:flex-wrap gap-3">
         <div className="flex-1 max-w-xs">
           <ClassSelect
             value={activeClassId}
@@ -442,6 +474,23 @@ export function TeacherAttendance() {
         </div>
       </div>
 
+      {isPeriodMode && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <Select value={String(periodNumber)} onValueChange={value => setSelectedPeriod(Number(value))} disabled={saveMutation.isPending}>
+            <SelectTrigger aria-label="Attendance period" className="w-full sm:w-64"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: attendanceSettings.periodCount }, (_, index) => {
+                const slot = slotData?.periods[index];
+                return <SelectItem key={index + 1} value={String(index + 1)}>Period {index + 1}{slot?.subjectName ? ` — ${slot.subjectName}` : ""}</SelectItem>;
+              })}
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground">
+            {selectedSlot?.startTime ? `${selectedSlot.startTime}–${selectedSlot.endTime}${selectedSlot.teacherName ? ` · ${selectedSlot.teacherName}` : ""}` : "Numbered period — no timetable needed."}
+          </p>
+        </div>
+      )}
+
       {!isWorkingDay && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/30 dark:text-amber-200">
           {date} is not a working day for this school. Attendance can only be marked on the working days configured in School Settings.
@@ -450,47 +499,67 @@ export function TeacherAttendance() {
 
       {/* Stats */}
       {students.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            {
-              label: "Total",
-              value: totalCount,
-              icon: <Users className="size-5 text-blue-500 dark:text-blue-400" />,
-              bg: "bg-blue-50 dark:bg-blue-900/30",
-              text: "text-foreground",
-            },
-            {
-              label: "Present",
-              value: presentCount,
-              icon: <UserCheck className="size-5 text-emerald-500 dark:text-emerald-400" />,
-              bg: "bg-emerald-50 dark:bg-emerald-900/30",
-              text: "text-emerald-600 dark:text-emerald-400",
-            },
-            {
-              label: "Absent",
-              value: absentCount,
-              icon: <UserX className="size-5 text-red-500 dark:text-red-400" />,
-              bg: "bg-red-50 dark:bg-red-900/30",
-              text: "text-red-600 dark:text-red-400",
-            },
-          ].map(({ label, value, icon, bg, text }) => (
-            <Card key={label} className="rounded-xl shadow-sm border-0">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div
-                  className={`size-10 rounded-xl ${bg} flex items-center justify-center`}
+        <Card className="rounded-xl shadow-sm border">
+          <CardContent className="p-2.5 sm:p-4 space-y-2 sm:space-y-3">
+            {/* Mobile View: Compact horizontal tiles */}
+            <div className="grid grid-cols-2 gap-2 sm:hidden">
+              <div className="flex items-center justify-between rounded-xl bg-emerald-50 dark:bg-emerald-950/20 px-3 py-1.5">
+                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{presentCount}</span>
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />Present
+                </span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl bg-red-50 dark:bg-red-950/20 px-3 py-1.5">
+                <span className="text-lg font-bold text-red-600 dark:text-red-400">{absentCount}</span>
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                  <span className="size-1.5 rounded-full bg-red-500" />Absent
+                </span>
+              </div>
+            </div>
+
+            {/* Desktop View: Preserved existing layout */}
+            <div className="hidden sm:grid sm:grid-cols-2 sm:gap-3">
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/20 p-3">
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{presentCount}</p>
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />Present
+                </p>
+              </div>
+              <div className="rounded-xl bg-red-50 dark:bg-red-950/20 p-3">
+                <p className="text-2xl font-bold text-red-600 dark:text-red-400">{absentCount}</p>
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="size-1.5 rounded-full bg-red-500" />Absent
+                </p>
+              </div>
+            </div>
+            <div className="flex h-1.5 gap-0.5 overflow-hidden rounded-full bg-muted">
+              <div className="bg-emerald-500 transition-all" style={{ flexGrow: presentCount }} />
+              <div className="bg-red-500 transition-all" style={{ flexGrow: absentCount }} />
+              <div className="flex-1" />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                {presentCount + absentCount} of {totalCount} marked
+              </p>
+              <div className="flex items-center gap-2 sm:hidden">
+                <button
+                  type="button"
+                  className="py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95 cursor-pointer"
+                  onClick={() => markAll("present")}
                 >
-                  {icon}
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-medium">
-                    {label}
-                  </p>
-                  <p className={`text-xl font-bold ${text}`}>{value}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  All Present
+                </button>
+                <button
+                  type="button"
+                  className="py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-500/20 active:scale-95 cursor-pointer"
+                  onClick={() => markAll("absent")}
+                >
+                  All Absent
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Attendance list */}
@@ -521,7 +590,7 @@ export function TeacherAttendance() {
               </Badge>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-muted dark:bg-[#111113] border rounded-xl sm:w-auto">
+            <div className="hidden sm:flex items-center gap-1.5 p-1 bg-muted dark:bg-[#111113] border rounded-xl sm:w-auto">
               <div className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">
                 Quick:
               </div>
@@ -605,12 +674,16 @@ export function TeacherAttendance() {
                                 onClick={() => updateRecord(student.id, isSelected ? "unmarked" : status)}
                                 className={cn(
                                   "flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border",
-                                  isSelected && status === "present" && "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-500 text-white border-transparent shadow-sm ring-1 ring-white/10",
-                                  isSelected && status === "absent" && "bg-red-500 hover:bg-red-600 dark:bg-red-500 text-white border-transparent shadow-sm ring-1 ring-white/10",
+                                  isSelected && status === "present" && "bg-emerald-500/15 hover:bg-emerald-500/25 dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 dark:border-emerald-500/40 shadow-xs",
+                                  isSelected && status === "absent" && "bg-red-500/15 hover:bg-red-500/25 dark:bg-red-500/20 dark:hover:bg-red-500/30 text-red-700 dark:text-red-300 border-red-500/30 dark:border-red-500/40 shadow-xs",
                                   !isSelected && "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
                                 )}
                               >
-                                {getStatusIcon(status)}
+                                {status === "present" ? (
+                                  <UserCheck className={cn("size-3.5", isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")} />
+                                ) : (
+                                  <UserX className={cn("size-3.5", isSelected ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} />
+                                )}
                                 <span className="capitalize">{status}</span>
                               </button>
                             );
@@ -635,12 +708,18 @@ export function TeacherAttendance() {
 
       {/* Floating Attendance Status Dock */}
       {students.length > 0 && (
-        <div className="sticky bottom-[-6px] lg:bottom-[-10px] z-40 flex justify-center mt-2 pointer-events-none px-3">
-          <div
-            role="status"
-            aria-live="polite"
-            className="pointer-events-auto w-full max-w-[420px] sm:max-w-[440px] flex items-center justify-between gap-2.5 sm:gap-3 p-2 pl-3.5 pr-2 rounded-[18px] bg-card border border-border shadow-[0_14px_34px_-12px_rgba(0,0,0,0.45)] relative backdrop-blur-md animate-in slide-in-from-bottom-2 duration-300"
-          >
+        <FixedDock
+          className={cn(
+            "fixed bottom-6 z-40 pointer-events-none px-4 transition-[left,right] duration-300 ease-spring sm:bottom-6 lg:bottom-8",
+            sidebarOpen ? "left-0 right-0 lg:left-[298px] lg:right-2.5" : "left-0 right-0 lg:left-[82px] lg:right-2.5",
+          )}
+        >
+          <div className="pointer-events-auto flex justify-center w-full">
+            <div
+              role="status"
+              aria-live="polite"
+              className="w-full max-w-[420px] sm:max-w-[440px] flex items-center justify-between gap-2.5 sm:gap-3 p-2 pl-3.5 pr-2 rounded-[18px] bg-card border border-border shadow-[0_14px_34px_-12px_rgba(0,0,0,0.45)] backdrop-blur-md animate-in slide-in-from-bottom-2 duration-300"
+            >
             {/* Status icon tile */}
             <span
               className={cn(
@@ -749,7 +828,8 @@ export function TeacherAttendance() {
             </button>
           </div>
         </div>
-      )}
+      </FixedDock>
+    )}
     </div>
   );
 }

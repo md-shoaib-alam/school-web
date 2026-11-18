@@ -14,6 +14,7 @@ import { useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-quer
 import { queryKeys } from "@/lib/graphql/keys";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pagination } from "@/components/shared/pagination";
+import { SearchInput } from "@/components/ui/search-input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -617,6 +618,19 @@ export function AdminParents() {
         />
       ) : (
         <div className="space-y-6">
+          {/* Mobile Sticky Search Bar (Sticks to top header for entire page) */}
+          <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 sm:hidden">
+            <SearchInput
+              id="search_parents_mobile"
+              value={search}
+              onChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}
+              placeholder="Search parents or children..."
+              delay={400}
+              className="w-full"
+              inputClassName="h-9"
+            />
+          </div>
+
           <ParentsHeader
             search={search}
             onSearchChange={(v) => dispatch({ type: 'SET_SEARCH', payload: v })}

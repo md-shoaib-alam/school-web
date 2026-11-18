@@ -424,6 +424,19 @@ export function AdminStaff() {
         />
       ) : (
         <div className="space-y-6">
+          {/* Mobile Sticky Search Bar (Sticks to top header for entire page) */}
+          <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 sm:hidden">
+            <SearchInput
+              id="search_staff_mobile"
+              value={search}
+              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+              placeholder="Search by name, email, phone..."
+              delay={400}
+              className="w-full"
+              inputClassName="h-9"
+            />
+          </div>
+
           {/* Header */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <SearchInput
@@ -432,10 +445,10 @@ export function AdminStaff() {
               onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
               placeholder="Search by name, email, phone..."
               delay={400}
-              className="w-full sm:max-w-sm flex-1 order-2 sm:order-1"
+              className="hidden sm:block w-full sm:max-w-sm flex-1 order-2 sm:order-1"
             />
 
-            <div className="flex items-center gap-2 self-end sm:self-auto order-1 sm:order-2">
+            <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto order-1 sm:order-2">
               <div className="flex items-center bg-muted p-1 rounded-lg border ">
                 <Button
                   variant="ghost"

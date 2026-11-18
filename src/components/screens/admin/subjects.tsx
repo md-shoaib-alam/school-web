@@ -2,7 +2,9 @@
 
 import { useState, useReducer, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Eye } from "lucide-react";
+import { BookOpen, Eye, Search, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { useModulePermissions } from "@/hooks/use-permissions";
@@ -242,7 +244,7 @@ export function AdminSubjects() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Read-only banner */}
       {!canCreate && !canEdit && !canDelete && (
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-3 py-2">
@@ -258,6 +260,28 @@ export function AdminSubjects() {
         canCreate={canCreate}
         onAddClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
       />
+
+      {/* Mobile Sticky Search Bar + Add Subject (Sticks to top header on scroll) */}
+      <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 sm:hidden flex items-center gap-2.5">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            placeholder="Search subjects…"
+            className="pl-9 w-full bg-background h-9"
+            value={search}
+            onChange={(e) => dispatch({ type: 'SET_SEARCH', payload: e.target.value })}
+          />
+        </div>
+        {canCreate && (
+          <Button
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 h-9 px-3 text-xs shadow-sm"
+            onClick={() => dispatch({ type: 'SET_CREATE_OPEN', payload: true })}
+          >
+            <Plus className="size-3.5 mr-1" /> Add Subject
+          </Button>
+        )}
+      </div>
 
       <SubjectsFilters 
         search={search}

@@ -1,9 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,18 +14,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Mail,
-  Phone,
   Briefcase,
-  Baby,
-  Pencil,
-  Link as LinkIcon,
-  Trash2,
-  GraduationCap,
-  Unlink,
   Link2,
+  Mail,
+  Pencil,
+  Phone,
+  Trash2,
+  Unlink,
 } from "lucide-react";
-import { ParentInfo, getInitials } from "./types";
+import { ParentInfo } from "./types";
 
 interface ParentCardProps {
   parent: ParentInfo;
@@ -37,6 +32,54 @@ interface ParentCardProps {
   onLinkOpen: (parent: ParentInfo) => void;
   onUnlinkChild: (parentId: string, childId: string) => void;
   onView: (parent: ParentInfo) => void;
+}
+
+/** "Parent 11" -> "P11", "Student 107" -> "S107", "Anita Rao" -> "AR" */
+function initials(name: string, prefix?: string) {
+  const num = name.match(/\d+/)?.[0];
+  if (num && prefix) return `${prefix}${num}`;
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function ChildRow({
+  child,
+  linking,
+  onUnlink,
+}: {
+  child: ParentInfo["children"][number];
+  linking: boolean;
+  onUnlink: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-[14px] bg-muted py-2.5 pl-3 pr-2.5">
+      <span className="flex size-[38px] flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-950 text-xs font-bold text-violet-600 dark:text-violet-400">
+        {initials(child.name, "S")}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-foreground">{child.name}</p>
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+          {child.className} · Roll {child.rollNumber}
+        </p>
+      </div>
+      <button
+        type="button"
+        aria-label={`Unlink ${child.name}`}
+        disabled={linking}
+        onClick={(e) => {
+          e.stopPropagation();
+          onUnlink();
+        }}
+        className="flex size-[34px] flex-none items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-50"
+      >
+        <Unlink className="size-[18px]" aria-hidden />
+      </button>
+    </div>
+  );
 }
 
 export function ParentCard({
@@ -49,70 +92,47 @@ export function ParentCard({
   onView,
 }: ParentCardProps) {
   return (
-    <Card 
-      className="rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border  hover:border-emerald-500/50 dark:hover:border-emerald-800/50 cursor-pointer"
+    <Card
+      className="h-full rounded-3xl border border-border bg-card shadow-sm cursor-pointer"
       onClick={() => onView(parent)}
     >
-      <CardContent className="p-5">
-        {/* Parent Header */}
-        <div className="flex items-start justify-between mb-4 gap-3">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <Avatar className="size-11 shrink-0">
-              {parent.avatar && <AvatarImage src={parent.avatar} alt={parent.name} className="object-cover" />}
-              <AvatarFallback
-                className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold"
-              >
-                {getInitials(parent.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-foreground text-sm truncate" title={parent.name}>
-                {parent.name}
-              </h3>
-              <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                <Mail className="size-3 text-muted-foreground shrink-0" />
-                <span className="text-xs text-foreground truncate block flex-1 min-w-0" title={parent.email}>
-                  {parent.email}
-                </span>
-              </div>
-            </div>
+      <CardContent className="flex flex-col gap-[18px] p-[22px]">
+        {/* Header */}
+        <div className="flex items-center gap-3.5">
+          <Avatar className="size-[54px] shrink-0 border border-border">
+            {parent.avatar && <AvatarImage src={parent.avatar} alt={parent.name} className="object-cover" />}
+            <AvatarFallback className="bg-muted text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              {initials(parent.name, "P")}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-base font-semibold tracking-[-0.01em] text-foreground">
+              {parent.name}
+            </h3>
+            <p className="mt-1 flex items-center gap-[7px] text-xs text-muted-foreground">
+              <Mail className="size-[15px] flex-none" aria-hidden />
+              <span className="truncate">{parent.email}</span>
+            </p>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(parent);
-              }}
-              title="Edit"
+          <div className="flex flex-none gap-0.5" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              aria-label={`Edit ${parent.name}`}
+              onClick={() => onEdit(parent)}
+              className="flex size-[34px] items-center justify-center rounded-[9px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              <Pencil className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 rounded-full border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 p-0 shrink-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                onLinkOpen(parent);
-              }}
-              title="Link Child"
-            >
-              <LinkIcon className="size-3.5" />
-            </Button>
+              <Pencil className="size-[18px]" aria-hidden />
+            </button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40"
-                  title="Delete"
+                <button
+                  type="button"
+                  aria-label={`Delete ${parent.name}`}
                   onClick={(e) => e.stopPropagation()}
+                  className="flex size-[34px] items-center justify-center rounded-[9px] text-red-400 transition-colors hover:bg-red-500/10"
                 >
-                  <Trash2 className="size-4" />
-                </Button>
+                  <Trash2 className="size-[18px]" aria-hidden />
+                </button>
               </AlertDialogTrigger>
               <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                 <AlertDialogHeader>
@@ -136,99 +156,61 @@ export function ParentCard({
           </div>
         </div>
 
-        {/* Parent Details */}
-        <div className="flex items-center gap-4 text-xs text-foreground mb-4">
-          {parent.phone && (
-            <span className="flex items-center gap-1">
-              <Phone className="size-3" /> {parent.phone}
-            </span>
-          )}
-          {parent.occupation && (
-            <span className="flex items-center gap-1">
-              <Briefcase className="size-3" /> {parent.occupation}
-            </span>
-          )}
+        {/* Occupation / phone pills */}
+        {(parent.occupation || parent.phone) && (
+          <div className="flex flex-wrap gap-2">
+            {parent.occupation && (
+              <span className="inline-flex items-center gap-2 self-start rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                <Briefcase className="size-[15px]" aria-hidden />
+                {parent.occupation}
+              </span>
+            )}
+            {parent.phone && (
+              <span className="inline-flex items-center gap-2 self-start rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                <Phone className="size-[15px]" aria-hidden />
+                {parent.phone}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="-mx-[22px] h-px bg-border" />
+
+        {/* Children header + Link Child */}
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+            Children <b className="font-bold text-emerald-600 dark:text-emerald-400">{parent.children.length}</b>
+          </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLinkOpen(parent);
+            }}
+            className="flex h-[34px] items-center gap-[7px] rounded-[10px] border border-emerald-500/30 bg-emerald-500/10 px-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400 transition-colors hover:bg-emerald-500/20"
+          >
+            <Link2 className="size-[15px]" aria-hidden />
+            Link Child
+          </button>
         </div>
 
-        {/* Children */}
-        <Separator className="mb-3" />
-        <div className="space-y-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-foreground flex items-center gap-1">
-              <Baby className="size-3" /> Children ({parent.children.length})
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7.5 text-[10px] sm:text-[11px] border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-3 rounded-md shrink-0 gap-1.5 font-semibold"
-              onClick={(e) => {
-                e.stopPropagation();
-                onLinkOpen(parent);
-              }}
-            >
-              <LinkIcon className="size-3" />
-              <span>Link Child</span>
-            </Button>
-          </div>
-
+        <div className="flex flex-1 flex-col gap-2">
           {parent.children.length === 0 ? (
-            <div 
-              className="text-center py-6 bg-muted rounded-lg"
+            <p
+              className="rounded-[14px] border-[1.5px] border-dashed border-border p-[18px] text-center text-xs text-muted-foreground"
               onClick={(e) => e.stopPropagation()}
             >
-              <GraduationCap className="size-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-xs text-muted-foreground">
-                No children linked yet
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 h-7 text-xs text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLinkOpen(parent);
-                }}
-              >
-                <Link2 className="size-3 mr-1" /> Link a Child
-              </Button>
-            </div>
+              No children linked yet
+            </p>
           ) : (
-            <div className="space-y-1.5">
-              {parent.children.map((child) => (
-                <div
-                  key={child.id}
-                  className="flex items-center justify-between bg-muted rounded-lg px-3 py-2 cursor-default"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-7 rounded-full bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                      {child.gender === "male" ? "👦" : "👧"}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-foreground truncate">
-                        {child.name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {child.className} • Roll {child.rollNumber}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-6 text-rose-600/80 hover:text-rose-900 hover:bg-rose-100/50 dark:text-rose-400/80 dark:hover:text-rose-200 dark:hover:bg-rose-950/40 shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUnlinkChild(parent.id, child.id);
-                    }}
-                    disabled={linking}
-                    title="Unlink"
-                  >
-                    <Unlink className="size-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+            parent.children.map((child) => (
+              <ChildRow
+                key={child.id}
+                child={child}
+                linking={linking}
+                onUnlink={() => onUnlinkChild(parent.id, child.id)}
+              />
+            ))
           )}
         </div>
       </CardContent>

@@ -40,7 +40,9 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          "bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-lg border px-2.5 py-1 text-xs font-medium shadow-md",
+          // Presence only unmounts on the exit animation's animationend, which never fires if
+          // the animation is interrupted or the tab is hidden, and closed bubbles pile up.
+          "bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:hidden z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-lg border px-2.5 py-1 text-xs font-medium shadow-md",
           className
         )}
         {...props}

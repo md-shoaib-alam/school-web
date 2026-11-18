@@ -17,8 +17,8 @@ export function AttendanceStats({
 }: AttendanceStatsProps) {
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
-      <Card className="rounded-xl shadow-xs border  bg-card">
-        <CardContent className="p-2.5 sm:p-4 flex items-center gap-2 sm:gap-3">
+      <Card className="rounded-xl shadow-xs border bg-card py-0 gap-0">
+        <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
           <div className="size-8 sm:size-10 rounded-lg sm:rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
             <Users className="size-4 sm:size-5 text-blue-500 dark:text-blue-400" />
           </div>
@@ -33,8 +33,8 @@ export function AttendanceStats({
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-xs border  bg-card">
-        <CardContent className="p-2.5 sm:p-4 flex items-center gap-2 sm:gap-3">
+      <Card className="rounded-xl shadow-xs border bg-card py-0 gap-0">
+        <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
           <div className="size-8 sm:size-10 rounded-lg sm:rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
             <UserCheck className="size-4 sm:size-5 text-emerald-500 dark:text-emerald-400" />
           </div>
@@ -49,8 +49,8 @@ export function AttendanceStats({
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-xs border  bg-card">
-        <CardContent className="p-2.5 sm:p-4 flex items-center gap-2 sm:gap-3">
+      <Card className="rounded-xl shadow-xs border bg-card py-0 gap-0">
+        <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
           <div className="size-8 sm:size-10 rounded-lg sm:rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center shrink-0">
             <UserX className="size-4 sm:size-5 text-red-500 dark:text-red-400" />
           </div>

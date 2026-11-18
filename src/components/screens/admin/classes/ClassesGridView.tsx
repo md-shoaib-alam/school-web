@@ -1,12 +1,24 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { UserCheck, Users, Pencil, Trash2 } from "lucide-react";
+import { Users, Pencil, Trash2 } from "lucide-react";
 import { LazyMotion, domMax, m, AnimatePresence } from "framer-motion";
 import type { ClassInfo } from "@/types";
+
+/** "Teacher 16" -> "T16", "Anita Rao" -> "AR", null -> "–" */
+function teacherInitials(name?: string | null) {
+  if (!name) return "–";
+  const num = name.match(/\d+/)?.[0];
+  if (num) return `T${num}`;
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 const premiumLayoutTransition = {
   type: "spring",
@@ -38,7 +50,7 @@ export function ClassesGridView({
   getProgressColor,
 }: ClassesGridViewProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-3.5 sm:gap-4">
       <LazyMotion features={domMax}>
         <AnimatePresence mode="popLayout">
           {classes.map((cls, index) => {
@@ -49,87 +61,79 @@ export function ClassesGridView({
                 key={cls.id}
                 id={`class-item-${cls.id}`}
                 layoutId={`class-${cls.id}`}
+                className="h-full"
                 initial={enter ? { y: 6 } : undefined}
                 animate={{ y: 0 }}
                 transition={enter ? { ...premiumLayoutTransition, delay: Math.min(index, 10) * 0.03 } : premiumLayoutTransition}
               >
-                <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative group overflow-hidden border-0 shadow-sm">
-                  <CardContent className="p-6">
-                    {/* Action buttons - top right */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1 transition-opacity">
-                      {canEdit && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
-                          onClick={() => onEdit(cls)}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                          onClick={() => onDelete(cls)}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      )}
+                <Card className="h-full rounded-[20px] border border-border bg-card shadow-sm py-0">
+                  <CardContent className="flex flex-col gap-3.5 p-4 sm:p-5">
+                    {/* Class name + section pill */}
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-base font-semibold tracking-[-0.01em] text-foreground">{cls.name}</h3>
+                      <span className="shrink-0 rounded-full border border-border bg-muted px-2.5 py-0.5 sm:px-3 sm:py-1 text-xs font-semibold text-muted-foreground">
+                        {cls.section.toLowerCase().startsWith("section") ? cls.section : `Section ${cls.section}`}
+                      </span>
                     </div>
 
-                    {/* Class name and grade badge */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {cls.name}
-                        </h3>
-                        <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">
-                          Section {cls.section}
-                        </Badge>
-                      </div>
+                    {/* Class teacher */}
+                    <div className="flex items-center gap-2.5 text-sm font-semibold text-foreground">
+                      <span className="flex size-8 sm:size-[34px] flex-none items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
+                        {teacherInitials(cls.classTeacher)}
+                      </span>
+                      <span className={`truncate ${cls.classTeacher ? "" : "font-medium text-muted-foreground"}`}>
+                        {cls.classTeacher || "Unassigned"}
+                      </span>
                     </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-1 gap-3 mb-6 mt-6">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <Users className="size-4 text-emerald-500" />
-                          <span className="text-muted-foreground font-medium text-xs">Students</span>
-                        </div>
-                        <span className="font-bold">{cls.studentCount}<span className="text-muted-foreground font-normal ml-0.5">/{cls.capacity}</span></span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <UserCheck className="size-4 text-blue-500" />
-                          <span className="text-muted-foreground font-medium text-xs">Teacher</span>
-                        </div>
-                        <span className="text-foreground font-semibold truncate max-w-[120px]">
-                          {cls.classTeacher || 'Unassigned'}
+                    {/* Occupancy */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                        <span>
+                          <b className="font-semibold text-foreground">{cls.studentCount}/{cls.capacity}</b> Students
                         </span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-tighter text-muted-foreground">
-                        <span>Capacity</span>
-                        <span className={percentage >= 90 ? "text-red-500" : "text-emerald-500"}>{percentage}% Full</span>
+                        <b className={`font-semibold ${percentage >= 90 ? "text-red-500" : "text-emerald-500"}`}>{percentage}%</b>
                       </div>
                       <Progress
                         value={percentage}
-                        className={`h-1.5 ${getProgressColor(percentage)}`}
+                        aria-label={`${cls.name} Section ${cls.section} occupancy`}
+                        className={`h-1.5 rounded-full bg-muted ${getProgressColor(percentage)}`}
                       />
                     </div>
 
-                    <Button 
-                      className="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white border-0 shadow-none transition-all duration-300 font-bold text-xs h-9"
-                      onClick={() => onViewStudents(cls)}
-                    >
-                      <Users className="size-3.5 mr-2" />
-                      View Students
-                    </Button>
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      <Button
+                        variant="outline"
+                        className="mr-1 h-9 flex-1 gap-1.5 whitespace-nowrap rounded-xl border-emerald-500/40 bg-emerald-500/[0.07] text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-500 shadow-none hover:bg-emerald-500/15 hover:text-emerald-700 dark:hover:text-emerald-400"
+                        onClick={() => onViewStudents(cls)}
+                      >
+                        <Users className="size-4" aria-hidden />
+                        View Students
+                      </Button>
+                      <div className="ml-auto flex items-center gap-1">
+                        {canEdit && (
+                          <button
+                            type="button"
+                            aria-label={`Edit ${cls.name} Section ${cls.section}`}
+                            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => onEdit(cls)}
+                          >
+                            <Pencil className="size-4" aria-hidden />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            type="button"
+                            aria-label={`Delete ${cls.name} Section ${cls.section}`}
+                            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-red-400"
+                            onClick={() => onDelete(cls)}
+                          >
+                            <Trash2 className="size-4" aria-hidden />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </m.div>

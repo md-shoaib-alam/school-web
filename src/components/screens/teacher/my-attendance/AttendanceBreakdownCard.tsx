@@ -31,12 +31,12 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
 
       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
         {/* Circular Radial Donut Ring */}
-        <div className="relative size-24 sm:size-28 shrink-0 flex items-center justify-center">
+        <div className="relative size-28 sm:size-32 shrink-0 flex items-center justify-center">
           <svg className="size-full -rotate-90" viewBox="0 0 36 36">
             {/* Background circle */}
             <path
-              className="text-muted-foreground"
-              strokeWidth="3.8"
+              className="text-muted/40 dark:text-muted/20"
+              strokeWidth="3.2"
               stroke="currentColor"
               fill="none"
               d={circlePath}
@@ -47,7 +47,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
                 className="text-emerald-500 transition-all duration-500"
                 strokeDasharray={`${presentPct}, 100`}
                 strokeDashoffset={presentOffset}
-                strokeWidth="3.8"
+                strokeWidth="3.2"
                 stroke="currentColor"
                 fill="none"
                 d={circlePath}
@@ -59,7 +59,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
                 className="text-rose-500 transition-all duration-500"
                 strokeDasharray={`${absentPct}, 100`}
                 strokeDashoffset={absentOffset}
-                strokeWidth="3.8"
+                strokeWidth="3.2"
                 stroke="currentColor"
                 fill="none"
                 d={circlePath}
@@ -71,7 +71,7 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
                 className="text-amber-500 transition-all duration-500"
                 strokeDasharray={`${leavePct}, 100`}
                 strokeDashoffset={leaveOffset}
-                strokeWidth="3.8"
+                strokeWidth="3.2"
                 stroke="currentColor"
                 fill="none"
                 d={circlePath}
@@ -83,18 +83,18 @@ export function AttendanceBreakdownCard({ metrics }: AttendanceBreakdownCardProp
                 className="text-purple-500 transition-all duration-500"
                 strokeDasharray={`${holidayPct}, 100`}
                 strokeDashoffset={holidayOffset}
-                strokeWidth="3.8"
+                strokeWidth="3.2"
                 stroke="currentColor"
                 fill="none"
                 d={circlePath}
               />
             )}
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-xl sm:text-2xl font-bold text-foreground">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-1">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-none">
               {metrics.recordedDays}
             </span>
-            <span className="text-xs font-medium text-muted-foreground mt-0.5">
+            <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground tracking-tight mt-1 whitespace-nowrap">
               Days Logged
             </span>
           </div>

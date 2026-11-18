@@ -18,33 +18,33 @@ export function AttendanceHeader({
   onOpenQR,
 }: AttendanceHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
       <div>
-        <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center justify-center md:justify-start gap-2">
           {activeTab === "teacher" ? (
-            <GraduationCap className="size-7 text-emerald-600" />
+            <GraduationCap className="size-6 sm:size-7 text-emerald-600" />
           ) : (
-            <Briefcase className="size-7 text-blue-600" />
+            <Briefcase className="size-6 sm:size-7 text-emerald-600" />
           )}
           {activeTab === "teacher"
             ? "Teacher Attendance"
             : "Staff Attendance"}
         </h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm hidden sm:block">
           {activeTab === "teacher"
             ? "Manage daily attendance logs for all teachers."
             : "Manage daily attendance logs for staff members."}
         </p>
       </div>
-      <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+      <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 w-full sm:w-auto">
         {onOpenQR && (
           <button
             type="button"
             onClick={onOpenQR}
-            className="rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/80 hover:bg-blue-100 text-blue-700 dark:text-blue-300 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-xs sm:text-sm font-semibold inline-flex items-center gap-2 px-3.5 h-10 shadow-2xs transition-all cursor-pointer active:scale-95"
+            className="w-full sm:w-auto rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-xs sm:text-sm font-semibold inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 h-10 shadow-2xs transition-all cursor-pointer active:scale-95"
           >
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Live QR Attendance</span>
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="truncate">Live QR Attendance</span>
           </button>
         )}
 
@@ -64,7 +64,7 @@ export function AttendanceHeader({
             return date > today;
           }}
           align="end"
-          className="rounded-xl dark:[color-scheme:dark] w-fit bg-card hover:bg-accent"
+          className="w-full sm:w-[165px] rounded-xl dark:[color-scheme:dark] bg-card hover:bg-accent"
         />
       </div>
     </div>

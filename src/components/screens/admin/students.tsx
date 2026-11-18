@@ -503,19 +503,32 @@ function AdminStudentsContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile Sticky Search Bar (Sticks to top header for entire page) */}
+      <div className="sticky -top-4 z-20 -mx-4 px-4 py-2.5 bg-background border-b border-border/40 sm:hidden">
+        <SearchInput
+          id="search_students_mobile"
+          value={search}
+          onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+          placeholder="Search by name..."
+          delay={400}
+          className="w-full"
+          inputClassName="h-9"
+        />
+      </div>
+
       {/* Header */}
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
           <SearchInput
-              id="search_students"
-              value={search}
-              onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
-              placeholder="Search by name..."
-              delay={400}
-              className="flex-1 max-w-sm"
-              inputClassName="h-9 sm:h-10"
-            />
+            id="search_students"
+            value={search}
+            onChange={(val) => dispatch({ type: 'SET_SEARCH', payload: val })}
+            placeholder="Search by name..."
+            delay={400}
+            className="hidden sm:block flex-1 max-w-sm"
+            inputClassName="h-9 sm:h-10"
+          />
           <ClassSelect
             value={classFilter}
             onValueChange={(v) => {
@@ -600,33 +613,34 @@ function AdminStudentsContent() {
           {loading ? (
             <StudentSkeleton />
           ) : (
-            <>
-              <StudentTable
-                students={students}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                onEdit={handleOpenEdit}
-                onDelete={handleDelete}
-                onView={handleOpenView}
-              />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={(p) => {
-                  dispatch({ type: 'SET_CURRENT_PAGE', payload: p });
-                  updateUrlParams(p, itemsPerPage, search, classFilter);
-                }}
-                onLimitChange={(limit) => {
-                  dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
-                  updateUrlParams(1, limit, search, classFilter);
-                }}
-              />
-            </>
+            <StudentTable
+              students={students}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+              onView={handleOpenView}
+            />
           )}
         </CardContent>
       </Card>
+
+      {!loading && totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(p) => {
+            dispatch({ type: 'SET_CURRENT_PAGE', payload: p });
+            updateUrlParams(p, itemsPerPage, search, classFilter);
+          }}
+          onLimitChange={(limit) => {
+            dispatch({ type: 'SET_ITEMS_PER_PAGE', payload: limit });
+            updateUrlParams(1, limit, search, classFilter);
+          }}
+        />
+      )}
 
       <StudentDialog
         open={dialogOpen}

@@ -13,7 +13,7 @@ import { AttendanceChart } from "./attendance/AttendanceChart";
 import { AttendanceCalendar } from "./attendance/AttendanceCalendar";
 import { TodayAttendanceCard } from "./attendance/TodayAttendanceCard";
 import { AttendanceSkeleton } from "./attendance/AttendanceSkeleton";
-import { AbsencePushPreviewModal } from "./attendance/AbsencePushPreviewModal";
+import { AbsencePushPreviewModal } from "@/temp/absence-push-preview-modal";
 import { ChildSelector } from "./ChildSelector";
 
 // Utils

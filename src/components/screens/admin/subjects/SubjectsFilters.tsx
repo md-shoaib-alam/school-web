@@ -27,7 +27,7 @@ export function SubjectsFilters({
       {/* Top filter row: search + class select */}
       <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between w-full">
         <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center flex-1">
-          <div className="relative flex-1 sm:max-w-sm">
+          <div className="hidden sm:block relative flex-1 sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search subjects…"

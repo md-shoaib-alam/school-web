@@ -9,6 +9,7 @@ import {
   clearVault,
   dashboardHref,
   getActiveAccount,
+  listAccounts,
   removeAccount,
   setActiveAccount,
   updateAccountTokens,
@@ -41,8 +42,8 @@ function getTenantId(): string | null {
   return localStorage.getItem('schoolsaas_tenant_id');
 }
 
-function buildHeaders(isFormData: boolean = false): Record<string, string> {
-  const token = getToken();
+function buildHeaders(isFormData: boolean = false, authToken?: string | null): Record<string, string> {
+  const token = authToken ?? getToken();
   const tenantId = getTenantId();
   const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -109,19 +110,33 @@ async function postRefresh(refreshToken: string): Promise<Response | null> {
 /**
  * A 409 means another request holds the rotation lock and will write the new pair locally.
  * Re-posting our own token would read as replay to the server and revoke that user's sessions,
- * so we wait for its result instead.
+ * so we wait for its result instead. With the vault we watch the OWNER's stored pair, never the
+ * globals: an account switch also rewrites the globals, and that is not a rotation of this session.
+ * ponytail: 10 s ceiling, matching markRefreshFailed's auto-reset; a lock holder that died
+ * mid-refresh costs the waiter ~10 s of polling before the transient retry fires.
  */
-async function adoptConcurrentRotation(previous: string): Promise<string | null> {
-  for (let waited = 0; waited < 2000; waited += 250) {
+export async function adoptConcurrentRotation(
+  ownerId: string | null,
+  previous: string,
+  maxWaitMs = 10_000
+): Promise<string | null> {
+  for (let waited = 0; waited < maxWaitMs; waited += 250) {
     await sleep(250);
-    const rotated = getRefreshToken();
-    if (rotated && rotated !== previous) return getToken();
+    if (!ownerId) {
+      const rotated = getRefreshToken();
+      if (rotated && rotated !== previous) return getToken();
+      continue;
+    }
+    const account = listAccounts().find((a) => a.user.id === ownerId);
+    if (!account) return null; // the owner was signed out mid-race; nothing to adopt
+    if (account.refreshToken && account.refreshToken !== previous) return account.token;
   }
   return null;
 }
 
-async function refreshAccessToken(): Promise<string> {
-  const refreshToken = getRefreshToken();
+async function refreshAccessToken(ownerId: string | null): Promise<string> {
+  const account = ownerId ? listAccounts().find((a) => a.user.id === ownerId) ?? null : null;
+  const refreshToken = account ? account.refreshToken : getRefreshToken();
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
@@ -133,19 +148,26 @@ async function refreshAccessToken(): Promise<string> {
   // token is bad — the same token works again once Redis answers.
   if (res.status === 503) throw transientError('Server is temporarily unavailable');
   if (res.status === 409) {
-    const token = await adoptConcurrentRotation(refreshToken);
+    const token = await adoptConcurrentRotation(ownerId, refreshToken);
     if (token) return token;
     throw transientError('Refresh already in progress');
   }
   if (!res.ok) throw new Error('Refresh failed');
 
   const data = await res.json();
-  persistRotation(data.token, data.refreshToken);
+  persistRotation(data.token, data.refreshToken, ownerId);
   return data.token;
 }
 
 /** The rotated pair belongs to one vault entry; the globals only mirror whoever is active. */
-export function persistRotation(token: string, refreshToken: string): void {
+export function persistRotation(token: string, refreshToken: string, ownerId: string | null = null): void {
+  if (ownerId) {
+    updateAccountTokens(ownerId, token, refreshToken);
+    if (getActiveAccount()?.user.id !== ownerId) return;
+  } else {
+    const active = getActiveAccount();
+    if (active) updateAccountTokens(active.user.id, token, refreshToken);
+  }
   setToken(token);
   setRefreshToken(refreshToken);
 
@@ -154,9 +176,6 @@ export function persistRotation(token: string, refreshToken: string): void {
     d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
     document.cookie = `school_token=${token};expires=${d.toUTCString()};path=/;SameSite=Lax`;
   }
-
-  const active = getActiveAccount();
-  if (active) updateAccountTokens(active.user.id, token, refreshToken);
 }
 
 let isForcingLogout = false;
@@ -207,9 +226,10 @@ export async function getValidTokenOrRefresh(): Promise<string> {
     });
   }
 
+  const ownerId = getActiveAccount()?.user.id ?? null;
   isRefreshing = true;
   try {
-    const newToken = await refreshAccessToken();
+    const newToken = await refreshAccessToken(ownerId);
     isRefreshing = false;
     refreshFailed = false;
     processQueue(null, newToken);
@@ -220,8 +240,12 @@ export async function getValidTokenOrRefresh(): Promise<string> {
     processQueue(err as Error);
     // A blip or a rate limit costs an account nothing; a rejected token drops just that one.
     if (!(err as RefreshError).transient) {
-      markRefreshFailed();
-      forceLogout();
+      // If the user already switched, the dead session is parked in its vault slot and
+      // surfaces when someone switches back — it must not log out the new active session.
+      if (!ownerId || getActiveAccount()?.user.id === ownerId) {
+        markRefreshFailed();
+        forceLogout();
+      }
     }
     throw err;
   }
@@ -240,7 +264,8 @@ async function request<T>(
   path: string,
   body?: unknown,
   options?: { params?: Record<string, any> },
-  attempt: number = 0
+  attempt: number = 0,
+  authToken?: string
 ): Promise<T> {
   let url = `${API_BASE}${path}`;
   if (options?.params) {
@@ -259,7 +284,7 @@ async function request<T>(
   const isFormData = body instanceof FormData;
   const res = await fetch(url, {
     method,
-    headers: buildHeaders(isFormData),
+    headers: buildHeaders(isFormData, authToken),
     body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
     keepalive: true,
   });
@@ -267,8 +292,8 @@ async function request<T>(
   // ── 401 → silent refresh + retry ──
   if (res.status === 401 && attempt < 2) {
     try {
-      await getValidTokenOrRefresh();
-      return request<T>(method, path, body, options, attempt + 1);
+      const refreshed = await getValidTokenOrRefresh();
+      return request<T>(method, path, body, options, attempt + 1, refreshed);
     } catch (err) {
       // A transient refresh failure (blip, 429, 503, lost lock race) leaves the
       // session alone on purpose. Labeling it "Session expired" would put a
@@ -405,14 +430,14 @@ export async function logoutWithElysia(): Promise<void> {
  * return the original 401 Response untouched, so callers that inspect
  * `res.status` keep working exactly as before.
  */
-export async function apiFetch(path: string, init?: RequestInit, attempt: number = 0): Promise<Response> {
+export async function apiFetch(path: string, init?: RequestInit, attempt: number = 0, authToken?: string): Promise<Response> {
   let cleanPath = path.startsWith('/api') ? path.slice(4) : path;
   if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
 
   const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
   const url = `${normalizedBase}${cleanPath}`;
 
-  const token = getToken();
+  const token = authToken ?? getToken();
   const tenantId = getTenantId();
   const headers: Record<string, string> = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -443,8 +468,8 @@ export async function apiFetch(path: string, init?: RequestInit, attempt: number
   // ── 401 → silent refresh + retry once ──
   if (res.status === 401 && attempt < 1 && getRefreshToken()) {
     try {
-      await getValidTokenOrRefresh();
-      return apiFetch(path, init, attempt + 1);
+      const refreshed = await getValidTokenOrRefresh();
+      return apiFetch(path, init, attempt + 1, refreshed);
     } catch {
       // A terminal failure has already been ended by forceLogout; a transient
       // one has not. Either way the caller keeps its 401 to read the status from.

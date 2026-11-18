@@ -19,6 +19,7 @@ import { MarksheetSettingsCard } from "./school-settings/marksheet-settings-card
 import { PrintSheetSettingsCard } from "./school-settings/print-sheet-settings-card";
 import { AdmitCardSettingsCard } from "./school-settings/admit-card-settings-card";
 import { ClassSettingsCard } from "./school-settings/class-settings-card";
+import { AttendanceSettingsCard } from "./school-settings/attendance-settings-card";
 
 export function AdminSchoolSettings() {
   const { currentTenantId } = useAppStore();
@@ -146,6 +147,8 @@ export function AdminSchoolSettings() {
           Configure school preferences and template defaults
         </p>
       </div>
+
+      <AttendanceSettingsCard key={currentTenantId} />
 
       {/* Working Days Card */}
       <WorkingDaysSettingsCard
